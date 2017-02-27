@@ -1,0 +1,25 @@
+{
+  "name": "Chrysalis",
+  "version": "0.0.0",
+  "description": "Kaleidoscope control center",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "install": "electron-rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:algernon/Chrysalis.git"
+  },
+  "keywords": [
+  ],
+  "author": "GitHub",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "electron": "^1.4.1",
+    "electron-rebuild": "^1.4.0"
+  },
+  "dependencies": {
+    "serialport": "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"
+  }
+}

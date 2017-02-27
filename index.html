@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Chrysalis</title>
+    <link rel="stylesheet" href="photon/css/photon.min.css">
+  </head>
+  <body>
+    <div class="window">
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane-mini sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">Pages</h5>
+              <span class="nav-group-item">
+                  <span class="icon icon-keyboard"></span>
+              </span>
+              <span class="nav-group-item">
+                  <span class="icon icon-publish"></span>
+              </span>
+              <span class="nav-group-item active">
+                  <span class="icon icon-code"></span>
+              </span>
+            </nav>
+          </div>
+
+          <div class="pane">
+              <div class="padded-more">
+                  <h1>Chrysalis console</h1>
+                  <form action="#" onSubmit="javascript:sendCommand()">
+                      <input type="text" id="command" />
+                      <input type="submit" id="commandSend" />
+                  </form>
+
+                  <hr>
+
+                  <div id="output">
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <footer class="toolbar toolbar-footer">
+          <div class="padded">
+              Some status message
+          </div>
+      </footer>
+
+    </div>
+
+  </body>
+
+  <script src="./renderer.js"></script>
+</html>
