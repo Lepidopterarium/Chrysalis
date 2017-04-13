@@ -1,13 +1,13 @@
-window.Focus = require("./lib/Focus/index")
+window.Chrysalis = require("./lib/Chrysalis/index")
 
-Focus.detect ()
+Chrysalis.device.detect ()
 
-Focus.once ("detected", (devices) => {
-    Focus.open (devices[0])
+Chrysalis.once ("device-detected", (devices) => {
+    Chrysalis.device.open (devices[0])
 })
 
-Focus.once ("ready", () => {
-    Focus.commands.version().then((version) => {
+Chrysalis.once ("device-ready", () => {
+    Chrysalis.commands.version().then((version) => {
         $("#device").html ("<pre>" + version.device.manufacturer + "/" + version.device.product + "</pre>")
     })
 })
