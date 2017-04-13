@@ -2,53 +2,65 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Chrysalis</title>
-    <link rel="stylesheet" href="photon/css/photon.min.css">
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <script>
+        window.$ = window.jQuery = require('jquery');
+    </script>
+    <script src="node_modules/tether/dist/js/tether.min.js"></script>
   </head>
   <body>
-    <div class="window">
-      <div class="window-content">
-        <div class="pane-group">
-          <div class="pane-mini sidebar">
-            <nav class="nav-group">
-              <h5 class="nav-group-title">Pages</h5>
-              <span class="nav-group-item">
-                  <span class="icon icon-keyboard"></span>
-              </span>
-              <span class="nav-group-item">
-                  <span class="icon icon-publish"></span>
-              </span>
-              <span class="nav-group-item active">
-                  <span class="icon icon-code"></span>
-              </span>
-            </nav>
-          </div>
 
-          <div class="pane">
-              <div class="padded-more">
-                  <h1>Chrysalis console</h1>
-                  <form action="#" onSubmit="javascript:sendCommand()">
-                      <input type="text" id="command" />
-                      <input type="submit" id="commandSend" />
-                  </form>
-
-                  <hr>
-
-                  <div id="output">
-                  </div>
+      <div class="container-fluid">
+          <div class="row justify-content-center">
+              <div class="col-2 text-center">
+                  <h1>Chrysalis</h1>
               </div>
           </div>
-        </div>
-      </div>
-      <footer class="toolbar toolbar-footer">
-          <div class="padded">
-              Some status message
+          <div class="row justify-content-center">
+              <div class="col-8 text-center">
+                  <span id="device"></span>
+              </div>
           </div>
-      </footer>
+          <div class="row">
+              <div class="col">
+                  <div class="card" style="width: 20rem;">
+                      <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+                      <div class="card-block">
+                          <h4 class="card-title">Layout</h4>
+                          <p class="card-text">Configure the key mapping on the device.</p>
+                          <a href="#" class="btn btn-primary">Configure</a>
+                      </div>
+                  </div>
+              </div>
 
-    </div>
+              <div class="col">
+                  <div class="card" style="width: 20rem;">
+                      <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+                      <div class="card-block">
+                          <h4 class="card-title">LEDs</h4>
+                          <p class="card-text">Configure the LED theme on the device.</p>
+                          <a href="#" class="btn btn-primary">Configure</a>
+                      </div>
+                  </div>
+              </div>
 
+              <div class="col">
+                  <div class="card" style="width: 20rem;">
+                      <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+                      <div class="card-block">
+                          <h4 class="card-title">Console</h4>
+                          <p class="card-text">A REPL for advanced users.</p>
+                          <a href="#" class="btn btn-primary">Launch</a>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+
+      <script src="./renderer.js"></script>
+      <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   </body>
-
-  <script src="./renderer.js"></script>
 </html>
