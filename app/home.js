@@ -1,4 +1,4 @@
-window.Chrysalis = require("./lib/Chrysalis/index")
+window.Chrysalis = require("../lib/Chrysalis/index")
 
 Chrysalis.device.detect ()
 
@@ -11,3 +11,4 @@ Chrysalis.once ("device-ready", () => {
         $("#device").html ("<pre>" + version.device.manufacturer + "/" + version.device.product + "</pre>")
     })
 })
+
