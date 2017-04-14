@@ -18,6 +18,6 @@ Chrysalis.once ("device-detected", (device) => {
 Chrysalis.once ("device-ready", () => {
     Chrysalis.commands.version().then((version) => {
         Chrysalis.hardware.load(version)
-        $("#device").html ("<img src='../lib/" + Chrysalis.device.meta.logo + "'>")
+        $("#device").html ("<a href='#' class='btn btn-outline-secondary'><img src='../lib/" + Chrysalis.device.meta.logo + "'></a>")
     })
 })
