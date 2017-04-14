@@ -17,6 +17,7 @@ Chrysalis.once ("device-detected", (device) => {
 
 Chrysalis.once ("device-ready", () => {
     Chrysalis.commands.version().then((version) => {
-        $("#device").html ("<pre>" + version.device.manufacturer + "/" + version.device.product + "</pre>")
+        Chrysalis.hardware.load(version)
+        $("#device").html ("<img src='../lib/" + Chrysalis.device.meta.logo + "'>")
     })
 })
