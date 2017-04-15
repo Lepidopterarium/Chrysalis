@@ -7,7 +7,7 @@ const url = require('url')
 
 let mainWindow
 
-function createWindow () {
+const createWindow = () => {
   mainWindow = new BrowserWindow({width: 1200, height: 600})
 
   mainWindow.loadURL(url.format({
@@ -18,18 +18,18 @@ function createWindow () {
 
   //mainWindow.webContents.openDevTools()
 
-  mainWindow.on('closed', function () {
+  mainWindow.on('closed', () => {
     mainWindow = null
   })
 }
 
 app.on('ready', createWindow)
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
   app.quit()
 })
 
-app.on('activate', function () {
+app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
