@@ -5,7 +5,7 @@ Chrysalis.hardware.loadAll ()
 Chrysalis.device.detect ()
 
 Chrysalis.on ("device-detected", (device) => {
-    var hw = Chrysalis.hardware.find (device)
+    let hw = Chrysalis.hardware.find (device)
     ReactDOM.render(
             <div className="col-sm-6">
               <div className="card">
@@ -25,7 +25,7 @@ Chrysalis.on ("device-detected", (device) => {
 })
 
 $(document).on ("click", ".chrysalis-device-select", (event) => {
-    var device = $(event.currentTarget).data('device')
+    let device = $(event.currentTarget).data('device')
     Chrysalis.device.open (device)
 })
 
