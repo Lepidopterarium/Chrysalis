@@ -9,16 +9,17 @@ Chrysalis.on ("device-detected", (device) => {
                          "<div class='card-block'>" +
                          "<div class='card-text'><img class='' src='../lib/" + hw.assets.logo + "' alt='...'></div>" +
                          "</div><div class='card-footer text-muted'>" +
-                         "<a href='#' class='btn btn-primary'>Select</a>" +
+                         "<button type='button' class='btn btn-primary chrysalis-device-select' data-device='" + hw.meta.id + "'>Select</button>" +
                          "</div></div></div>")
 })
 
+$(document).on ("click", ".chrysalis-device-select", (event) => {
+    console.log($(event.currentTarget).data('device'))
+    //Chrysalis.device.open ("/dev/ttyACM0")
+})
 
-/*
 Chrysalis.on ("device-ready", () => {
     Chrysalis.commands.version().then((version) => {
-        device = Chrysalis.hardware.select (version)
-        $("#device").append ("<a href='#' class='btn btn-outline-secondary'><img src='../lib/" + device.assets.logo + "'></a>")
+        console.log (version)
     })
 })
-*/
