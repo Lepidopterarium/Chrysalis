@@ -32,7 +32,7 @@
     "presets": ["es2015", "react"]
   },
   "scripts": {
-    "build": "babel src -d public",
+    "build": "babel src -d public && babel lib -d public/lib",
     "start": "electron .",
     "install": "electron-rebuild"
   }
