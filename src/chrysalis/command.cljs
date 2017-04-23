@@ -40,6 +40,10 @@
   (fn [command _]
     (keyword command)))
 
+(defmethod process* :default [_ result]
+  (fn [text]
+    (reset! result text)))
+
 (defmethod process* :version [_ result]
   (fn [text]
     (let [[version-and-device date] (.split text #" \| ")
