@@ -90,11 +90,13 @@
     [:div.col-sm-12
      [:form {:on-submit (fn [e]
                           (.preventDefault e)
-                          (send-command! (get-in @state [:repl :command])))}
+                          (send-command! (get-in @state [:repl :command]))
+                          (swap! state assoc-in [:repl :command] nil))}
       [:label {:style {:margin-right "1em"}} "❯"]
       [:input {:type :text
                :placeholder "Type command here"
                :style {:border 0}
+               :value (get-in @state [:repl :command])
                :on-change (fn [e]
                             (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
       ]
