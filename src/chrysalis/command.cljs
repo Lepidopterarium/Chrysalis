@@ -69,6 +69,14 @@
                           (map keyword)
                           vec)))))
 
+(defmethod process* :layer.getState [_ result]
+  (fn [text]
+    (reset! result
+            (->> (map (fn [state idx] [idx (= state "1")]) text (range))
+                 (filter second)
+                 (map first)
+                 vec))))
+
 (defmulti pre-process*
   (fn [command args]
     (keyword command)))
