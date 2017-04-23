@@ -1,3 +1,11 @@
-node_modules
-public/*.js
-public/lib/
+/node_modules
+/.nrepl-port
+/*-init.clj
+/.lein-repl-history
+/*.log
+/target/
+/resources/public/js/
+/resources/main.js
+
+*~
+.#*
