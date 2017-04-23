@@ -87,7 +87,7 @@
 (defn <repl> []
   [:div
    [:div.row
-    [:div.col-12
+    [:div.col-sm-12
      [:form {:on-submit (fn [e]
                           (.preventDefault e)
                           (send-command! (get-in @state [:repl :command])))}
