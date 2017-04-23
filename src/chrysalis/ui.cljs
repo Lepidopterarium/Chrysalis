@@ -25,4 +25,7 @@
     command))
 
 (defmethod display :default [_ req result]
-  [:pre (str "> " req "\n" (.stringify js/JSON (clj->js result) nil 2))])
+  [:div.row {:style {:margin-bottom "1em"}}
+   [:pre.col-sm-12
+    "❯ " [:b req] "\n"
+    (.stringify js/JSON (clj->js result) nil 2)]])

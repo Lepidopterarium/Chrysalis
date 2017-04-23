@@ -26,16 +26,16 @@
 (defmethod display :fingerpainter.palette [_ req result]
   (when result
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
-      [:div
-       [:pre
-            "> " req]
-       [:div.row
-        [:div.col-sm-12
-         (map (fn [[r g b]]
-                [:span.badge
-                 {:style {:background-color (str "rgb(" r "," g "," b ")")
-                          :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
-                          :display "inline-block"
-                          :margin-right "1em"}}
-                 (str "#" (toHex r) (toHex g) (toHex b))])
-              palette)]]])))
+      [:div.row {:style {:margin-bottom "1em"}}
+       [:pre.col-sm-12
+        "❯ " [:b req] "\n"
+
+        (map (fn [[r g b]]
+               [:span.badge
+                {:style {:background-color (str "rgb(" r "," g "," b ")")
+                         :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
+                         :display "inline-block"
+                         :margin-right "1em"}}
+                (str "#" (toHex r) (toHex g) (toHex b))])
+             palette)
+       ]])))
