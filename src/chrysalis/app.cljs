@@ -22,6 +22,8 @@
             [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
 
+            [chrysalis.command.LEDControl]
+
             [chrysalis.hardware.model01]
             [chrysalis.hardware.shortcut]))
 
