@@ -24,7 +24,7 @@
   (.substring s 0 (- (.-length s) 5)))
 
 (defn send* [device command callback]
-  (.write device (str (name command) "\n")
+  (.write device (str command "\n")
           (fn []
             (.drain device (fn []
                              (.setTimeout js/window (fn []
@@ -69,7 +69,19 @@
                           (map keyword)
                           vec)))))
 
+(defmulti pre-process*
+  (fn [command args]
+    (keyword command)))
+
+(defmethod pre-process* :default [_ args]
+  args)
+
 (defn run [device command & args]
   (let [result (atom nil)]
-    (send* device command (process* command result))
+    (if args
+      (send* device
+             (str (name command) " "
+                  (s/join " " (pre-process* command args)))
+             (process* :none result))
+      (send* device (name command) (process* command result)))
     result))
