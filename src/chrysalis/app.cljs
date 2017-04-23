@@ -21,6 +21,7 @@
 
             [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
+            [chrysalis.ui :as ui]
 
             [chrysalis.command.LEDControl]
 
@@ -29,7 +30,8 @@
 
 (enable-console-print!)
 
-(defonce state (atom {:devices []}))
+(defonce state (atom {:devices []
+                      :repl {}}))
 
 (defn device-open! [device]
   (when (:current-device @state)
@@ -37,7 +39,7 @@
   (hardware/open device))
 
 (defn device-detect! []
-  (reset! state (assoc @state :devices []))
+  (swap! state assoc :devices [])
   (let [in (hardware/detect (hardware/scan))]
     (go-loop []
       (when-let [device (<! in)]
@@ -45,6 +47,18 @@
                        (update-in state [:devices] conj device)) device)
         (recur))))
   nil)
+
+(defn send-command! [req]
+  (let [[command & args] (.split req #" +")
+        full-args (vec (cons (keyword command) (map (fn [arg]
+                                                      (if (= (first arg) ":")
+                                                        (.substring arg 1)
+                                                        arg))
+                                                    args)))
+        result (apply command/run (:current-device @state) full-args)]
+    (swap! state update-in [:repl :history] conj {:command (keyword command)
+                                                  :request req
+                                                  :result result})))
 
 (defn <device> [device]
   [:div.col-sm-6 {:key (:comName device)}
@@ -68,8 +82,27 @@
    [:div.row
     (map <device> (:devices @state))]])
 
+(defn <repl> []
+  [:div
+   [:div.row
+    [:div.col-12
+     [:form {:on-submit (fn [e]
+                          (.preventDefault e)
+                          (send-command! (get-in @state [:repl :command])))}
+      [:input {:type :text
+               :placeholder "Type command here"
+               :on-change (fn [e]
+                            (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
+      ]
+     (doall (map (fn [item]
+                   (print item)
+                   (ui/display (:command item) (:request item) @(:result item)))
+                 (get-in @state [:repl :history])))]]])
+
 (defn root-component []
-  [<available-devices>])
+  [:div
+   [<available-devices>]
+   [<repl>]])
 
 (defn init! []
   (device-detect!))
