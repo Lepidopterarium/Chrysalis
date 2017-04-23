@@ -23,6 +23,8 @@
             [chrysalis.command :as command]
             [chrysalis.ui :as ui]
 
+            [chrysalis.ui.FingerPainter]
+
             [chrysalis.command.LEDControl]
 
             [chrysalis.hardware.model01]
