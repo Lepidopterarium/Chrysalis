@@ -91,8 +91,10 @@
      [:form {:on-submit (fn [e]
                           (.preventDefault e)
                           (send-command! (get-in @state [:repl :command])))}
+      [:label {:style {:margin-right "1em"}} "❯"]
       [:input {:type :text
                :placeholder "Type command here"
+               :style {:border 0}
                :on-change (fn [e]
                             (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
       ]
