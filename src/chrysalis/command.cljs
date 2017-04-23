@@ -62,6 +62,13 @@
                       :timestamp date}))
     result))
 
+(defmethod process* :help [_ result]
+  (fn [text]
+    (let [lines (.split text #"\r?\n")]
+      (reset! result (->> lines
+                          (map keyword)
+                          vec)))))
+
 (defn run [device command & args]
   (let [result (atom nil)]
     (send* device command (process* command result))
