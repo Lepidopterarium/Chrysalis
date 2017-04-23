@@ -31,6 +31,21 @@
 
 (defonce state (atom {:devices []}))
 
+(defn device-open! [device]
+  (when (:current-device @state)
+    (hardware/close (:current-device @state)))
+  (hardware/open device))
+
+(defn device-detect! []
+  (reset! state (assoc @state :devices []))
+  (let [in (hardware/detect (hardware/scan))]
+    (go-loop []
+      (when-let [device (<! in)]
+        (swap! state (fn [state device]
+                       (update-in state [:devices] conj device)) device)
+        (recur))))
+  nil)
+
 (defn <device> [device]
   [:div.col-sm-6 {:key (:comName device)}
    [:div.card
@@ -41,7 +56,9 @@
       [:p
        (get-in device [:meta :name])]]]
     [:div.card-footer.text-muted
-     [:button.btn.btn-primary {:type "button" :data-device (:comName device)} "Select"]]]])
+     [:button.btn.btn-primary {:type "button"
+                               :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
+      "Select"]]]])
 
 (defn <available-devices> []
   [:div
@@ -54,18 +71,11 @@
 (defn root-component []
   [<available-devices>])
 
-(defn detect-devices []
-  (reset! state (assoc @state :devices []))
-  (let [in (hardware/detect (hardware/scan))]
-    (go-loop []
-     (when-let [device (<! in)]
-       (swap! state (fn [state device]
-                      (update-in state [:devices] conj device)) device)
-       (recur))))
-  nil)
+(defn init! []
+  (device-detect!))
 
 (reagent/render
  [root-component]
   (js/document.getElementById "application"))
 
-(detect-devices)
+(init!)

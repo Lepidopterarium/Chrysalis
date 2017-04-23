@@ -59,3 +59,6 @@
                          (.drain port)
                          (.read port)))
     port))
+
+(defn close [device]
+  (.close device))
