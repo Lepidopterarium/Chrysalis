@@ -98,8 +98,7 @@
                :style {:border 0}
                :value (get-in @state [:repl :command])
                :on-change (fn [e]
-                            (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
-      ]
+                            (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]
      (doall (map (fn [item]
                    (print item)
                    (ui/display (:command item) (:request item) @(:result item)))
