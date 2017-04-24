@@ -15,16 +15,16 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.app
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [reagent.core :as reagent :refer [atom]]
-            [cljs.core.async :refer [<!]]
+  (:require [reagent.core :as reagent]
             [clojure.string :as s]
 
-            [chrysalis.hardware :as hardware]
-            [chrysalis.command :as command]
-            [chrysalis.ui :as ui]
+            [chrysalis.utils :refer [state]]
+            [chrysalis.ui.page :refer [pages page]]
 
             ;; Hook-only libraries
+
+            [chrysalis.ui.page.selector :as selector]
+            [chrysalis.ui.page.repl]
 
             [chrysalis.ui.FingerPainter]
 
@@ -35,94 +35,6 @@
             [chrysalis.hardware.shortcut]))
 
 (enable-console-print!)
-
-(defonce state (atom {:devices []
-                      :current-device (hardware/open "<fake>")
-                      :page :selector
-                      :repl {}}))
-
-(defonce pages (atom {:selector {:name "Home"}
-                      :repl {:name "REPL"}}))
-
-(defn device-open! [device]
-  (when (:current-device @state)
-    (hardware/close (:current-device @state)))
-  (hardware/open device))
-
-(defn device-detect! []
-  (swap! state assoc :devices [])
-  (let [in (hardware/detect (hardware/scan))]
-    (go-loop []
-      (when-let [device (<! in)]
-        (swap! state (fn [state device]
-                       (update-in state [:devices] conj device)) device)
-        (recur))))
-  nil)
-
-(defn send-command! [req]
-  (let [[command & args] (.split req #" +")
-        full-args (vec (cons (keyword command) (map (fn [arg]
-                                                      (if (= (first arg) ":")
-                                                        (.substring arg 1)
-                                                        arg))
-                                                    args)))
-        result (apply command/run (:current-device @state) full-args)]
-    (swap! state update-in [:repl :history] conj {:command (keyword command)
-                                                  :request req
-                                                  :result result})))
-
-(defmulti page
-  (fn [p]
-    p))
-
-(defmethod page :default [_])
-
-(defn <device> [device]
-  [:div.card {:key (:comName device)
-              :style {:margin "0.5em"}}
-   [:div.card-block
-    [:div.card-text
-     [:p
-      "[Image comes here]"]
-     [:p
-      (get-in device [:meta :name])]]]
-   [:div.card-footer.text-muted
-    [:button.btn.btn-primary {:type "button"
-                              :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
-     "Select"]]])
-
-(defmethod page :selector [_]
-  [:div.container-fluid
-   [:div.row.justify-content-center
-    [:div.col-12.text-center
-     [:h2 "Available devices"]]]
-   [:div.row
-    (map <device> (:devices @state))]])
-
-(defmethod page :repl [_]
-  [:div.container-fluid
-   [:div.row.justify-content-center
-    [:div.col-12.text-center
-     [:h2 "REPL"]]]
-   [:div.row.justify-content-left
-    [:form.col-sm-12 {:on-submit (fn [e]
-                                   (.preventDefault e)
-                                   (send-command! (get-in @state [:repl :command]))
-                                   (swap! state assoc-in [:repl :command] nil))}
-     [:label {:style {:margin-right "1em"}} "❯"]
-     [:input {:type :text
-              :placeholder "Type command here"
-              :style {:border 0
-                      :width "75%"}
-              :value (get-in @state [:repl :command])
-              :on-change (fn [e]
-                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]
-   [:div.row
-    [:div.col-sm-12
-     (doall (map (fn [item index]
-                   (ui/display (:command item) (:request item) @(:result item)
-                               (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
-                 (get-in @state [:repl :history]) (range)))]]])
 
 (defn <menu-item> [[key meta]]
   [:li {:key (str "main-menu-" (name key))
@@ -155,7 +67,7 @@
    (page (:page @state))])
 
 (defn init! []
-  (device-detect!))
+  (selector/device-detect!))
 
 (reagent/render
  [root-component]
