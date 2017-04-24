@@ -34,6 +34,7 @@
 (enable-console-print!)
 
 (defonce state (atom {:devices []
+                      :current-device (hardware/open "<fake>")
                       :repl {}}))
 
 (defn device-open! [device]
