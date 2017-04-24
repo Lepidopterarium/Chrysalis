@@ -17,7 +17,8 @@
 (ns chrysalis.hardware.fake
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
-            [chrysalis.hardware :refer [scan* open known?]]))
+            [chrysalis.hardware :refer [scan* open known?]]
+            [clojure.string :as str]))
 
 (defmethod known? [0xdead 0xbeef] [device]
   (assoc device :meta {:name "An example fake device"}))
@@ -31,15 +32,35 @@
                       :productId "0xbeef"
                       :serialNumber "0xffff"}))))
 
+(defmulti command
+  (fn [command req]
+    (keyword command)))
+
+(defmethod command :default [_ _])
+
+(defmethod command :version [_ _]
+  "Kaleidoscope/<fake> Fake/Example | Apr 24 2017 15:25:00")
+
+(defmethod command :help [_ _]
+  (str/join "\n"
+            ["help"
+             "version"]))
+
+(defn- format-result [text]
+  (str text "\r\n.\r\n"))
+
 (defmethod open "<fake>" [_]
   (js-obj
-   "command" ""
+   "req" ""
    "close" (fn [])
    "write" (fn [text callback]
              (this-as self
-               (aset self "command" text))
+               (aset self "req" (.substring text 0 (dec (.-length text)))))
              (callback))
    "drain" (fn [callback]
              (callback))
    "read" (fn []
-            "Kaleidoscope/<fake> Fake/Example | Apr 24 2017 15:25:00\r\n.\r\n")))
+            (this-as self
+              (let [req (aget self "req")
+                    cmd (-> req (.split #" ") first)]
+                (format-result (command cmd req)))))))
