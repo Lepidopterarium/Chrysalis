@@ -97,6 +97,9 @@
 
 (defmethod page :repl [_]
   [:div.container-fluid
+   [:div.row.justify-content-center
+    [:div.col-12.text-center
+     [:h2 "REPL"]]]
    [:div.row.justify-content-left
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
