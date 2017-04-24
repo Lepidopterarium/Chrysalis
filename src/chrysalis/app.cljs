@@ -104,8 +104,34 @@
                    (ui/display (:command item) (:request item) @(:result item)))
                  (get-in @state [:repl :history])))]]])
 
+(defn <main-menu> []
+  [:nav.navbar.navbar-toggleable-md.navbar-light.bg-faded
+   [:button.navbar-toggler.navbar-toggler-right {:type :button
+                                                 :data-toggle :collapse
+                                                 :data-target "#navbarSupportedContent"
+                                                 :aria-controls "navbarSupportedContent"
+                                                 :aria-expanded false
+                                                 :aria-label "Toggle navigation"}
+    [:span.navbar-toggler-icon]]
+   [:a.navbar-brand {:href "#"} "Chrysalis"]
+   [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
+    [:ul.navbar-nav.mr-auto
+     [:li.nav-item.active
+      [:a.nav-link {:href "#"}
+       "Home" [:span.sr-only "(current)"]]]
+     [:li.nav-item
+      [:a.nav-link {:href "#"}
+       "REPL"]]
+     [:li.nav-item
+      [:a.nav-link.disabled {:href "#"}
+       "Layout"]]
+     [:li.nav-item
+      [:a.nav-link.disabled {:href "#"}
+       "LED theme"]]]]])
+
 (defn root-component []
   [:div
+   [<main-menu>]
    [<available-devices>]
    [<repl>]])
 
