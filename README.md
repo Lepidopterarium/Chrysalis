@@ -6,10 +6,18 @@
 
 ## Quick start
 
+First of all, install [Leiningen](https://leiningen.org/)
+and [Node](https://nodejs.org/en/), the follow these steps:
+
 ```bash
-npm install
-npm run build
-npm run start
+## Dependencies
+lein deps
+npm install -g electron
+gem install foreman
+
+## Running
+foreman start
+electron resources
 ```
 
 ## License
