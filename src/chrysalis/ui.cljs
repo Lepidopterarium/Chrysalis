@@ -32,5 +32,6 @@
     command))
 
 (defmethod display :default [_ req result key]
-  (repl-wrap req key
-             (.stringify js/JSON (clj->js result) nil 2)))
+  (when result
+    (repl-wrap req key
+               (.stringify js/JSON (clj->js result) nil 2))))
