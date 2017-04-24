@@ -27,6 +27,7 @@
 
             [chrysalis.command.LEDControl]
 
+            [chrysalis.hardware.fake]
             [chrysalis.hardware.model01]
             [chrysalis.hardware.shortcut]))
 

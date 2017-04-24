@@ -31,15 +31,26 @@
   [x]
   (into {} (for [k (.keys js/Object x)] [(keyword k) (aget x k)])))
 
+(defmulti scan*
+  (fn [scanner-type out]
+    scanner-type))
+
+(defmethod scan* :serial [_ out]
+  (.list SerialPort (fn [err ports]
+                      (go
+                        (loop [devices ports]
+                          (when-let [device (first devices)]
+                            (>! out device)
+                            (recur (rest devices)))))))
+  out)
+
+(defmethod scan* :default [_ out]
+  out)
+
 (defn scan []
   (let [out (chan)]
-    (.list SerialPort (fn [err ports]
-                        (go
-                          (loop [devices ports]
-                            (when-let [device (first devices)]
-                              (>! out device)
-                              (recur (rest devices))))
-                          (close! out))))
+    (scan* :serial out)
+    (scan* :fake out)
     out))
 
 (defn detect [list]
@@ -52,7 +63,11 @@
       (close! out))
     out))
 
-(defn open [device-path]
+(defmulti open
+  (fn [device-path]
+    device-path))
+
+(defmethod open :default [device-path]
   (let [port (SerialPort. device-path)]
     (.once port "open" (fn []
                          (.flush port)
