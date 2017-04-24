@@ -18,6 +18,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs.core.async :refer [<!]]
+            [clojure.string :as s]
 
             [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
@@ -39,6 +40,9 @@
                       :current-device (hardware/open "<fake>")
                       :page :selector
                       :repl {}}))
+
+(defonce pages (atom {:selector {:name "Home"}
+                      :repl {:name "REPL"}}))
 
 (defn device-open! [device]
   (when (:current-device @state)
@@ -119,6 +123,17 @@
                                (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
                  (get-in @state [:repl :history]) (range)))]]])
 
+(defn <menu-item> [[key meta]]
+  [:li {:key (str "main-menu-" (name key))
+        :class (s/join " " ["nav-item"
+                            (when (= key (:page @state))
+                              "active")])}
+   [:a.nav-link {:href "#"
+                 :on-click (fn [e]
+                             (.preventDefault e)
+                             (swap! state assoc :page key))}
+    (:name meta)]])
+
 (defn <main-menu> []
   [:nav.navbar.navbar-toggleable-md.navbar-light.bg-faded
    [:button.navbar-toggler.navbar-toggler-right {:type :button
@@ -131,24 +146,7 @@
    [:a.navbar-brand {:href "#"} "Chrysalis"]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
-     [:li.nav-item.active
-      [:a.nav-link {:href "#"
-                    :on-click (fn [e]
-                                (.preventDefault e)
-                                (swap! state assoc :page :selector))}
-       "Home" [:span.sr-only "(current)"]]]
-     [:li.nav-item
-      [:a.nav-link {:href "#"
-                    :on-click (fn [e]
-                                (.preventDefault e)
-                                (swap! state assoc :page :repl))}
-       "REPL"]]
-     [:li.nav-item
-      [:a.nav-link.disabled {:href "#"}
-       "Layout"]]
-     [:li.nav-item
-      [:a.nav-link.disabled {:href "#"}
-       "LED theme"]]]]])
+     (doall (map <menu-item> @pages))]]])
 
 (defn root-component []
   [:div
