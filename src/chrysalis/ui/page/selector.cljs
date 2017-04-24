@@ -41,18 +41,25 @@
   nil)
 
 (defn <device> [device]
-  [:div.card {:key (:comName device)
-              :style {:margin "0.5em"}}
-   [:div.card-block
-    [:div.card-text
-     [:p
-      "[Image comes here]"]
-     [:p
-      (get-in device [:meta :name])]]]
-   [:div.card-footer.text-muted
-    [:button.btn.btn-primary {:type "button"
-                              :on-click #(swap! state assoc :current-device (device-open! device))}
-     "Select"]]])
+  (let [current? (and (:current-device @state)
+                      (= (:comName device) (get-in @state [:current-device :device :comName])))]
+    [:div.card {:key (:comName device)
+                :style {:margin "0.5em"}}
+     [:div.card-block
+      [:div.card-text
+       [:p
+        "[Image comes here]"]
+       [:p
+        (get-in device [:meta :name])]]]
+     [:div.card-footer.text-muted
+      [:button {:type "button"
+                :disabled current?
+                :class (s/join " " ["btn"
+                                    (if current?
+                                      "btn-outline-secondary"
+                                      "btn-primary")])
+                :on-click #(swap! state assoc :current-device (device-open! device))}
+       "Select"]]]))
 
 (defmethod page :selector [_]
   [:div.container-fluid
