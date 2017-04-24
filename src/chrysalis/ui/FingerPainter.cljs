@@ -15,7 +15,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui.FingerPainter
-  (:require [chrysalis.ui :refer [display]]))
+  (:require [chrysalis.ui :refer [display repl-wrap]]))
 
 (defn- toHex [i]
   (let [hex (.toString i 16)]
@@ -26,16 +26,12 @@
 (defmethod display :fingerpainter.palette [_ req result key]
   (when result
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
-      [:div.row {:style {:margin-bottom "1em"}
-                 :key key}
-       [:pre.col-sm-12
-        "❯ " [:b req] "\n"
-
-        (map (fn [[r g b]]
-               [:span.badge
-                {:style {:background-color (str "rgb(" r "," g "," b ")")
-                         :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
-                         :display "inline-block"
-                         :margin-right "1em"}}
-                (str "#" (toHex r) (toHex g) (toHex b))])
-             palette)]])))
+      (repl-wrap req key
+                 (map (fn [[r g b]]
+                        [:span.badge
+                         {:style {:background-color (str "rgb(" r "," g "," b ")")
+                                  :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
+                                  :display "inline-block"
+                                  :margin-right "1em"}}
+                         (str "#" (toHex r) (toHex g) (toHex b))])
+                      palette)))))
