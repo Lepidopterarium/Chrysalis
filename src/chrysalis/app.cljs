@@ -23,6 +23,8 @@
             [chrysalis.command :as command]
             [chrysalis.ui :as ui]
 
+            ;; Hook-only libraries
+
             [chrysalis.ui.FingerPainter]
 
             [chrysalis.command.LEDControl]
@@ -35,6 +37,7 @@
 
 (defonce state (atom {:devices []
                       :current-device (hardware/open "<fake>")
+                      :page :selector
                       :repl {}}))
 
 (defn device-open! [device]
@@ -64,6 +67,12 @@
                                                   :request req
                                                   :result result})))
 
+(defmulti page
+  (fn [p]
+    p))
+
+(defmethod page :default [_])
+
 (defn <device> [device]
   [:div.card {:key (:comName device)
               :style {:margin "0.5em"}}
@@ -78,7 +87,7 @@
                               :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
      "Select"]]])
 
-(defn <available-devices> []
+(defmethod page :selector [_]
   [:div.container-fluid
    [:div.row.justify-content-center
     [:div.col-12.text-center
@@ -86,7 +95,7 @@
    [:div.row
     (map <device> (:devices @state))]])
 
-(defn <repl> []
+(defmethod page :repl [_]
   [:div.container-fluid
    [:div.row.justify-content-left
     [:form.col-sm-12 {:on-submit (fn [e]
@@ -120,10 +129,16 @@
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
      [:li.nav-item.active
-      [:a.nav-link {:href "#"}
+      [:a.nav-link {:href "#"
+                    :on-click (fn [e]
+                                (.preventDefault e)
+                                (swap! state assoc :page :selector))}
        "Home" [:span.sr-only "(current)"]]]
      [:li.nav-item
-      [:a.nav-link {:href "#"}
+      [:a.nav-link {:href "#"
+                    :on-click (fn [e]
+                                (.preventDefault e)
+                                (swap! state assoc :page :repl))}
        "REPL"]]
      [:li.nav-item
       [:a.nav-link.disabled {:href "#"}
@@ -135,9 +150,7 @@
 (defn root-component []
   [:div
    [<main-menu>]
-   [:div.container-fluid
-    [<available-devices>]
-    [<repl>]]])
+   (page (:page @state))])
 
 (defn init! []
   (device-detect!))
