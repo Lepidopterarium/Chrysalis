@@ -23,10 +23,11 @@
       (str "0" hex)
       hex)))
 
-(defmethod display :fingerpainter.palette [_ req result]
+(defmethod display :fingerpainter.palette [_ req result key]
   (when result
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
-      [:div.row {:style {:margin-bottom "1em"}}
+      [:div.row {:style {:margin-bottom "1em"}
+                 :key key}
        [:pre.col-sm-12
         "❯ " [:b req] "\n"
 
@@ -37,5 +38,4 @@
                          :display "inline-block"
                          :margin-right "1em"}}
                 (str "#" (toHex r) (toHex g) (toHex b))])
-             palette)
-       ]])))
+             palette)]])))

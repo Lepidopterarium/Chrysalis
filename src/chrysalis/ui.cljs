@@ -21,11 +21,12 @@
             [reagent.core :refer [atom]]))
 
 (defmulti display
-  (fn [command _ _]
+  (fn [command _ _ _]
     command))
 
-(defmethod display :default [_ req result]
-  [:div.row {:style {:margin-bottom "1em"}}
+(defmethod display :default [_ req result key]
+  [:div.row {:style {:margin-bottom "1em"}
+             :key key}
    [:pre.col-sm-12 {:style {:white-space :pre-wrap}}
     "❯ " [:b req] "\n"
     (.stringify js/JSON (clj->js result) nil 2)]])

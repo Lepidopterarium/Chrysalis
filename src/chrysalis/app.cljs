@@ -100,10 +100,10 @@
                :value (get-in @state [:repl :command])
                :on-change (fn [e]
                             (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]
-     (doall (map (fn [item]
-                   (print item)
-                   (ui/display (:command item) (:request item) @(:result item)))
-                 (get-in @state [:repl :history])))]]])
+     (doall (map (fn [item index]
+                   (ui/display (:command item) (:request item) @(:result item)
+                               (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
+                 (get-in @state [:repl :history]) (range)))]]])
 
 (defn <main-menu> []
   [:nav.navbar.navbar-toggleable-md.navbar-light.bg-faded
