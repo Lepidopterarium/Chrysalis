@@ -64,21 +64,21 @@
                                                   :result result})))
 
 (defn <device> [device]
-  [:div.col-sm-6 {:key (:comName device)}
-   [:div.card
-    [:div.card-block
-     [:div.card-text
-      [:p
-       "[Image comes here]"]
-      [:p
-       (get-in device [:meta :name])]]]
-    [:div.card-footer.text-muted
-     [:button.btn.btn-primary {:type "button"
-                               :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
-      "Select"]]]])
+  [:div.card {:key (:comName device)
+              :style {:margin "0.5em"}}
+   [:div.card-block
+    [:div.card-text
+     [:p
+      "[Image comes here]"]
+     [:p
+      (get-in device [:meta :name])]]]
+   [:div.card-footer.text-muted
+    [:button.btn.btn-primary {:type "button"
+                              :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
+     "Select"]]])
 
 (defn <available-devices> []
-  [:div
+  [:div.container-fluid
    [:div.row.justify-content-center
     [:div.col-12.text-center
      [:h2 "Available devices"]]]
@@ -86,20 +86,21 @@
     (map <device> (:devices @state))]])
 
 (defn <repl> []
-  [:div
+  [:div.container-fluid
+   [:div.row.justify-content-left
+    [:form.col-sm-12 {:on-submit (fn [e]
+                                   (.preventDefault e)
+                                   (send-command! (get-in @state [:repl :command]))
+                                   (swap! state assoc-in [:repl :command] nil))}
+     [:label {:style {:margin-right "1em"}} "❯"]
+     [:input {:type :text
+              :placeholder "Type command here"
+              :style {:border 0}
+              :value (get-in @state [:repl :command])
+              :on-change (fn [e]
+                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]
    [:div.row
     [:div.col-sm-12
-     [:form {:on-submit (fn [e]
-                          (.preventDefault e)
-                          (send-command! (get-in @state [:repl :command]))
-                          (swap! state assoc-in [:repl :command] nil))}
-      [:label {:style {:margin-right "1em"}} "❯"]
-      [:input {:type :text
-               :placeholder "Type command here"
-               :style {:border 0}
-               :value (get-in @state [:repl :command])
-               :on-change (fn [e]
-                            (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]
      (doall (map (fn [item index]
                    (ui/display (:command item) (:request item) @(:result item)
                                (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
@@ -133,8 +134,9 @@
 (defn root-component []
   [:div
    [<main-menu>]
-   [<available-devices>]
-   [<repl>]])
+   [:div.container-fluid
+    [<available-devices>]
+    [<repl>]]])
 
 (defn init! []
   (device-detect!))
