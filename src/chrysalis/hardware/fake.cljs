@@ -41,5 +41,5 @@
              (callback))
    "drain" (fn [callback]
              (callback))
-   "read" (fn [callback]
+   "read" (fn []
             "Kaleidoscope/<fake> Fake/Example | Apr 24 2017 15:25:00")))
