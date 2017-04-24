@@ -26,8 +26,9 @@
 
 (defn device-open! [device]
   (when (:current-device @state)
-    (hardware/close (:current-device @state)))
-  (hardware/open device))
+    (hardware/close (get-in @state [:current-device :port])))
+  {:port (hardware/open (:comName device))
+   :device device})
 
 (defn device-detect! []
   (swap! state assoc :devices [])
@@ -50,7 +51,7 @@
       (get-in device [:meta :name])]]]
    [:div.card-footer.text-muted
     [:button.btn.btn-primary {:type "button"
-                              :on-click #(swap! state assoc :current-device (device-open! (:comName device)))}
+                              :on-click #(swap! state assoc :current-device (device-open! device))}
      "Select"]]])
 
 (defmethod page :selector [_]

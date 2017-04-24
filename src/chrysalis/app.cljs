@@ -59,7 +59,10 @@
    [:a.navbar-brand {:href "#"} "Chrysalis"]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
-     (doall (map <menu-item> @pages))]]])
+     (doall (map <menu-item> @pages))]]
+   [:span.navbar-text {:style {:white-space :pre}}
+    (when (:current-device @state)
+      (get-in @state [:current-device :device :meta :name]))]])
 
 (defn root-component []
   [:div

@@ -30,7 +30,7 @@
                                                         (.substring arg 1)
                                                         arg))
                                                     args)))
-        result (apply command/run (:current-device @state) full-args)]
+        result (apply command/run (get-in @state [:current-device :port]) full-args)]
     (swap! state update-in [:repl :history] conj {:command (keyword command)
                                                   :request req
                                                   :result result})))
