@@ -56,7 +56,7 @@
                                                  :aria-expanded false
                                                  :aria-label "Toggle navigation"}
     [:span.navbar-toggler-icon]]
-   [:a.navbar-brand {:href "#"} "Chrysalis"]
+   [:span.navbar-brand "Chrysalis"]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
      (doall (map <menu-item> @pages))]]
