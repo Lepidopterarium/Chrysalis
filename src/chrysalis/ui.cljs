@@ -25,7 +25,9 @@
              :key key}
    [:pre.col-sm-12 {:style {:white-space :pre-wrap}}
     "❯ " [:b req] "\n"
-    result]])
+    (if-not (= result "\"\"")
+      result
+      [:i "<no output>"])]])
 
 (defmulti display
   (fn [command _ _ _]
