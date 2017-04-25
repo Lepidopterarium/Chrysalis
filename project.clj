@@ -11,6 +11,7 @@
                  [com.cemerick/piggieback "0.2.1"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.0.0"]
+                       [electron "^1.6.6"]
                        [bootstrap "^4.0.0-alpha.4"]
                        [jquery "^3.1.0"]
                        [font-awesome "^4.7.0"]
@@ -29,7 +30,7 @@
   {:builds
    [{:source-paths ["src/electron"]
      :id "electron-dev"
-     :compiler {:output-to "resources/main.js"
+     :compiler {:output-to "resources/public/main.js"
                 :output-dir "resources/public/js/electron-dev"
                 :optimizations :simple
                 :pretty-print true
@@ -45,7 +46,7 @@
                 :main "dev.core"}}
     {:source-paths ["src/electron"]
      :id "electron-release"
-     :compiler {:output-to "resources/main.js"
+     :compiler {:output-to "resources/public/main.js"
                 :output-dir "resources/public/js/electron-release"
                 :optimizations :simple
                 :pretty-print true

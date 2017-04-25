@@ -12,12 +12,11 @@ and [Node](https://nodejs.org/en/), the follow these steps:
 ```bash
 ## Dependencies
 lein deps
-npm install -g electron
 gem install foreman
 
 ## Running
 foreman start
-electron resources
+./resources/public/node_modules/.bin/electron resources/public
 ```
 
 ## License

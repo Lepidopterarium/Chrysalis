@@ -12,7 +12,7 @@
                         (clj->js {:width 1200
                                   :height 600
                                   :autoHideMenuBar true})))
-  (.loadURL @main-window (str "file://" js/__dirname "/public/index.html"))
+  (.loadURL @main-window (str "file://" js/__dirname "/index.html"))
   (.on @main-window "closed" #(reset! main-window nil)))
 
 
