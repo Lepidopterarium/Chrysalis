@@ -28,18 +28,22 @@
      [:div.card-block
       [:div.card-title.row {:style {:margin-bottom "0px"}}
        [:div.col-sm-6.text-left
-        [:i.fa.fa-angle-down]
+        [:a {:href (str "#repl-history-collapse-" index)
+             :data-toggle :collapse
+             :style {:color "#292b2c"}}
+         [:i.fa.fa-angle-down]]
         " " [:code req]]
        [:div.col-sm-6.text-right
         [:a {:style {:color "#292b2c"}
-             :href "#"
              :on-click (fn [e]
                          (.preventDefault e)
                          (swap! state assoc-in [:repl :command] req))}
          [:i.fa.fa-repeat]]]]
-      (if-not (= result [:pre "\"\""])
-        result
-        [:pre [:i "<no output>"]])]]]])
+      [:div {:id (str "repl-history-collapse-" index)
+             :class "collapse show"}
+       (if-not (= result [:pre "\"\""])
+         result
+         [:pre [:i "<no output>"]])]]]]])
 
 (defn- <command> [cmd]
   [:button.btn.btn-outline-primary
