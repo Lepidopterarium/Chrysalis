@@ -102,6 +102,7 @@
       [:span.input-group-addon
        [:a {:href "#"
             :style {:color "#292b2c"}
+            :title "Clear the REPL history"
             :on-click (fn [e]
                         (.preventDefault e)
                         (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]
@@ -111,7 +112,8 @@
               :style {:color "#292b2c"}
               :data-toggle :modal
               :data-target "#repl-available-commands"
-              } [:i.fa.fa-info]]])]]]])
+              :title "List of available commands"}
+          [:i.fa.fa-info]]])]]]])
 
 (swap! pages assoc :repl {:name "REPL"
                           :index 1})
