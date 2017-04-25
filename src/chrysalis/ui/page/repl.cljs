@@ -41,6 +41,15 @@
         result
         [:pre [:i "<no output>"]])]]]])
 
+(defn- <command> [cmd]
+  [:button.btn.btn-outline-primary
+   {:type :button
+    :key (str "repl-avail-command-modal-" cmd)
+    :data-dismiss :modal
+    :on-click (fn [e]
+                (swap! state assoc-in [:repl :command] (name cmd)))}
+   cmd])
+
 (defmulti display
   (fn [command _ _ _]
     command))
@@ -50,19 +59,16 @@
     (repl-wrap req index
                [:pre  (.stringify js/JSON (clj->js result) nil 2)])))
 
+(defmethod display :help [_ req result index]
+  (when result
+    (repl-wrap req index
+               [:div.list-group.col-sm-2
+                (doall (map <command> result))])))
+
 (defn- available-commands []
   (when (get-in @state [:current-device :port])
     (let [r (command/run (get-in @state [:current-device :port]) :help)]
      (swap! state assoc-in [:repl :available-commands] r))))
-
-(defn- <command> [cmd]
-  [:button.btn.btn-outline-primary
-   {:type :button
-    :key (str "repl-avail-command-modal-" cmd)
-    :data-dismiss :modal
-    :on-click (fn [e]
-                (swap! state assoc-in [:repl :command] (name cmd)))}
-   cmd])
 
 (defmethod page :repl [_]
   (when-not (get-in @state [:repl :available-commands])
