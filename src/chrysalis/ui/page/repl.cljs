@@ -41,6 +41,12 @@
    [:div.row.justify-content-center
     [:div.col-12.text-center
      [:h2 "REPL"]]]
+   [:div.row
+    [:div.col-sm-12
+     (doall (map (fn [item index]
+                   (display (:command item) (:request item) @(:result item)
+                            (str "repl-history-" index)))
+                 (reverse (get-in @state [:repl :history])) (range)))]]
    [:div.row.justify-content-left
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
@@ -48,18 +54,13 @@
                                    (swap! state assoc-in [:repl :command] nil))}
      [:label {:style {:margin-right "1em"}} "❯"]
      [:input {:type :text
+              :autofocus :autofocus
               :placeholder "Type command here"
               :style {:border 0
                       :width "75%"}
               :value (get-in @state [:repl :command])
               :on-change (fn [e]
-                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]
-   [:div.row
-    [:div.col-sm-12
-     (doall (map (fn [item index]
-                   (display (:command item) (:request item) @(:result item)
-                            (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
-                 (get-in @state [:repl :history]) (range)))]]])
+                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]])
 
 (swap! pages assoc :repl {:name "REPL"})
 (swap! state assoc :repl {})
