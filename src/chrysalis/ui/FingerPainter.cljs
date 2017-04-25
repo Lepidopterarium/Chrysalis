@@ -15,7 +15,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui.FingerPainter
-  (:require [chrysalis.ui :refer [display repl-wrap]]))
+  (:require [chrysalis.ui.page.repl :refer [display repl-wrap]]))
 
 (defn- toHex [i]
   (let [hex (.toString i 16)]

@@ -15,9 +15,26 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui.page.repl
-  (:require [chrysalis.ui :as ui]
-            [chrysalis.ui.page :refer [pages page]]
+  (:require [chrysalis.ui.page :refer [pages page]]
             [chrysalis.utils :refer [state send-command!]]))
+
+(defn repl-wrap [req key result]
+  [:div.row {:style {:margin-bottom "1em"}
+             :key key}
+   [:pre.col-sm-12 {:style {:white-space :pre-wrap}}
+    "❯ " [:b req] "\n"
+    (if-not (= result "\"\"")
+      result
+      [:i "<no output>"])]])
+
+(defmulti display
+  (fn [command _ _ _]
+    command))
+
+(defmethod display :default [_ req result key]
+  (when result
+    (repl-wrap req key
+               (.stringify js/JSON (clj->js result) nil 2))))
 
 (defmethod page :repl [_]
   [:div.container-fluid
@@ -40,8 +57,8 @@
    [:div.row
     [:div.col-sm-12
      (doall (map (fn [item index]
-                   (ui/display (:command item) (:request item) @(:result item)
-                               (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
+                   (display (:command item) (:request item) @(:result item)
+                            (str "repl-history-" (- (count (get-in @state [:repl :history])) index))))
                  (get-in @state [:repl :history]) (range)))]]])
 
 (swap! pages assoc :repl {:name "REPL"})
