@@ -48,8 +48,10 @@
                         :min-width "350px"}}
      [:div.card-block
       [:div.card-text
-       [:p
-        "[Image comes here]"]
+       (if-let [logo-url (get-in device [:meta :logo])]
+         [:img {:src logo-url}]
+         [:p
+          "[Image comes here]"])
        [:p
         (get-in device [:meta :name])]]]
      [:div.card-footer.text-muted
