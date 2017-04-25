@@ -106,6 +106,10 @@
                             :on-change (fn [e]
                                          (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
       [:span.input-group-addon
+       [:input.nav-link {:type :submit
+                         :value "⏎"
+                         :title "Run!"}]]
+      [:span.input-group-addon
        [:a {:href "#"
             :style {:color "#292b2c"}
             :title "Clear the REPL history"
