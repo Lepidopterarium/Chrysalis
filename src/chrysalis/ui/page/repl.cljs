@@ -111,7 +111,7 @@
               :style {:color "#292b2c"}
               :data-toggle :modal
               :data-target "#repl-available-commands"
-              } [:i.fa.fa-terminal]]])]]]])
+              } [:i.fa.fa-info]]])]]]])
 
 (swap! pages assoc :repl {:name "REPL"
                           :index 1})
