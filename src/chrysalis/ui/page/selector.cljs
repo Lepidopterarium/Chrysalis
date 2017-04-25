@@ -67,6 +67,6 @@
     [:div.col-12.text-center
      [:h2 "Available devices"]]]
    [:div.row
-    (map <device> (:devices @state))]])
+    (doall (map <device> (:devices @state)))]])
 
 (swap! pages assoc :selector {:name "Home"})
