@@ -48,17 +48,22 @@
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (reverse (get-in @state [:repl :history])) (range)))
-   [:div.row.justify-content-left
-    [:form.col-sm-12 {:on-submit (fn [e]
+   [:div.row.justify-content-left {:style {:margin-bottom "1em"}}
+    [:form.col-sm-12 {:style {:background-color "rgb(211,211,211)"
+                              :padding-bottom "3px"}
+                      :on-submit (fn [e]
                                    (.preventDefault e)
                                    (send-command! (get-in @state [:repl :command]))
                                    (swap! state assoc-in [:repl :command] nil))}
-     [:label {:style {:margin-right "1em"}} [:i.fa.fa-angle-right]]
+     [:div {:style {:margin-right "1em"
+                    :display :inline-block
+                    :vertical-align "-webkit-baseline-middle"}} [:i.fa.fa-angle-right]]
      [:input {:type :text
               :placeholder "Type command here"
               :autoFocus true
               :style {:border 0
                       :width "75%"
+                      :vertical-align "-webkit-baseline-middle"
                       :outline :none}
               :value (get-in @state [:repl :command])
               :on-change (fn [e]
