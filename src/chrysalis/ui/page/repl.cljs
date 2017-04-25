@@ -58,37 +58,25 @@
                  (display (:command item) (:request item) @(:result item) index))
                (reverse (get-in @state [:repl :history])) (range)))
    [:div.row.justify-content-left {:style {:margin-bottom "1em"}}
-    [:form.col-sm-12 {:style {:background-color "rgb(211,211,211)"
-                              :padding-bottom "3px"}
-                      :on-submit (fn [e]
+    [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
                                    (send-command! (get-in @state [:repl :command]))
                                    (swap! state assoc-in [:repl :command] nil))}
-     [:div {:style {:margin-right "1em"
-                    :display :inline-block
-                    :vertical-align "-webkit-baseline-middle"}} [:i.fa.fa-angle-right]]
-     [:input {:type :text
-              :placeholder "Type command here"
-              :autoFocus true
-              :style {:border 0
-                      :width "75%"
-                      :vertical-align "-webkit-baseline-middle"
-                      :padding-left "0.25em"
-                      :padding-right "0.25em"
-                      :outline :none}
-              :value (get-in @state [:repl :command])
-              :on-change (fn [e]
-                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
-     [:div {:style {:margin-left "1em"
-                    :display :inline-block
-                    :width "15%"
-                    :text-align :right
-                    :vertical-align "-webkit-baseline-middle"}}
-      [:a {:href "#"
-           :style {:color "#292b2c"}
-           :on-click (fn [e]
-                       (.preventDefault e)
-                       (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]]]])
+     [:div.input-group
+      [:span.input-group-addon
+       [:i.fa.fa-angle-right]]
+      [:input.form-control {:type :text
+                            :placeholder "Type command here"
+                            :autoFocus true
+                            :value (get-in @state [:repl :command])
+                            :on-change (fn [e]
+                                         (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
+      [:span.input-group-addon
+       [:a {:href "#"
+            :style {:color "#292b2c"}
+            :on-click (fn [e]
+                        (.preventDefault e)
+                        (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]]]]])
 
 (swap! pages assoc :repl {:name "REPL"})
 (swap! state assoc :repl {})
