@@ -64,6 +64,8 @@
               :style {:border 0
                       :width "75%"
                       :vertical-align "-webkit-baseline-middle"
+                      :padding-left "0.25em"
+                      :padding-right "0.25em"
                       :outline :none}
               :value (get-in @state [:repl :command])
               :on-change (fn [e]
