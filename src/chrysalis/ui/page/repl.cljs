@@ -52,11 +52,12 @@
                                    (.preventDefault e)
                                    (send-command! (get-in @state [:repl :command]))
                                    (swap! state assoc-in [:repl :command] nil))}
-     [:label {:style {:margin-right "1em"}} "❯"]
+     [:label {:style {:margin-right "1em"}} [:i.fa.fa-angle-right]]
      [:input {:type :text
               :placeholder "Type command here"
               :style {:border 0
-                      :width "75%"}
+                      :width "75%"
+                      :outline :none}
               :value (get-in @state [:repl :command])
               :on-change (fn [e]
                            (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]])
