@@ -25,18 +25,20 @@
    [:div.col-sm-12
     [:div.card
      [:div.card-block
-      [:span.card-title
-       [:i.fa.fa-angle-down] " " [:code req]]
+      [:div.card-title.row {:style {:margin-bottom "0px"}}
+       [:div.col-sm-6.text-left
+        [:i.fa.fa-angle-down]
+        " " [:code req]]
+       [:div.col-sm-6.text-right
+        [:a {:style {:color "#292b2c"}
+             :href "#"
+             :on-click (fn [e]
+                         (.preventDefault e)
+                         (swap! state assoc-in [:repl :command] req))}
+         [:i.fa.fa-repeat]]]]
       (if-not (= result [:pre "\"\""])
         result
-        [:pre [:i "<no output>"]])]
-     [:div.card-footer.text-right
-      [:a {:style {:color "#292b2c"}
-                     :href "#"
-                     :on-click (fn [e]
-                                 (.preventDefault e)
-                                 (swap! state assoc-in [:repl :command] req))}
-       [:i.fa.fa-repeat]]]]]])
+        [:pre [:i "<no output>"]])]]]])
 
 (defmulti display
   (fn [command _ _ _]
