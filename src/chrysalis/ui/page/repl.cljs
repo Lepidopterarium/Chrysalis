@@ -74,7 +74,7 @@
       [:div.modal-header
        [:h5.modal-title "Available commands"]]
       [:div.modal-body
-       [:div.btn-group
+       [:div.list-group
         (when (get-in @state [:repl :available-commands])
           (doall (map <command> @(get-in @state [:repl :available-commands]))))]]
       [:div.modal-footer
