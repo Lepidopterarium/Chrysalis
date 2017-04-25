@@ -19,8 +19,8 @@
             [chrysalis.ui.page :refer [pages page]]
             [chrysalis.utils :refer [state send-command!]]))
 
-(defn repl-wrap [req key result]
-  [:div.row {:key key
+(defn repl-wrap [req index result]
+  [:div.row {:key (str "repl-history-" index)
              :style {:margin-bottom "1em"}}
    [:div.col-sm-12
     [:div.card
@@ -35,9 +35,9 @@
   (fn [command _ _ _]
     command))
 
-(defmethod display :default [_ req result key]
+(defmethod display :default [_ req result index]
   (when result
-    (repl-wrap req key
+    (repl-wrap req index
                [:pre  (.stringify js/JSON (clj->js result) nil 2)])))
 
 (defmethod page :repl [_]
@@ -46,8 +46,7 @@
     [:div.col-12.text-center
      [:h2 "REPL"]]]
    (doall (map (fn [item index]
-                 (display (:command item) (:request item) @(:result item)
-                          (str "repl-history-" index)))
+                 (display (:command item) (:request item) @(:result item) index))
                (reverse (get-in @state [:repl :history])) (range)))
    [:div.row.justify-content-left
     [:form.col-sm-12 {:on-submit (fn [e]
