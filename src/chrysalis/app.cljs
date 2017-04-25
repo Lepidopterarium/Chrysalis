@@ -42,6 +42,10 @@
                             (when (= key (:page @state))
                               "active")])}
    [:a.nav-link {:href "#"
+                 :class (when (and (:disable? meta)
+                                   ((:disable? meta)))
+                          (print "disabled" key)
+                          "disabled")
                  :on-click (fn [e]
                              (.preventDefault e)
                              (swap! state assoc :page key))}
