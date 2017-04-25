@@ -69,4 +69,5 @@
    [:div.row
     (doall (map <device> (:devices @state)))]])
 
-(swap! pages assoc :selector {:name "Home"})
+(swap! pages assoc :selector {:name "Home"
+                              :index 0})

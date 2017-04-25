@@ -113,5 +113,6 @@
               :data-target "#repl-available-commands"
               } [:i.fa.fa-terminal]]])]]]])
 
-(swap! pages assoc :repl {:name "REPL"})
+(swap! pages assoc :repl {:name "REPL"
+                          :index 1})
 (swap! state assoc :repl {})
