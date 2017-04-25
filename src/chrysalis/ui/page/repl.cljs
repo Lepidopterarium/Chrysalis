@@ -51,9 +51,6 @@
 
 (defmethod page :repl [_]
   [:div.container-fluid
-   [:div.row
-    [:div.col-12.text-center
-     [:h2 "REPL"]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (reverse (get-in @state [:repl :history])) (range)))
