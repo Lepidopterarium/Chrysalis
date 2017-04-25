@@ -13,6 +13,7 @@
   :npm {:dependencies [[avrgirl-arduino "^2.0.0"]
                        [bootstrap "^4.0.0-alpha.4"]
                        [jquery "^3.1.0"]
+                       [font-awesome "^4.7.0"]
                        [tether "^1.3.7"]
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]]}
   :plugins [[lein-cljsbuild "1.1.5"]
