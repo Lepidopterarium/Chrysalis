@@ -69,7 +69,17 @@
                       :outline :none}
               :value (get-in @state [:repl :command])
               :on-change (fn [e]
-                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]]]])
+                           (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
+     [:div {:style {:margin-left "1em"
+                    :display :inline-block
+                    :width "15%"
+                    :text-align :right
+                    :vertical-align "-webkit-baseline-middle"}}
+      [:a {:href "#"
+           :style {:color "#292b2c"}
+           :on-click (fn [e]
+                       (.preventDefault e)
+                       (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]]]])
 
 (swap! pages assoc :repl {:name "REPL"})
 (swap! state assoc :repl {})
