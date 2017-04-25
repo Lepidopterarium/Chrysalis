@@ -54,7 +54,6 @@
                                    (swap! state assoc-in [:repl :command] nil))}
      [:label {:style {:margin-right "1em"}} "❯"]
      [:input {:type :text
-              :autofocus :autofocus
               :placeholder "Type command here"
               :style {:border 0
                       :width "75%"}
