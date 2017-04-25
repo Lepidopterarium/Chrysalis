@@ -29,7 +29,14 @@
        [:i.fa.fa-angle-down] " " [:code req]]
       (if-not (= result [:pre "\"\""])
         result
-        [:pre [:i "<no output>"]])]]]])
+        [:pre [:i "<no output>"]])]
+     [:div.card-footer.text-right
+      [:a {:style {:color "#292b2c"}
+                     :href "#"
+                     :on-click (fn [e]
+                                 (.preventDefault e)
+                                 (swap! state assoc-in [:repl :command] req))}
+       [:i.fa.fa-repeat]]]]]])
 
 (defmulti display
   (fn [command _ _ _]
