@@ -19,13 +19,17 @@
             [chrysalis.utils :refer [state send-command!]]))
 
 (defn repl-wrap [req key result]
-  [:div.row {:style {:margin-bottom "1em"}
-             :key key}
-   [:pre.col-sm-12 {:style {:white-space :pre-wrap}}
-    [:i.fa.fa-angle-down] " " [:b req] "\n"
-    (if-not (= result "\"\"")
-      result
-      [:i "<no output>"])]])
+  [:div.row {:key key
+             :style {:margin-bottom "1em"}}
+   [:div.col-sm-12
+    [:div.card
+     [:div.card-block
+      [:div.card-title
+       [:i.fa.fa-angle-down] " " [:code req]]
+      [:pre
+       (if-not (= result "\"\"")
+         result
+         [:i "<no output>"])]]]]])
 
 (defmulti display
   (fn [command _ _ _]
@@ -38,15 +42,13 @@
 
 (defmethod page :repl [_]
   [:div.container-fluid
-   [:div.row.justify-content-center
+   [:div.row
     [:div.col-12.text-center
      [:h2 "REPL"]]]
-   [:div.row
-    [:div.col-sm-12
-     (doall (map (fn [item index]
-                   (display (:command item) (:request item) @(:result item)
-                            (str "repl-history-" index)))
-                 (reverse (get-in @state [:repl :history])) (range)))]]
+   (doall (map (fn [item index]
+                 (display (:command item) (:request item) @(:result item)
+                          (str "repl-history-" index)))
+               (reverse (get-in @state [:repl :history])) (range)))
    [:div.row.justify-content-left
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
