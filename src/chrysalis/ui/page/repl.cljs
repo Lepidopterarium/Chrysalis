@@ -16,6 +16,7 @@
 
 (ns chrysalis.ui.page.repl
   (:require [reagent.core :as reagent]
+            [chrysalis.command :as command]
             [chrysalis.ui.page :refer [pages page]]
             [chrysalis.utils :refer [state send-command!]]))
 
@@ -49,8 +50,38 @@
     (repl-wrap req index
                [:pre  (.stringify js/JSON (clj->js result) nil 2)])))
 
+(defn- available-commands []
+  (when (get-in @state [:current-device :port])
+    (let [r (command/run (get-in @state [:current-device :port]) :help)]
+     (swap! state assoc-in [:repl :available-commands] r))))
+
+(defn- <command> [cmd]
+  [:button.btn.btn-outline-primary
+   {:type :button
+    :key (str "repl-avail-command-modal-" cmd)
+    :data-dismiss :modal
+    :on-click (fn [e]
+                (swap! state assoc-in [:repl :command] (name cmd)))}
+   cmd])
+
 (defmethod page :repl [_]
+  (when-not (get-in @state [:repl :available-commands])
+    (available-commands))
   [:div.container-fluid
+   [:div.modal.fade {:id "repl-available-commands"}
+    [:div.modal-dialog
+     [:div.modal-content
+      [:div.modal-header
+       [:h5.modal-title "Available commands"]]
+      [:div.modal-body
+       [:div.btn-group
+        (when (get-in @state [:repl :available-commands])
+          (doall (map <command> @(get-in @state [:repl :available-commands]))))]]
+      [:div.modal-footer
+       [:button.btn.btn-secondary
+        {:type :button
+         :data-dismiss :modal} "Cancel"]]]]]
+
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (reverse (get-in @state [:repl :history])) (range)))
@@ -73,7 +104,14 @@
             :style {:color "#292b2c"}
             :on-click (fn [e]
                         (.preventDefault e)
-                        (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]]]]])
+                        (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]
+      (when (get-in @state [:repl :available-commands])
+        [:span.input-group-addon
+         [:a {:href "#"
+              :style {:color "#292b2c"}
+              :data-toggle :modal
+              :data-target "#repl-available-commands"
+              } [:i.fa.fa-terminal]]])]]]])
 
 (swap! pages assoc :repl {:name "REPL"})
 (swap! state assoc :repl {})
