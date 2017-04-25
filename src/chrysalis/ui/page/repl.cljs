@@ -15,7 +15,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui.page.repl
-  (:require [chrysalis.ui.page :refer [pages page]]
+  (:require [reagent.core :as reagent]
+            [chrysalis.ui.page :refer [pages page]]
             [chrysalis.utils :refer [state send-command!]]))
 
 (defn repl-wrap [req key result]
@@ -57,6 +58,7 @@
      [:label {:style {:margin-right "1em"}} [:i.fa.fa-angle-right]]
      [:input {:type :text
               :placeholder "Type command here"
+              :autoFocus true
               :style {:border 0
                       :width "75%"
                       :outline :none}
