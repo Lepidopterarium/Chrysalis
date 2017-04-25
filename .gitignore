@@ -5,7 +5,9 @@
 /*.log
 /target/
 /resources/public/js/
+/resources/public/node_modules/
 /resources/main.js
+/Chrysalis-*/
 
 *~
 .#*

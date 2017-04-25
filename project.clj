@@ -15,7 +15,8 @@
                        [jquery "^3.1.0"]
                        [font-awesome "^4.7.0"]
                        [tether "^1.3.7"]
-                       [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]]}
+                       [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]]
+        :root "resources/public"}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
             [lein-npm "0.6.2"]]
