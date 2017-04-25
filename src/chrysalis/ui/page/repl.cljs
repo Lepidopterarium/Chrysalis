@@ -22,7 +22,7 @@
   [:div.row {:style {:margin-bottom "1em"}
              :key key}
    [:pre.col-sm-12 {:style {:white-space :pre-wrap}}
-    "❯ " [:b req] "\n"
+    [:i.fa.fa-angle-down] " " [:b req] "\n"
     (if-not (= result "\"\"")
       result
       [:i "<no output>"])]])
