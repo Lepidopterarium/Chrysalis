@@ -37,19 +37,20 @@
 (enable-console-print!)
 
 (defn <menu-item> [[key meta]]
-  [:li {:key (str "main-menu-" (name key))
-        :class (s/join " " ["nav-item"
-                            (when (= key (:page @state))
-                              "active")])}
-   [:a.nav-link {:href "#"
-                 :class (when (and (:disable? meta)
-                                   ((:disable? meta)))
-                          (print "disabled" key)
-                          "disabled")
-                 :on-click (fn [e]
-                             (.preventDefault e)
-                             (swap! state assoc :page key))}
-    (:name meta)]])
+  (let [disabled? (and (:disable? meta)
+                       ((:disable? meta)))]
+    [:li {:key (str "main-menu-" (name key))
+          :class (s/join " " ["nav-item"
+                              (when (= key (:page @state))
+                                "active")])}
+     [:a.nav-link {:href "#"
+                   :class (when disabled?
+                            "disabled")
+                   :on-click (fn [e]
+                               (.preventDefault e)
+                               (when-not disabled?
+                                 (swap! state assoc :page key)))}
+      (:name meta)]]))
 
 (defn <main-menu> []
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
