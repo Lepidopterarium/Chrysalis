@@ -27,11 +27,12 @@
   (when result
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
       (repl-wrap req key
-                 (map (fn [[r g b]]
-                        [:span.badge
-                         {:style {:background-color (str "rgb(" r "," g "," b ")")
-                                  :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
-                                  :display "inline-block"
-                                  :margin-right "1em"}}
-                         (str "#" (toHex r) (toHex g) (toHex b))])
-                      palette)))))
+                 [:pre
+                  (map (fn [[r g b]]
+                         [:span.badge
+                          {:style {:background-color (str "rgb(" r "," g "," b ")")
+                                   :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
+                                   :display "inline-block"
+                                   :margin-right "1em"}}
+                          (str "#" (toHex r) (toHex g) (toHex b))])
+                       palette)]))))

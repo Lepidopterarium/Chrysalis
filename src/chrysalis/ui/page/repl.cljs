@@ -27,10 +27,9 @@
      [:div.card-block
       [:div.card-title
        [:i.fa.fa-angle-down] " " [:code req]]
-      [:pre
-       (if-not (= result "\"\"")
-         result
-         [:i "<no output>"])]]]]])
+      (if-not (= result [:pre "\"\""])
+        result
+        [:pre [:i "<no output>"]])]]]])
 
 (defmulti display
   (fn [command _ _ _]
@@ -39,7 +38,7 @@
 (defmethod display :default [_ req result key]
   (when result
     (repl-wrap req key
-               (.stringify js/JSON (clj->js result) nil 2))))
+               [:pre  (.stringify js/JSON (clj->js result) nil 2)])))
 
 (defmethod page :repl [_]
   [:div.container-fluid
