@@ -40,7 +40,9 @@
                          (swap! state assoc-in [:repl :command] req))}
          [:i.fa.fa-repeat]]]]
       [:div {:id (str "repl-history-collapse-" index)
-             :class "collapse show"}
+             :class (str "collapse "
+                         (when (= index (dec (count (get-in @state [:repl :history]))))
+                           "show"))}
        (if-not (= result [:pre "\"\""])
          result
          [:pre [:i "<no output>"]])]]]]])
