@@ -25,7 +25,7 @@
    [:div.col-sm-12
     [:div.card
      [:div.card-block
-      [:div.card-title
+      [:span.card-title
        [:i.fa.fa-angle-down] " " [:code req]]
       (if-not (= result [:pre "\"\""])
         result
