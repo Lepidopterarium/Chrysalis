@@ -44,7 +44,8 @@
   (let [current? (and (:current-device @state)
                       (= (:comName device) (get-in @state [:current-device :device :comName])))]
     [:div.card {:key (:comName device)
-                :style {:margin "0.5em"}}
+                :style {:margin "0.5em"
+                        :min-width "350px"}}
      [:div.card-block
       [:div.card-text
        [:p
@@ -66,8 +67,9 @@
    [:div.row.justify-content-center
     [:div.col-12.text-center
      [:h2 "Available devices"]]]
-   [:div.row
-    (doall (map <device> (:devices @state)))]])
+   [:div.row.justify-content-center
+    [:div.card-deck
+     (doall (map <device> (:devices @state)))]]])
 
 (swap! pages assoc :selector {:name "Home"
                               :index 0})
