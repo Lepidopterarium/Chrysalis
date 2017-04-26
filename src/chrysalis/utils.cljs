@@ -31,6 +31,8 @@
                                                         arg))
                                                     args)))
         result (apply command/run (get-in @state [:current-device :port]) full-args)]
-    (swap! state update-in [:repl :history] conj {:command (keyword command)
-                                                  :request req
-                                                  :result result})))
+    (swap! state update-in [:repl :history] (fn [s x]
+                                              (cons x s))
+           {:command (keyword command)
+            :request req
+            :result result})))
