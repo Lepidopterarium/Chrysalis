@@ -52,7 +52,8 @@
     :key (str "repl-avail-command-modal-" cmd)
     :data-dismiss :modal
     :on-click (fn [e]
-                (swap! state assoc-in [:repl :command] (name cmd)))}
+                (swap! state assoc-in [:repl :command] (name cmd))
+                (.focus (js/document.getElementById "repl-prompt-input")))}
    cmd])
 
 (defmulti display
@@ -101,7 +102,8 @@
      [:div.input-group
       [:span.input-group-addon
        [:i.fa.fa-angle-right]]
-      [:input.form-control {:type :text
+      [:input.form-control {:id "repl-prompt-input"
+                            :type :text
                             :placeholder "Type command here"
                             :autoFocus true
                             :value (get-in @state [:repl :command])
