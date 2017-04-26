@@ -14,6 +14,12 @@
     color: #014c8c;
 }
 
+.chrysalis-page-repl-prompt .dropdown-menu {
+    min-width: 0px;
+    left: auto;
+    right: 0px;
+}
+
 .chrysalis-page-repl-box .card-title {
     margin-bottom: 0px;
 }

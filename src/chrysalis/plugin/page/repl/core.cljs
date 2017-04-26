@@ -125,19 +125,26 @@
        [:input.nav-link {:type :submit
                          :value ""
                          :title "Run!"}]]
-      [:span.input-group-addon
-       [:a.chrysalis-link-button {:href "#"
-                                  :title "Clear the REPL history"
-                                  :on-click (fn [e]
-                                              (.preventDefault e)
-                                              (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]
-      (when (get-in @state [:repl :available-commands])
-        [:span.input-group-addon
-         [:a.chrysalis-link-button {:href "#"
-                                    :data-toggle :modal
-                                    :data-target "#repl-available-commands"
-                                    :title "List of available commands"}
-          [:i.fa.fa-info]]])]]]
+      [:div.dropdown.input-group-addon
+       [:a.dropdown-toggle.chrysalis-link-button {:href "#"
+                                                  :data-toggle :dropdown
+                                                  :min-width "0px"
+                                                  :left :auto
+                                                  :right "0px"}
+        [:i.fa.fa-cogs]]
+       [:div.dropdown-menu.text-right
+        [:a.chrysalis-link-button.dropdown-item {:href "#"
+                                                 :title "Clear the REPL history"
+                                                 :on-click (fn [e]
+                                                             (.preventDefault e)
+                                                             (swap! state assoc-in [:repl :history] []))}
+         "Clear history"]
+        (when (get-in @state [:repl :available-commands])
+          [:a.chrysalis-link-button.dropdown-item {:href "#"
+                                                   :data-toggle :modal
+                                                   :data-target "#repl-available-commands"
+                                                   :title "List of available commands"}
+           "Help"])]]]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (get-in @state [:repl :history])
