@@ -46,15 +46,14 @@
 (defn <device> [device]
   (let [current? (and (:current-device @state)
                       (= (:comName device) (get-in @state [:current-device :device :comName])))]
-    [:a.card {:key (:comName device)
-              :href "#"
-              :disabled current?
-              :class (str "chrysalis-page-selector-device "
-                          (when current? "card-outline-success disabled"))
-              :on-click (fn [e]
-                          (if current?
-                            (swap! state assoc :current-device (device-close!))
-                            (swap! state assoc :current-device (device-open! device))))}
+    [:a.card.chrysalis-page-selector-device {:key (:comName device)
+                                             :href "#"
+                                             :disabled current?
+                                             :class (when current? "card-outline-success")
+                                             :on-click (fn [e]
+                                                         (if current?
+                                                           (swap! state assoc :current-device (device-close!))
+                                                           (swap! state assoc :current-device (device-open! device))))}
      [:div.card-block
       [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]
