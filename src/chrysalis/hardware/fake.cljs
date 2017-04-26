@@ -21,7 +21,8 @@
             [clojure.string :as str]))
 
 (defmethod known? [0xdead 0xbeef] [device]
-  (assoc device :meta {:name "An example fake device"}))
+  (assoc device :meta {:name "An example fake device"
+                       :logo "images/virtual-keyboard.png"}))
 
 (defmethod scan* :fake [_ out]
   (go
