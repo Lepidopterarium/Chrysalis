@@ -28,11 +28,12 @@
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
       (repl-wrap req index
                  [:pre
-                  (map (fn [[r g b]]
+                  (map (fn [[r g b] index]
                          [:span.badge
-                          {:style {:background-color (str "rgb(" r "," g "," b ")")
+                          {:key (str "repl-fingerpainter-palette-" index)
+                           :style {:background-color (str "rgb(" r "," g "," b ")")
                                    :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
                                    :display "inline-block"
                                    :margin-right "1em"}}
                           (str "#" (toHex r) (toHex g) (toHex b))])
-                       palette)]))))
+                       palette (range))]))))
