@@ -23,7 +23,7 @@
 
             [chrysalis.plugin.page.devices.core :as devices]
             [chrysalis.plugin.page.repl.core]
-            [chrysalis.plugin.page.flash.core]
+            [chrysalis.plugin.page.firmware.core]
 
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]

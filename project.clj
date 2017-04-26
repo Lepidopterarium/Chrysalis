@@ -71,7 +71,8 @@
   :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
                               "src/chrysalis/plugin/hardware/virtual"
                               ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]
-                              ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]]
+                              ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]
+                              ["src/chrysalis/plugin/page/firmware" {:target-path "resources/public/css/plugins/firmware"}]]
              :includes [#".*\.png" #".*\.css"]
              :target-path "resources/public/images/plugins"
              :skip-stencil [#".*"]})
