@@ -1,0 +1,12 @@
+.chrysalis-page-repl-prompt,
+.chrysalis-page-repl-box {
+    margin-bottom: 1em;
+}
+
+.chrysalis-page-repl-box .card-title {
+    margin-bottom: 0px;
+}
+
+.chrysalis-page-repl-box .card-block .collapse pre {
+    white-space: pre-wrap;
+}

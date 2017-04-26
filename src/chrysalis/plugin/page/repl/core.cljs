@@ -35,12 +35,11 @@
 
 (defn repl-wrap [req index result]
   (let [latest? (= index (count (get-in @state [:repl :history])))]
-    [:div.row {:key (str "repl-history-" index)
-               :style {:margin-bottom "1em"}}
+    [:div.row.chrysalis-page-repl-box {:key (str "repl-history-" index)}
      [:div.col-sm-12
       [:div.card {:class (when latest? "card-outline-info")}
        [:div.card-block
-        [:div.card-title.row {:style {:margin-bottom "0px"}}
+        [:div.card-title.row
          [:div.col-sm-6.text-left
           [:a.chrysalis-link-button {:href (str "#repl-history-collapse-" index)
                                      :data-toggle :collapse}
@@ -75,7 +74,7 @@
 (defmethod display :default [_ req result index]
   (when result
     (repl-wrap req index
-               [:pre {:style {:white-space :pre-wrap}} (.stringify js/JSON (clj->js result) nil 2)])))
+               [:pre (.stringify js/JSON (clj->js result) nil 2)])))
 
 (defmethod display :help [_ req result index]
   (when result
@@ -106,7 +105,7 @@
         {:type :button
          :data-dismiss :modal} "Cancel"]]]]]
 
-   [:div.row.justify-content-left {:style {:margin-bottom "1em"}}
+   [:div.row.justify-content-left.chrysalis-page-repl-prompt
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
                                    (send-command! (get-in @state [:repl :command]))

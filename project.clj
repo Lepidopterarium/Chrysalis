@@ -69,7 +69,8 @@
              :ring-handler tools.figwheel-middleware/app
              :server-port 3449}
   :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
-                              "src/chrysalis/plugin/hardware/virtual"]
-             :includes [ #".*\.png" ]
+                              "src/chrysalis/plugin/hardware/virtual"
+                              ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]]
+             :includes [#".*\.png" #".*\.css"]
              :target-path "resources/public/images/plugins"
-             :skip-stencil [ #".*" ]})
+             :skip-stencil [#".*"]})
