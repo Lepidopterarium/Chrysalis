@@ -5,6 +5,7 @@
 /*.log
 /target/
 /resources/public/js/
+/resources/public/images/plugins/
 /resources/public/node_modules/
 /resources/public/main.js
 /resources/public/npm-debug.log

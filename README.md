@@ -9,11 +9,21 @@
 First of all, install [Leiningen](https://leiningen.org/)
 and [Node](https://nodejs.org/en/), the follow these steps:
 
-```bash
-## Dependencies
-lein deps
+### Installing dependencies
 
-## Running
+```bash
+lein deps
+```
+
+### Copying assets
+
+```bash
+lein resource
+```
+
+### Running in development mode
+
+```bash
 lein npm run start-backend
 lein npm run start-ui
 ```

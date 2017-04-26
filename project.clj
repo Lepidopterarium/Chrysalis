@@ -23,9 +23,11 @@
                             :start-backend "nf -j ../../Procfile start"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
+            [lein-resource "16.9.1"]
             [lein-npm "0.6.2"]]
+  :hooks [leiningen.resource]
 
-  :clean-targets ^{:protect false} ["resources/main.js"
+  :clean-targets ^{:protect false} ["resources/public/main.js"
                                     "resources/public/js/ui-core.js"
                                     "resources/public/js/ui-core.js.map"
                                     "resources/public/js/ui-out"]
@@ -65,4 +67,9 @@
   :figwheel {:http-server-root "public"
              :css-dirs ["resources/public/css"]
              :ring-handler tools.figwheel-middleware/app
-             :server-port 3449})
+             :server-port 3449}
+  :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
+                              "src/chrysalis/plugin/hardware/virtual"]
+             :includes [ #".*\.png" ]
+             :target-path "resources/public/images/plugins"
+             :skip-stencil [ #".*" ]})

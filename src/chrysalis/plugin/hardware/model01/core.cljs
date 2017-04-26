@@ -19,4 +19,4 @@
 
 (defmethod known? [0x1209 0x2301] [device]
   (assoc device :meta {:name "Keyboardio Model 01"
-                       :logo "images/model01.png"}))
+                       :logo "images/plugins/model01.png"}))
