@@ -68,7 +68,7 @@
   (when result
     (repl-wrap req index
                [:div.list-group.col-sm-2
-                (doall (map <command> result))])))
+                (doall (map <command> (sort result)))])))
 
 (defn- available-commands []
   (when (get-in @state [:current-device :port])
@@ -87,7 +87,7 @@
       [:div.modal-body
        [:div.list-group
         (when (get-in @state [:repl :available-commands])
-          (doall (map <command> @(get-in @state [:repl :available-commands]))))]]
+          (doall (map <command> (sort @(get-in @state [:repl :available-commands])))))]]
       [:div.modal-footer
        [:button.btn.btn-secondary
         {:type :button
