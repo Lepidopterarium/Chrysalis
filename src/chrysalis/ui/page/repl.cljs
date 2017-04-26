@@ -21,31 +21,30 @@
             [chrysalis.utils :refer [state send-command!]]))
 
 (defn repl-wrap [req index result]
-  [:div.row {:key (str "repl-history-" index)
-             :style {:margin-bottom "1em"}}
-   [:div.col-sm-12
-    [:div.card
-     [:div.card-block
-      [:div.card-title.row {:style {:margin-bottom "0px"}}
-       [:div.col-sm-6.text-left
-        [:a {:href (str "#repl-history-collapse-" index)
-             :data-toggle :collapse
-             :style {:color "#292b2c"}}
-         [:i.fa.fa-angle-down]]
-        " " [:code req]]
-       [:div.col-sm-6.text-right
-        [:a {:style {:color "#292b2c"}
-             :on-click (fn [e]
-                         (.preventDefault e)
-                         (swap! state assoc-in [:repl :command] req))}
-         [:i.fa.fa-repeat]]]]
-      [:div {:id (str "repl-history-collapse-" index)
-             :class (str "collapse "
-                         (when (= index (count (get-in @state [:repl :history])))
-                           "show"))}
-       (if-not (= result [:pre "\"\""])
-         result
-         [:pre [:i "<no output>"]])]]]]])
+  (let [latest? (= index (count (get-in @state [:repl :history])))]
+    [:div.row {:key (str "repl-history-" index)
+               :style {:margin-bottom "1em"}}
+     [:div.col-sm-12
+      [:div.card {:class (when latest? "card-outline-info")}
+       [:div.card-block
+        [:div.card-title.row {:style {:margin-bottom "0px"}}
+         [:div.col-sm-6.text-left
+          [:a {:href (str "#repl-history-collapse-" index)
+               :data-toggle :collapse
+               :style {:color "#292b2c"}}
+           [:i.fa.fa-angle-down]]
+          " " [:code req]]
+         [:div.col-sm-6.text-right
+          [:a {:style {:color "#292b2c"}
+               :on-click (fn [e]
+                           (.preventDefault e)
+                           (swap! state assoc-in [:repl :command] req))}
+           [:i.fa.fa-repeat]]]]
+        [:div {:id (str "repl-history-collapse-" index)
+               :class (str "collapse " (when latest? "show"))}
+         (if-not (= result [:pre "\"\""])
+           result
+           [:pre [:i "<no output>"]])]]]]]))
 
 (defn- <command> [cmd]
   [:button.btn.btn-outline-primary
