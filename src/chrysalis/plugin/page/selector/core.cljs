@@ -23,9 +23,13 @@
             [clojure.string :as s]
             [cljs.core.async :refer [<!]]))
 
-(defn device-open! [device]
+(defn device-close! []
   (when (:current-device @state)
     (hardware/close (get-in @state [:current-device :port])))
+  nil)
+
+(defn device-open! [device]
+  (device-close!)
   {:port (hardware/open (:comName device))
    :device device})
 
@@ -42,26 +46,23 @@
 (defn <device> [device]
   (let [current? (and (:current-device @state)
                       (= (:comName device) (get-in @state [:current-device :device :comName])))]
-    [:div.card {:key (:comName device)
-                :class (str "chrysalis-page-selector-device "
-                            (when current? "card-outline-success"))}
+    [:a.card {:key (:comName device)
+              :href "#"
+              :disabled current?
+              :class (str "chrysalis-page-selector-device "
+                          (when current? "card-outline-success disabled"))
+              :on-click (fn [e]
+                          (if current?
+                            (swap! state assoc :current-device (device-close!))
+                            (swap! state assoc :current-device (device-open! device))))}
      [:div.card-block
       [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]
          [:img {:src logo-url}]
          [:p
           "[Image comes here]"])
-       [:p
-        (get-in device [:meta :name])]]]
-     [:div.card-footer.text-muted
-      [:button {:type "button"
-                :disabled current?
-                :class (s/join " " ["btn"
-                                    (if current?
-                                      "btn-outline-secondary"
-                                      "btn-primary")])
-                :on-click #(swap! state assoc :current-device (device-open! device))}
-       "Select"]]]))
+       [:p.text-mute.chrysalis-link-button
+        (get-in device [:meta :name])]]]]))
 
 (defmethod page :selector [_]
   [:div.container-fluid
