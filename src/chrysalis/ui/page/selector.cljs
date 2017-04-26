@@ -44,6 +44,7 @@
   (let [current? (and (:current-device @state)
                       (= (:comName device) (get-in @state [:current-device :device :comName])))]
     [:div.card {:key (:comName device)
+                :class (when current? "card-outline-success")
                 :style {:margin "0.5em"
                         :min-width "350px"}}
      [:div.card-block
