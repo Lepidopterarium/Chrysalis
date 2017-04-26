@@ -42,17 +42,15 @@
        [:div.card-block
         [:div.card-title.row {:style {:margin-bottom "0px"}}
          [:div.col-sm-6.text-left
-          [:a {:href (str "#repl-history-collapse-" index)
-               :data-toggle :collapse
-               :style {:color "#292b2c"}}
+          [:a.chrysalis-link-button {:href (str "#repl-history-collapse-" index)
+                                     :data-toggle :collapse}
            [:i.fa.fa-angle-down]]
           " " [:code req]]
          [:div.col-sm-6.text-right
-          [:a {:style {:color "#292b2c"}
-               :on-click (fn [e]
-                           (.preventDefault e)
-                           (swap! state assoc-in [:repl :command] req)
-                           (.focus (js/document.getElementById "repl-prompt-input")))}
+          [:a.chrysalis-link-button {:on-click (fn [e]
+                                                 (.preventDefault e)
+                                                 (swap! state assoc-in [:repl :command] req)
+                                                 (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
         [:div {:id (str "repl-history-collapse-" index)
                :class (str "collapse " (when latest? "show"))}
@@ -128,19 +126,17 @@
                          :value "⏎"
                          :title "Run!"}]]
       [:span.input-group-addon
-       [:a {:href "#"
-            :style {:color "#292b2c"}
-            :title "Clear the REPL history"
-            :on-click (fn [e]
-                        (.preventDefault e)
-                        (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]
+       [:a.chrysalis-link-button {:href "#"
+                                  :title "Clear the REPL history"
+                                  :on-click (fn [e]
+                                              (.preventDefault e)
+                                              (swap! state assoc-in [:repl :history] []))} [:i.fa.fa-eraser]]]
       (when (get-in @state [:repl :available-commands])
         [:span.input-group-addon
-         [:a {:href "#"
-              :style {:color "#292b2c"}
-              :data-toggle :modal
-              :data-target "#repl-available-commands"
-              :title "List of available commands"}
+         [:a.chrysalis-link-button {:href "#"
+                                    :data-toggle :modal
+                                    :data-target "#repl-available-commands"
+                                    :title "List of available commands"}
           [:i.fa.fa-info]]])]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
