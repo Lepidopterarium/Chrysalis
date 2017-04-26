@@ -18,7 +18,21 @@
   (:require [reagent.core :as reagent]
             [chrysalis.command :as command]
             [chrysalis.ui.page :refer [pages page]]
-            [chrysalis.utils :refer [state send-command!]]))
+            [chrysalis.utils :refer [state]]))
+
+(defn- send-command! [req]
+  (let [[command & args] (.split req #" +")
+        full-args (vec (cons (keyword command) (map (fn [arg]
+                                                      (if (= (first arg) ":")
+                                                        (.substring arg 1)
+                                                        arg))
+                                                    args)))
+        result (apply command/run (get-in @state [:current-device :port]) full-args)]
+    (swap! state update-in [:repl :history] (fn [s x]
+                                              (cons x s))
+           {:command (keyword command)
+            :request req
+            :result result})))
 
 (defn repl-wrap [req index result]
   (let [latest? (= index (count (get-in @state [:repl :history])))]

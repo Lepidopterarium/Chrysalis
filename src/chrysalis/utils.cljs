@@ -15,24 +15,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.utils
-  (:require [reagent.core :as reagent :refer [atom]]
-
-            [chrysalis.command :as command]))
+  (:require [reagent.core :as reagent :refer [atom]]))
 
 (defonce state (atom {:devices []
                       :current-device nil
                       :page :selector}))
 
-(defn send-command! [req]
-  (let [[command & args] (.split req #" +")
-        full-args (vec (cons (keyword command) (map (fn [arg]
-                                                      (if (= (first arg) ":")
-                                                        (.substring arg 1)
-                                                        arg))
-                                                    args)))
-        result (apply command/run (get-in @state [:current-device :port]) full-args)]
-    (swap! state update-in [:repl :history] (fn [s x]
-                                              (cons x s))
-           {:command (keyword command)
-            :request req
-            :result result})))
+
