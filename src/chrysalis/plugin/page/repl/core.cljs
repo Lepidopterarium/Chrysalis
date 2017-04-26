@@ -144,6 +144,6 @@
                (range (count (get-in @state [:repl :history])) 0 -1)))])
 
 (swap! pages assoc :repl {:name "REPL"
-                          :index 1
+                          :index 99
                           :disable? (fn [] (nil? (get-in @state [:current-device :port])))})
 (swap! state assoc :repl {:history []})
