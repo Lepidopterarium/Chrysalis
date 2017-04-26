@@ -47,7 +47,7 @@
                 :style {:margin "0.5em"
                         :min-width "350px"}}
      [:div.card-block
-      [:div.card-text
+      [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]
          [:img {:src logo-url}]
          [:p
