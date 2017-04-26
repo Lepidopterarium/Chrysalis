@@ -10,3 +10,12 @@
 .chrysalis-page-repl-box .card-block .collapse pre {
     white-space: pre-wrap;
 }
+
+.chrysalis-page-repl-collapse-toggle i {
+    width: 10.38px;
+    display: inline-block;
+}
+
+.chrysalis-page-repl-collapse-toggle.collapsed i:before {
+    content: "\f105"
+}

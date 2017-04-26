@@ -41,8 +41,9 @@
        [:div.card-block
         [:div.card-title.row
          [:div.col-sm-6.text-left
-          [:a.chrysalis-link-button {:href (str "#repl-history-collapse-" index)
-                                     :data-toggle :collapse}
+          [:a.chrysalis-link-button.chrysalis-page-repl-collapse-toggle
+           {:href (str "#repl-history-collapse-" index)
+            :data-toggle :collapse}
            [:i.fa.fa-angle-down]]
           " " [:code req]]
          [:div.col-sm-6.text-right
