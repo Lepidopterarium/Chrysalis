@@ -83,29 +83,27 @@
                [:div.list-group.col-sm-2
                 (doall (map <command> (sort result)))])))
 
-(defn- available-commands []
-  (when (get-in @state [:current-device :port])
-    (let [r (command/run (get-in @state [:current-device :port]) :help)]
-     (swap! state assoc-in [:repl :available-commands] r))))
+(defn <available-commands> []
+  (when-let [port (get-in @state [:current-device :port])]
+    (let [commands (command/run port :help)]
+      (print "recheck" commands)
+      (fn []
+        [:div.modal.fade {:id "repl-available-commands"}
+         [:div.modal-dialog
+          [:div.modal-content
+           [:div.modal-header
+            [:h5.modal-title "Available commands"]]
+           [:div.modal-body
+            [:div.list-group
+             (doall (map <command> (sort @commands)))]]
+           [:div.modal-footer
+            [:button.btn.btn-secondary
+             {:type :button
+              :data-dismiss :modal} "Cancel"]]]]]))))
 
 (defmethod page :repl [_]
-  (when-not (get-in @state [:repl :available-commands])
-    (available-commands))
   [:div.container-fluid
-   [:div.modal.fade {:id "repl-available-commands"}
-    [:div.modal-dialog
-     [:div.modal-content
-      [:div.modal-header
-       [:h5.modal-title "Available commands"]]
-      [:div.modal-body
-       [:div.list-group
-        (when (get-in @state [:repl :available-commands])
-          (doall (map <command> (sort @(get-in @state [:repl :available-commands])))))]]
-      [:div.modal-footer
-       [:button.btn.btn-secondary
-        {:type :button
-         :data-dismiss :modal} "Cancel"]]]]]
-
+   [<available-commands>]
    [:div.row.justify-content-left.chrysalis-page-repl-prompt
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
@@ -136,12 +134,11 @@
                                                              (.preventDefault e)
                                                              (swap! state assoc-in [:repl :history] []))}
          "Clear history"]
-        (when (get-in @state [:repl :available-commands])
-          [:a.chrysalis-link-button.dropdown-item {:href "#"
-                                                   :data-toggle :modal
-                                                   :data-target "#repl-available-commands"
-                                                   :title "List of available commands"}
-           "Help"])]]]]]
+        [:a.chrysalis-link-button.dropdown-item {:href "#"
+                                                 :data-toggle :modal
+                                                 :data-target "#repl-available-commands"
+                                                 :title "List of available commands"}
+         "Help"]]]]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (get-in @state [:repl :history])
