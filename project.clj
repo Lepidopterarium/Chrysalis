@@ -11,13 +11,16 @@
                  [com.cemerick/piggieback "0.2.1"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.0.0"]
-                       [electron "^1.6.6"]
                        [bootstrap "^4.0.0-alpha.4"]
                        [jquery "^3.1.0"]
                        [font-awesome "^4.7.0"]
                        [tether "^1.3.7"]
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]]
-        :root "resources/public"}
+        :devDependencies [[electron "^1.6.6"]
+                          [foreman "^2.0.0"]]
+        :root "resources/public"
+        :package {:scripts {:start-ui "electron .."
+                            :start-backend "nf -j ../../Procfile start"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
             [lein-npm "0.6.2"]]

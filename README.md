@@ -12,11 +12,10 @@ and [Node](https://nodejs.org/en/), the follow these steps:
 ```bash
 ## Dependencies
 lein deps
-gem install foreman
 
 ## Running
-foreman start
-./resources/public/node_modules/.bin/electron resources
+lein npm run start-backend
+lein npm run start-ui
 ```
 
 ## License
