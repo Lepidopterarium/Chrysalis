@@ -41,7 +41,7 @@
          [:i.fa.fa-repeat]]]]
       [:div {:id (str "repl-history-collapse-" index)
              :class (str "collapse "
-                         (when (= index (dec (count (get-in @state [:repl :history]))))
+                         (when (= index (count (get-in @state [:repl :history])))
                            "show"))}
        (if-not (= result [:pre "\"\""])
          result
@@ -94,9 +94,6 @@
         {:type :button
          :data-dismiss :modal} "Cancel"]]]]]
 
-   (doall (map (fn [item index]
-                 (display (:command item) (:request item) @(:result item) index))
-               (reverse (get-in @state [:repl :history])) (range)))
    [:div.row.justify-content-left {:style {:margin-bottom "1em"}}
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
@@ -129,7 +126,11 @@
               :data-toggle :modal
               :data-target "#repl-available-commands"
               :title "List of available commands"}
-          [:i.fa.fa-info]]])]]]])
+          [:i.fa.fa-info]]])]]]
+   (doall (map (fn [item index]
+                 (display (:command item) (:request item) @(:result item) index))
+               (get-in @state [:repl :history])
+               (range (count (get-in @state [:repl :history])) 0 -1)))])
 
 (swap! pages assoc :repl {:name "REPL"
                           :index 1
