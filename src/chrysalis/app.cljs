@@ -21,7 +21,7 @@
 
             ;; Plugins
 
-            [chrysalis.plugin.page.selector.core :as selector]
+            [chrysalis.plugin.page.devices.core :as devices]
             [chrysalis.plugin.page.repl.core]
 
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
@@ -39,7 +39,7 @@
    (page (:page @state))])
 
 (defn init! []
-  (selector/device-detect!))
+  (devices/device-detect!))
 
 (reagent/render
  [root-component]

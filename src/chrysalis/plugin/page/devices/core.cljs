@@ -14,7 +14,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.plugin.page.selector.core
+(ns chrysalis.plugin.page.devices.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
@@ -63,7 +63,7 @@
        [:p.text-mute.chrysalis-link-button
         (get-in device [:meta :name])]]]]))
 
-(defmethod page :selector [_]
+(defmethod page :devices [_]
   [:div.container-fluid
    [:div.row.justify-content-center
     [:div.col-12.text-center
@@ -72,5 +72,5 @@
     [:div.card-deck
      (doall (map <device> (:devices @state)))]]])
 
-(swap! pages assoc :selector {:name "Home"
-                              :index 0})
+(swap! pages assoc :devices {:name "Devices"
+                             :index 0})

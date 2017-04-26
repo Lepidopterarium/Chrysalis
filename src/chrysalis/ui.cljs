@@ -21,7 +21,7 @@
 
 (defonce state (atom {:devices []
                       :current-device nil
-                      :page :selector}))
+                      :page :devices}))
 
 (defonce pages (atom {}))
 
