@@ -38,7 +38,8 @@
           [:a {:style {:color "#292b2c"}
                :on-click (fn [e]
                            (.preventDefault e)
-                           (swap! state assoc-in [:repl :command] req))}
+                           (swap! state assoc-in [:repl :command] req)
+                           (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
         [:div {:id (str "repl-history-collapse-" index)
                :class (str "collapse " (when latest? "show"))}
