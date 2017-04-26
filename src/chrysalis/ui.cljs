@@ -15,7 +15,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui
-  (:require [reagent.core :as reagent :refer [atom]]))
+  (:require [reagent.core :as reagent :refer [atom]]
+
+            [clojure.string :as s]))
 
 (defonce state (atom {:devices []
                       :current-device nil
@@ -29,3 +31,36 @@
 
 (defmethod page :default [_])
 
+(defn- <menu-item> [[key meta]]
+  (let [disabled? (and (:disable? meta)
+                       ((:disable? meta)))]
+    [:li {:key (str "main-menu-" (name key))
+          :class (s/join " " ["nav-item"
+                              (when (= key (:page @state))
+                                "active")])}
+     [:a.nav-link {:href "#"
+                   :class (when disabled?
+                            "disabled")
+                   :on-click (fn [e]
+                               (.preventDefault e)
+                               (when-not disabled?
+                                 (swap! state assoc :page key)))}
+      (:name meta)]]))
+
+(defn <main-menu> []
+  [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
+   [:button.navbar-toggler.navbar-toggler-right {:type :button
+                                                 :data-toggle :collapse
+                                                 :data-target "#navbarSupportedContent"
+                                                 :aria-controls "navbarSupportedContent"
+                                                 :aria-expanded false
+                                                 :aria-label "Toggle navigation"}
+    [:span.navbar-toggler-icon]]
+   [:span.navbar-brand "Chrysalis"]
+   [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
+    [:ul.navbar-nav.mr-auto
+     (doall (map <menu-item>
+                 (sort-by (fn [[key meta]] (:index meta)) @pages)))]]
+   [:span.navbar-text {:style {:white-space :pre}}
+    (when (:current-device @state)
+      (get-in @state [:current-device :device :meta :name]))]])
