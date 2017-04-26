@@ -123,7 +123,7 @@
                                          (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
       [:span.input-group-addon
        [:input.nav-link {:type :submit
-                         :value "⏎"
+                         :value ""
                          :title "Run!"}]]
       [:span.input-group-addon
        [:a.chrysalis-link-button {:href "#"

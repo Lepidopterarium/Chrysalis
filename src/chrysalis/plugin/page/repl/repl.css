@@ -3,6 +3,17 @@
     margin-bottom: 1em;
 }
 
+.chrysalis-page-repl-prompt [type=submit] {
+    background: none;
+    padding: 0px;
+    border: 0px;
+    cursor: pointer;
+}
+
+.chrysalis-page-repl-prompt [type=submit]:hover {
+    color: #014c8c;
+}
+
 .chrysalis-page-repl-box .card-title {
     margin-bottom: 0px;
 }
