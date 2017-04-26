@@ -14,8 +14,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.ui.FingerPainter
-  (:require [chrysalis.ui.page.repl :refer [display repl-wrap]]))
+(ns chrysalis.plugin.Kaleidoscope.FingerPainter.core
+  (:require [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]))
 
 (defn- toHex [i]
   (let [hex (.toString i 16)]

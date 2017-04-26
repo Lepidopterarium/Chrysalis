@@ -18,21 +18,19 @@
   (:require [reagent.core :as reagent]
             [clojure.string :as s]
 
-            [chrysalis.utils :refer [state]]
-            [chrysalis.ui.page :refer [pages page]]
+            [chrysalis.ui :refer [pages page state]]
 
-            ;; Hook-only libraries
+            ;; Plugins
 
-            [chrysalis.ui.page.selector :as selector]
-            [chrysalis.ui.page.repl]
+            [chrysalis.plugin.page.selector.core :as selector]
+            [chrysalis.plugin.page.repl.core]
 
-            [chrysalis.ui.FingerPainter]
+            [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
+            [chrysalis.plugin.Kaleidoscope.LEDControl.core]
 
-            [chrysalis.command.LEDControl]
-
-            [chrysalis.hardware.fake]
-            [chrysalis.hardware.model01]
-            [chrysalis.hardware.shortcut]))
+            [chrysalis.plugin.hardware.virtual.core]
+            [chrysalis.plugin.hardware.model01.core]
+            [chrysalis.plugin.hardware.shortcut.core]))
 
 (enable-console-print!)
 

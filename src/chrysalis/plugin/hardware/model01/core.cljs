@@ -14,11 +14,9 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.utils
-  (:require [reagent.core :as reagent :refer [atom]]))
+(ns chrysalis.plugin.hardware.model01.core
+  (:require [chrysalis.hardware :refer [known?]]))
 
-(defonce state (atom {:devices []
-                      :current-device nil
-                      :page :selector}))
-
-
+(defmethod known? [0x1209 0x2301] [device]
+  (assoc device :meta {:name "Keyboardio Model 01"
+                       :logo "images/model01.png"}))

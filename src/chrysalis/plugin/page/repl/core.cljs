@@ -14,11 +14,10 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.ui.page.repl
+(ns chrysalis.plugin.page.repl.core
   (:require [reagent.core :as reagent]
             [chrysalis.command :as command]
-            [chrysalis.ui.page :refer [pages page]]
-            [chrysalis.utils :refer [state]]))
+            [chrysalis.ui :refer [pages page state]]))
 
 (defn- send-command! [req]
   (let [[command & args] (.split req #" +")

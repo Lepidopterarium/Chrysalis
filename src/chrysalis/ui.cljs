@@ -14,8 +14,12 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.ui.page
+(ns chrysalis.ui
   (:require [reagent.core :as reagent :refer [atom]]))
+
+(defonce state (atom {:devices []
+                      :current-device nil
+                      :page :selector}))
 
 (defonce pages (atom {}))
 

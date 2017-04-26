@@ -14,7 +14,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.hardware.fake
+(ns chrysalis.plugin.hardware.virtual.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
             [chrysalis.hardware :refer [scan* open known?]]

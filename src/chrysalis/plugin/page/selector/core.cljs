@@ -14,12 +14,11 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.ui.page.selector
+(ns chrysalis.plugin.page.selector.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
-            [chrysalis.ui.page :refer [pages page]]
-            [chrysalis.utils :refer [state]]
+            [chrysalis.ui :refer [pages page state]]
 
             [clojure.string :as s]
             [cljs.core.async :refer [<!]]))

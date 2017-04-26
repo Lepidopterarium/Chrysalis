@@ -14,8 +14,14 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.hardware.shortcut
-  (:require [chrysalis.hardware :refer [known?]]))
+(ns chrysalis.plugin.Kaleidoscope.LEDControl.core
+  (:require [chrysalis.command :refer [pre-process* process*]]))
 
-(defmethod known? [0xfeed 0x6060] [device]
-  (assoc device :meta {:name "Shortcut v0.4"}))
+(defmethod pre-process* :led.mode [_ args]
+  (condp = (first args)
+    :n ["n"]
+    :next ["n"]
+    :p ["p"]
+    :prev ["p"]
+    :previous ["p"]
+    args))

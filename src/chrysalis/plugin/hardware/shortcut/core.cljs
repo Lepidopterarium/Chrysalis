@@ -14,14 +14,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.command.LEDControl
-  (:require [chrysalis.command :refer [pre-process* process*]]))
+(ns chrysalis.plugin.hardware.shortcut.core
+  (:require [chrysalis.hardware :refer [known?]]))
 
-(defmethod pre-process* :led.mode [_ args]
-  (condp = (first args)
-    :n ["n"]
-    :next ["n"]
-    :p ["p"]
-    :prev ["p"]
-    :previous ["p"]
-    args))
+(defmethod known? [0xfeed 0x6060] [device]
+  (assoc device :meta {:name "Shortcut v0.4"}))
