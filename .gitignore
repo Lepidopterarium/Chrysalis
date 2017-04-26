@@ -7,6 +7,7 @@
 /resources/public/js/
 /resources/public/node_modules/
 /resources/public/main.js
+/resources/public/npm-debug.log
 /Chrysalis-*/
 
 *~

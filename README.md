@@ -16,7 +16,7 @@ gem install foreman
 
 ## Running
 foreman start
-./resources/public/node_modules/.bin/electron resources/public
+./resources/public/node_modules/.bin/electron resources
 ```
 
 ## License
