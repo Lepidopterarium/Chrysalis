@@ -21,13 +21,13 @@
             [clojure.string :as str]))
 
 (defmethod known? [0xdead 0xbeef] [device]
-  (assoc device :meta {:name "An example fake device"
+  (assoc device :meta {:name "An example virtual device"
                        :logo "images/plugins/virtual-keyboard.png"}))
 
-(defmethod scan* :fake [_ out]
+(defmethod scan* :virtual [_ out]
   (go
-    (>! out (clj->js {:comName "<fake>"
-                      :manufacturer "Example Corp."
+    (>! out (clj->js {:comName "<virtual>"
+                      :manufacturer "Chrysalis"
                       :pnpId "<none>"
                       :vendorId "0xdead"
                       :productId "0xbeef"
@@ -40,7 +40,7 @@
 (defmethod command :default [_ _])
 
 (defmethod command :version [_ _]
-  "Kaleidoscope/<fake> Fake/Example | Apr 24 2017 15:25:00")
+  "Kaleidoscope/<virtual> Chrysalis/Virtual Keyboard | Apr 24 2017 15:25:00")
 
 (defmethod command :help [_ _]
   (str/join "\n"
@@ -50,7 +50,7 @@
 (defn- format-result [text]
   (str text "\r\n.\r\n"))
 
-(defmethod open "<fake>" [_]
+(defmethod open "<virtual>" [_]
   (js-obj
    "req" ""
    "close" (fn [])

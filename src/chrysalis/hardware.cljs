@@ -50,7 +50,7 @@
 (defn scan []
   (let [out (chan)]
     (scan* :serial out)
-    (scan* :fake out)
+    (scan* :virtual out)
     out))
 
 (defn detect [list]
