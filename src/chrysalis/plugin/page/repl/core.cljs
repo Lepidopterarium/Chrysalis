@@ -127,10 +127,7 @@
                          :title "Run!"}]]
       [:div.dropdown.input-group-addon
        [:a.dropdown-toggle.chrysalis-link-button {:href "#"
-                                                  :data-toggle :dropdown
-                                                  :min-width "0px"
-                                                  :left :auto
-                                                  :right "0px"}
+                                                  :data-toggle :dropdown}
         [:i.fa.fa-cogs]]
        [:div.dropdown-menu.text-right
         [:a.chrysalis-link-button.dropdown-item {:href "#"
