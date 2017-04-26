@@ -1,4 +1,5 @@
 @import 'plugins/page/repl.css';
+@import 'plugins/selector/selector.css';
 
 #application { margin-top: 5rem; }
 

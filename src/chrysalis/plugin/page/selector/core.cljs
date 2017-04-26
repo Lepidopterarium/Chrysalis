@@ -43,9 +43,8 @@
   (let [current? (and (:current-device @state)
                       (= (:comName device) (get-in @state [:current-device :device :comName])))]
     [:div.card {:key (:comName device)
-                :class (when current? "card-outline-success")
-                :style {:margin "0.5em"
-                        :min-width "350px"}}
+                :class (str "chrysalis-page-selector-device "
+                            (when current? "card-outline-success"))}
      [:div.card-block
       [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]
