@@ -129,16 +129,17 @@
         [:i.fa.fa-cogs]]
        [:div.dropdown-menu.text-right
         [:a.chrysalis-link-button.dropdown-item {:href "#"
+                                                 :data-toggle :modal
+                                                 :data-target "#repl-available-commands"
+                                                 :title "List of available commands"}
+         "Help"]
+        [:hr]
+        [:a.chrysalis-link-button.dropdown-item {:href "#"
                                                  :title "Clear the REPL history"
                                                  :on-click (fn [e]
                                                              (.preventDefault e)
                                                              (swap! state assoc-in [:repl :history] []))}
-         "Clear history"]
-        [:a.chrysalis-link-button.dropdown-item {:href "#"
-                                                 :data-toggle :modal
-                                                 :data-target "#repl-available-commands"
-                                                 :title "List of available commands"}
-         "Help"]]]]]]
+         "Clear history"]]]]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) index))
                (get-in @state [:repl :history])
