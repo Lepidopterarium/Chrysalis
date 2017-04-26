@@ -62,7 +62,7 @@
 (defmethod display :default [_ req result index]
   (when result
     (repl-wrap req index
-               [:pre  (.stringify js/JSON (clj->js result) nil 2)])))
+               [:pre {:style {:white-space :pre-wrap}} (.stringify js/JSON (clj->js result) nil 2)])))
 
 (defmethod display :help [_ req result index]
   (when result
