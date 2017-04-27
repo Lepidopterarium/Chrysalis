@@ -61,15 +61,8 @@
         [:div.container-fluid
          [:div.row
           [:div.col-sm-12
-           [:i "There will be settings here, at some point..."]]]]
-        ]
+           [:i "There will be settings here, at some point..."]]]]]
        [:div.modal-footer
-        [:div {:style {:position :absolute
-                       :left "15px"}}
-         [:a.btn.btn-danger {:href "#"
-                             :on-click (fn [_]
-                                         (.close js/window))}
-         "Quit"]]
         [:a.btn.btn-primary.disabled {:href "#"
                                       :disabled true}
          "Save"]
@@ -86,9 +79,18 @@
                                                  :aria-expanded false
                                                  :aria-label "Toggle navigation"}
     [:span.navbar-toggler-icon]]
-   [:a.navbar-brand.chrysalis-link-button {:data-toggle :modal
-                                           :href "#settings"}
-    [:i.fa.fa-spinner] " Chrysalis"]
+   [:div.dropdown
+    [:a.navbar-brand.chrysalis-link-button.text-white {:data-toggle :dropdown
+                                                       :href "#"}
+     [:i.fa.fa-spinner] " Chrysalis"]
+    [:div.dropdown-menu
+     [:a.dropdown-item {:href "#settings"
+                        :data-toggle :modal}
+      "Settings"]
+     [:hr]
+     [:a.dropdown-item {:href "#"
+                        :on-click #(.close js/window)} "Quit"]]]
+
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
      (doall (map <menu-item>
