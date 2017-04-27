@@ -68,7 +68,7 @@
     device-path))
 
 (defmethod open :default [device-path]
-  (let [port (SerialPort. device-path)]
+  (let [port (SerialPort. device-path #js {"lock" false})]
     (.once port "open" (fn []
                          (.flush port)
                          (.drain port)
