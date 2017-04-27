@@ -7,3 +7,7 @@
 .chrysalis-link-button {
     color: #292b2c;
 }
+
+.navbar-brand:hover i {
+    animation: fa-spin 2s infinite linear;
+}

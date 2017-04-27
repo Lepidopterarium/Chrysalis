@@ -88,7 +88,7 @@
     [:span.navbar-toggler-icon]]
    [:a.navbar-brand.chrysalis-link-button {:data-toggle :modal
                                            :href "#settings"}
-    "Chrysalis"]
+    [:i.fa.fa-spinner] " Chrysalis"]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
      (doall (map <menu-item>
