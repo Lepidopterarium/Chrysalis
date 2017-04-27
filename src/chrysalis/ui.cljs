@@ -47,6 +47,36 @@
                                  (swap! state assoc :page key)))}
       (:name meta)]]))
 
+(defn <settings> []
+  (fn []
+    [:div.modal.fade {:id "settings"}
+     [:div.modal-dialog.modal-lg
+      [:div.modal-content.bg-faded
+       [:div.modal-header
+        [:h5.modal-title "Settings"]
+        [:button.close {:type :close
+                        :data-dismiss :modal}
+         [:span "×"]]]
+       [:div.modal-body
+        [:div.container-fluid
+         [:div.row
+          [:div.col-sm-12
+           [:i "There will be settings here, at some point..."]]]]
+        ]
+       [:div.modal-footer
+        [:div {:style {:position :absolute
+                       :left "15px"}}
+         [:button.btn.btn-error {:type :button
+                                 :on-click (fn [_]
+                                             (.close js/window))}
+         "Quit"]]
+        [:button.btn.btn-primary.disabled {:type :button
+                                           :disabled true}
+         "Save"]
+        [:button.btn.btn-secondary {:type :button
+                                    :data-dismiss :modal}
+         "Cancel"]]]]]))
+
 (defn <main-menu> []
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
    [:button.navbar-toggler.navbar-toggler-right {:type :button
@@ -56,7 +86,9 @@
                                                  :aria-expanded false
                                                  :aria-label "Toggle navigation"}
     [:span.navbar-toggler-icon]]
-   [:span.navbar-brand "Chrysalis"]
+   [:a.navbar-brand.chrysalis-link-button {:data-toggle :modal
+                                           :href "#settings"}
+    "Chrysalis"]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
      (doall (map <menu-item>

@@ -17,7 +17,7 @@
 (ns chrysalis.app
   (:require [reagent.core :as reagent]
 
-            [chrysalis.ui :refer [pages page state <main-menu>]]
+            [chrysalis.ui :refer [pages page state <main-menu> <settings>]]
 
             ;; Plugins
 
@@ -36,6 +36,7 @@
 
 (defn root-component []
   [:div
+   [<settings>]
    [<main-menu>]
    (page (:page @state))])
 
