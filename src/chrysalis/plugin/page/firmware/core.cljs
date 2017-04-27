@@ -81,7 +81,7 @@
    [:div.row.justify-content-center
     [:div.card.chrysalis-page-firmware-card
      [:img.card-img-top {:alt "Kaleidoscope Logo"
-                         :src "http://placehold.it/350x150"}]
+                         :src "images/kaleidoscope-logo-ph-small.png"}]
      [:div.card-block
       [:h4.card-title "Kaleidoscope"]
       [firmware-version]]]]])
