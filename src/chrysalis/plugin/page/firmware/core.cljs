@@ -52,6 +52,7 @@
        [:input.form-control {:type :text
                              :disabled :true
                              :placeholder "Please select a file"
+                             :title firmware-file
                              :value (or (basename firmware-file) "")}]
        [:div.input-group-addon
         [:a.chrysalis-link-button {:href "#"
