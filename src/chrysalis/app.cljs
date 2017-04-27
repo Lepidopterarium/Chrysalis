@@ -43,8 +43,10 @@
 (defn init! []
   (devices/device-detect!)
 
-  (reagent/render
-   [root-component]
-   (js/document.getElementById "application")))
+  (.setTimeout js/window (fn []
+                           (reagent/render
+                            [root-component]
+                            (js/document.getElementById "application")))
+               2000))
 
 (init!)
