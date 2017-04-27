@@ -37,7 +37,7 @@
 (defn root-component []
   [:div
    [<settings>]
-   [<main-menu>]
+   [<main-menu> devices/device-detect!]
    (page (:page @state))])
 
 (defn init! []
