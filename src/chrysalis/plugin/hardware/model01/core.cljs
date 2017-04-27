@@ -18,5 +18,11 @@
   (:require [chrysalis.hardware :refer [known?]]))
 
 (defmethod known? [0x1209 0x2301] [device]
-  (assoc device :meta {:name "Keyboardio Model 01"
-                       :logo "images/plugins/model01.png"}))
+  (assoc device
+         :meta {:name "Keyboardio Model 01"
+                :logo "images/plugins/model01.png"}
+         :board {:name "Keyboard.io Model 01"
+                 :baud 9600
+                 :productId ["0x2300" "0x2301"]
+                 :protocol "avr109"
+                 :signature (js/Buffer. #js [0x43 0x41 0x54 0x45 0x52 0x49 0x4e])}))

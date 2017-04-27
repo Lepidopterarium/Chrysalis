@@ -18,15 +18,32 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.ui :refer [pages page state]]
             [chrysalis.command :as command]
+            [chrysalis.hardware :as hardware]
 
             [clojure.string :as s]
             [cljs.core.async :refer [<!]]))
 
 (def dialog (.-dialog (.-remote (js/require "electron"))))
+(def Avrgirl (js/require "avrgirl-arduino"))
 
 (defn basename [path]
   (when path
     (last (.split path #"/|\\"))))
+
+(defn device-reopen [device]
+  (swap! state assoc :current-device {:port (hardware/open (:comName device))
+                                      :device device}))
+
+(defn upload [hex-name]
+  (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
+        device (get-in @state [:current-device :device])
+        port (get-in @state [:current-device :port])]
+    (.close port
+            (fn [_]
+              (.flash avrgirl hex-name (fn [error]
+                                         (if error
+                                           (print error)
+                                           (device-reopen device))))))))
 
 (defn drop-down []
   (let [firmware-file (get-in @state [:flash :firmware-file])]
@@ -60,7 +77,8 @@
                                                (swap! state assoc-in [:flash :firmware-file] nil))}
          [:i.fa.fa-eraser]]]]
       (when firmware-file
-        [:a.btn.btn-primary {:href "#"}
+        [:a.btn.btn-primary {:href "#"
+                             :on-click #(upload firmware-file)}
          "Upload"])]]))
 
 (defn firmware-version []
