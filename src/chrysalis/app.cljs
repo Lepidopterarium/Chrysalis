@@ -41,10 +41,10 @@
    (page (:page @state))])
 
 (defn init! []
-  (devices/device-detect!))
+  (devices/device-detect!)
 
-(reagent/render
- [root-component]
-  (js/document.getElementById "application"))
+  (reagent/render
+   [root-component]
+   (js/document.getElementById "application")))
 
 (init!)
