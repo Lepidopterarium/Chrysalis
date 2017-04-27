@@ -23,10 +23,10 @@
       (str "0" hex)
       hex)))
 
-(defmethod display :fingerpainter.palette [_ req result index]
+(defmethod display :fingerpainter.palette [_ req result device index]
   (when result
     (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
-      (repl-wrap req index
+      (repl-wrap req index device
                  [:pre
                   (map (fn [[r g b] index]
                          [:span.badge

@@ -31,9 +31,10 @@
                                               (cons x s))
            {:command (keyword command)
             :request req
-            :result result})))
+            :result result
+            :device (get-in @state [:current-device :device])})))
 
-(defn repl-wrap [req index result]
+(defn repl-wrap [req index device result]
   (let [latest? (= index (count (get-in @state [:repl :history])))]
     [:div.row.chrysalis-page-repl-box {:key (str "repl-history-" index)}
      [:div.col-sm-12
@@ -56,7 +57,9 @@
                :class (str "collapse " (when latest? "show"))}
          (if-not (= result [:pre "\"\""])
            result
-           [:pre [:i "<no output>"]])]]]]]))
+           [:pre [:i "<no output>"]])
+         [:div.text-muted.text-right
+          (get-in device [:meta :name])]]]]]]))
 
 (defn- <command> [cmd]
   [:button.btn.btn-outline-primary
@@ -69,17 +72,17 @@
    cmd])
 
 (defmulti display
-  (fn [command _ _ _]
+  (fn [command _ _ _ _]
     command))
 
-(defmethod display :default [_ req result index]
+(defmethod display :default [_ req result device index]
   (when result
-    (repl-wrap req index
+    (repl-wrap req index device
                [:pre (.stringify js/JSON (clj->js result) nil 2)])))
 
-(defmethod display :help [_ req result index]
+(defmethod display :help [_ req result device index]
   (when result
-    (repl-wrap req index
+    (repl-wrap req index device
                [:div.list-group.col-sm-2
                 (doall (map <command> (sort result)))])))
 
@@ -141,7 +144,7 @@
                                                              (swap! state assoc-in [:repl :history] []))}
          "Clear history"]]]]]]
    (doall (map (fn [item index]
-                 (display (:command item) (:request item) @(:result item) index))
+                 (display (:command item) (:request item) @(:result item) (:device item) index))
                (get-in @state [:repl :history])
                (range (count (get-in @state [:repl :history])) 0 -1)))])
 
