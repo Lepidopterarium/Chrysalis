@@ -38,7 +38,7 @@
   (let [latest? (= index (count (get-in @state [:repl :history])))]
     [:div.row.chrysalis-page-repl-box {:key (str "repl-history-" index)}
      [:div.col-sm-12
-      [:div.card {:class (when latest? "card-outline-info")}
+      [:div.card {:class (when latest? "card-outline-success")}
        [:div.card-block
         [:div.card-title.row
          [:div.col-sm-6.text-left
