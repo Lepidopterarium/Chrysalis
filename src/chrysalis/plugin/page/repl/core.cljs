@@ -88,7 +88,6 @@
 (defn <available-commands> []
   (when-let [port (get-in @state [:current-device :port])]
     (let [commands (command/run port :help)]
-      (print "recheck" commands)
       (fn []
         [:div.modal.fade {:id "repl-available-commands"}
          [:div.modal-dialog
