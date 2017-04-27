@@ -66,15 +66,15 @@
        [:div.modal-footer
         [:div {:style {:position :absolute
                        :left "15px"}}
-         [:button.btn.btn-error {:type :button
-                                 :on-click (fn [_]
-                                             (.close js/window))}
+         [:a.btn.btn-danger {:href "#"
+                             :on-click (fn [_]
+                                         (.close js/window))}
          "Quit"]]
-        [:button.btn.btn-primary.disabled {:type :button
-                                           :disabled true}
+        [:a.btn.btn-primary.disabled {:href "#"
+                                      :disabled true}
          "Save"]
-        [:button.btn.btn-secondary {:type :button
-                                    :data-dismiss :modal}
+        [:a.btn.btn-secondary {:href "#"
+                               :data-dismiss :modal}
          "Cancel"]]]]]))
 
 (defn <main-menu> []
