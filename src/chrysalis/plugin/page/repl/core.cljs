@@ -53,8 +53,7 @@
                                                  (swap! state assoc-in [:repl :command] req)
                                                  (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
-        [:div {:id (str "repl-history-collapse-" index)
-               :class (str "collapse " (when latest? "show"))}
+        [:div.collapse.show {:id (str "repl-history-collapse-" index)}
          (if-not (= result [:pre "\"\""])
            result
            [:pre [:i "<no output>"]])
