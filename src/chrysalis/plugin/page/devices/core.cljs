@@ -18,30 +18,11 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.hardware :as hardware]
             [chrysalis.command :as command]
+            [chrysalis.device :as device]
             [chrysalis.ui :refer [pages page state]]
 
             [clojure.string :as s]
             [cljs.core.async :refer [<!]]))
-
-(defn device-close! []
-  (when (:current-device @state)
-    (hardware/close (get-in @state [:current-device :port])))
-  nil)
-
-(defn device-open! [device]
-  (device-close!)
-  {:port (hardware/open (:comName device))
-   :device device})
-
-(defn device-detect! []
-  (swap! state assoc :devices [])
-  (let [in (hardware/detect (hardware/scan))]
-    (go-loop []
-      (when-let [device (<! in)]
-        (swap! state (fn [state device]
-                       (update-in state [:devices] conj device)) device)
-        (recur))))
-  nil)
 
 (defn <device> [device]
   (let [current? (and (:current-device @state)
@@ -52,8 +33,8 @@
                                              :class (when current? "card-outline-success")
                                              :on-click (fn [e]
                                                          (if current?
-                                                           (swap! state assoc :current-device (device-close!))
-                                                           (swap! state assoc :current-device (device-open! device))))}
+                                                           (device/close!)
+                                                           (device/open! device)))}
      [:div.card-block
       [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]

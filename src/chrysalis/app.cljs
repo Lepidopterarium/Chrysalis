@@ -17,11 +17,12 @@
 (ns chrysalis.app
   (:require [reagent.core :as reagent]
 
+            [chrysalis.device :as device]
             [chrysalis.ui :refer [pages page state <main-menu> <settings>]]
 
             ;; Plugins
 
-            [chrysalis.plugin.page.devices.core :as devices]
+            [chrysalis.plugin.page.devices.core]
             [chrysalis.plugin.page.repl.core]
             [chrysalis.plugin.page.firmware.core]
 
@@ -37,11 +38,11 @@
 (defn root-component []
   [:div
    [<settings>]
-   [<main-menu> devices/device-detect!]
+   [<main-menu> device/detect!]
    (page (:page @state))])
 
 (defn init! []
-  (devices/device-detect!)
+  (device/detect!)
 
   (.setTimeout js/window (fn []
                            (reagent/render
