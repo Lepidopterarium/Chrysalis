@@ -17,8 +17,9 @@
 (ns chrysalis.app
   (:require [reagent.core :as reagent]
 
+            [chrysalis.core :as core :refer [state pages]]
             [chrysalis.device :as device]
-            [chrysalis.ui :refer [pages page state <main-menu> <settings>]]
+            [chrysalis.ui :as ui]
 
             ;; Plugins
 
@@ -37,9 +38,9 @@
 
 (defn root-component []
   [:div
-   [<settings>]
-   [<main-menu> device/detect!]
-   (page (:page @state))])
+   [ui/<settings>]
+   [ui/<main-menu> @state @pages device/detect!]
+   (ui/page (core/current-page))])
 
 (defn init! []
   (device/detect!)

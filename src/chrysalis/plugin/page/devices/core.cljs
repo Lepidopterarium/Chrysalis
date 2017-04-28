@@ -15,14 +15,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.devices.core
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [chrysalis.hardware :as hardware]
-            [chrysalis.command :as command]
-            [chrysalis.device :as device]
-            [chrysalis.ui :refer [pages page state]]
-
-            [clojure.string :as s]
-            [cljs.core.async :refer [<!]]))
+  (:require [chrysalis.device :as device]
+            [chrysalis.core :refer [state pages]]
+            [chrysalis.ui :refer [page]]))
 
 (defn <device> [device]
   (let [current? (and (:current-device @state)

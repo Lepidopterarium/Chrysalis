@@ -15,15 +15,12 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require [clojure.string :as s]
 
-            [clojure.string :as s]))
+            [chrysalis.core :as core]
+            [chrysalis.device :as device]))
 
-(defonce state (atom {:devices []
-                      :current-device nil
-                      :page :devices}))
-
-(defonce pages (atom {}))
+;;; ---- Page ---- ;;;
 
 (defmulti page
   (fn [p]
@@ -31,12 +28,14 @@
 
 (defmethod page :default [_])
 
-(defn- <menu-item> [[key meta]]
+;;; ---- Menu ---- ;;;
+
+(defn- <menu-item> [state [key meta]]
   (let [disabled? (and (:disable? meta)
                        ((:disable? meta)))]
     [:li {:key (str "main-menu-" (name key))
           :class (s/join " " ["nav-item"
-                              (when (= key (:page @state))
+                              (when (= key (core/current-page))
                                 "active")])}
      [:a.nav-link {:href "#"
                    :class (when disabled?
@@ -44,40 +43,14 @@
                    :on-click (fn [e]
                                (.preventDefault e)
                                (when-not disabled?
-                                 (swap! state assoc :page key)))}
+                                 (core/switch-to-page! key)))}
       (:name meta)]]))
 
-(defn <settings> []
-  (fn []
-    [:div.modal.fade {:id "settings"}
-     [:div.modal-dialog.modal-lg
-      [:div.modal-content.bg-faded
-       [:div.modal-header
-        [:h5.modal-title "Settings"]
-        [:button.close {:type :close
-                        :data-dismiss :modal}
-         [:span "×"]]]
-       [:div.modal-body
-        [:div.container-fluid
-         [:div.row
-          [:div.col-sm-12
-           [:i "There will be settings here, at some point..."]]]]]
-       [:div.modal-footer
-        [:a.btn.btn-primary.disabled {:href "#"
-                                      :disabled true}
-         "Save"]
-        [:a.btn.btn-secondary {:href "#"
-                               :data-dismiss :modal}
-         "Cancel"]]]]]))
-
-(defn <main-menu> [detector]
+(defn <main-menu> [state pages detector]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
    [:button.navbar-toggler.navbar-toggler-right {:type :button
                                                  :data-toggle :collapse
-                                                 :data-target "#navbarSupportedContent"
-                                                 :aria-controls "navbarSupportedContent"
-                                                 :aria-expanded false
-                                                 :aria-label "Toggle navigation"}
+                                                 :data-target "#navbarSupportedContent"}
     [:span.navbar-toggler-icon]]
    [:div.dropdown
     [:a.navbar-brand.chrysalis-link-button.text-white {:data-toggle :dropdown
@@ -96,8 +69,32 @@
 
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
     [:ul.navbar-nav.mr-auto
-     (doall (map <menu-item>
-                 (sort-by (fn [[key meta]] (:index meta)) @pages)))]]
+     (doall (map (partial <menu-item> state)
+                 (sort-by (fn [[key meta]] (:index meta)) pages)))]]
    [:span.navbar-text {:style {:white-space :pre}}
-    (when (:current-device @state)
-      (get-in @state [:current-device :device :meta :name]))]])
+    (when-let [device (device/current)]
+      (get-in device [:meta :name]))]])
+
+;;; ---- Settings ---- ;;;
+
+(defn <settings> []
+  [:div.modal.fade {:id "settings"}
+   [:div.modal-dialog.modal-lg
+    [:div.modal-content.bg-faded
+     [:div.modal-header
+      [:h5.modal-title "Settings"]
+      [:button.close {:type :close
+                      :data-dismiss :modal}
+       [:span "×"]]]
+     [:div.modal-body
+      [:div.container-fluid
+       [:div.row
+        [:div.col-sm-12
+         [:i "There will be settings here, at some point..."]]]]]
+     [:div.modal-footer
+      [:a.btn.btn-primary.disabled {:href "#"
+                                    :disabled true}
+       "Save"]
+      [:a.btn.btn-secondary {:href "#"
+                             :data-dismiss :modal}
+       "Cancel"]]]]])

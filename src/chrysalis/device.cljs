@@ -17,21 +17,27 @@
 (ns chrysalis.device
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.hardware :as hardware]
-            [chrysalis.ui :refer [state]]
+            [chrysalis.core :as core :refer [state]]
 
             [cljs.core.async :refer [<!]]))
 
+(defn switch-to! [d]
+  (swap! state assoc :current-device d))
+
+(defn current []
+  (:current-device @state))
+
 (defn close! []
-  (when (:current-device @state)
-    (hardware/close (get-in @state [:current-device :port]))
-    (swap! state assoc :page :devices)
-    (swap! state assoc :current-device nil))
+  (when-let [device (current)]
+    (hardware/close (:port device))
+    (core/switch-to-page! :devices)
+    (switch-to! nil))
   nil)
 
 (defn open! [device]
   (close!)
-  (swap! state assoc :current-device {:port (hardware/open (:comName device))
-                                      :device device}))
+  (switch-to! {:port (hardware/open (:comName device))
+               :device device}))
 
 (defn detect! []
   (swap! state assoc :devices [])
@@ -44,3 +50,5 @@
                        (update-in state [:devices] conj device)) device)
         (recur))))
   nil)
+
+

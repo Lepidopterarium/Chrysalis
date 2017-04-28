@@ -15,13 +15,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.firmware.core
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [chrysalis.ui :refer [pages page state]]
+  (:require [chrysalis.core :refer [state pages]]
+            [chrysalis.device :as device]
+            [chrysalis.ui :refer [page]]
             [chrysalis.command :as command]
-            [chrysalis.hardware :as hardware]
-
-            [clojure.string :as s]
-            [cljs.core.async :refer [<!]]))
+            [chrysalis.hardware :as hardware]))
 
 (def dialog (.-dialog (.-remote (js/require "electron"))))
 (def Avrgirl (js/require "avrgirl-arduino"))
@@ -30,26 +28,25 @@
   (when path
     (last (.split path #"/|\\"))))
 
-(defn device-reopen [device]
-  (swap! state assoc :current-device {:port (hardware/open (:comName device))
-                                      :device device}))
+(defn firmware-state! [s]
+  (swap! state assoc-in [:firmware :state] s))
 
 (defn upload [hex-name]
   (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
-        device (get-in @state [:current-device :device])
-        port (get-in @state [:current-device :port])]
-    (swap! state assoc-in [:firmware :state] :uploading)
+        device (:device (device/current))
+        port (:port (device/current))]
+    (firmware-state! :uploading)
     (.close port
             (fn [_]
               (.flash avrgirl hex-name (fn [error]
                                          (if error
                                            (do
-                                             (swap! state assoc-in [:firmware :state] :error)
-                                             (.log js/console error)
-                                             )
+                                             (firmware-state! :error)
+                                             (.log js/console error))
                                            (do
-                                             (swap! state assoc-in [:firmware :state] :success)
-                                             (device-reopen device)))))))))
+                                             (firmware-state! :success)
+                                             (device/switch-to! {:port (hardware/open (:comName device))
+                                                                 :device device})))))))))
 
 (defn drop-down []
   (let [hex-file (get-in @state [:firmware :hex-file])]
@@ -81,7 +78,7 @@
        [:div.input-group-addon
         [:a.chrysalis-link-button {:href "#"
                                    :on-click (fn []
-                                               (swap! state assoc-in [:firmware :state] :default)
+                                               (firmware-state! :default)
                                                (swap! state assoc-in [:firmware :hex-file] nil))}
          [:i.fa.fa-eraser]]]]
       (when hex-file
@@ -90,7 +87,7 @@
          "Upload"])]]))
 
 (defn firmware-version []
-  (let [version (command/run (get-in @state [:current-device :port]) :version)]
+  (let [version (command/run (:port (device/current)) :version)]
     (fn []
       [:div.card-text
        [:div.text-muted
@@ -122,7 +119,7 @@
        "Kaleidoscope"]
       [firmware-version]]]]])
 
-(swap! state assoc :firmware {:state :normal})
+(swap! state assoc :firmware {:state :default})
 (swap! pages assoc :firmware {:name "Firmware"
                               :index 80
-                              :disable? (fn [] (nil? (get-in @state [:current-device :port])))})
+                              :disable? (fn [] (nil? (:port (device/current))))})

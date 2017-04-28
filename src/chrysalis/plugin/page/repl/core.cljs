@@ -15,9 +15,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.repl.core
-  (:require [reagent.core :as reagent]
+  (:require [chrysalis.core :refer [state pages]]
+            [chrysalis.device :as device]
             [chrysalis.command :as command]
-            [chrysalis.ui :refer [pages page state]]))
+            [chrysalis.ui :refer [page]]))
 
 (defn- send-command! [req]
   (let [[command & args] (.split req #" +")
@@ -26,13 +27,13 @@
                                                         (.substring arg 1)
                                                         arg))
                                                     args)))
-        result (apply command/run (get-in @state [:current-device :port]) full-args)]
+        result (apply command/run (:port (device/current)) full-args)]
     (swap! state update-in [:repl :history] (fn [s x]
                                               (cons x s))
            {:command (keyword command)
             :request req
             :result result
-            :device (get-in @state [:current-device :device])})))
+            :device (:device (device/current))})))
 
 (defn repl-wrap [req index device result]
   (let [latest? (= index (count (get-in @state [:repl :history])))]
@@ -86,7 +87,7 @@
                 (doall (map <command> (sort result)))])))
 
 (defn <available-commands> []
-  (when-let [port (get-in @state [:current-device :port])]
+  (when-let [port (:port (device/current))]
     (let [commands (command/run port :help)]
       (fn []
         [:div.modal.fade {:id "repl-available-commands"}
@@ -148,5 +149,5 @@
 
 (swap! pages assoc :repl {:name "REPL"
                           :index 99
-                          :disable? (fn [] (nil? (get-in @state [:current-device :port])))})
+                          :disable? (fn [] (nil? (:port (device/current))))})
 (swap! state assoc :repl {:history []})
