@@ -24,8 +24,7 @@ lein resource
 ### Running in development mode
 
 ```bash
-lein npm run start-backend
-lein npm run start-ui
+lein npm run start
 ```
 
 ## License

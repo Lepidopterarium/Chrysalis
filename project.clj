@@ -20,7 +20,7 @@
                           [foreman "^2.0.0"]]
         :root "resources/public"
         :package {:scripts {:start-ui "electron .."
-                            :start-backend "nf -j ../../Procfile start"}}}
+                            :start "nf -j ../../Procfile start"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
             [lein-resource "16.9.1"]
