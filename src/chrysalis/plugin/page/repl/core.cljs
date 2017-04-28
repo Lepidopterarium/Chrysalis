@@ -104,6 +104,23 @@
              {:type :button
               :data-dismiss :modal} "Cancel"]]]]]))))
 
+(defn- repl-history-previous []
+  (let [history-length (count (get-in @state [:repl :history]))
+        current-index (max (or (get-in @state [:repl :history-index]) 0) 0)]
+    (when (< current-index history-length)
+        (let [history-item (nth (get-in @state [:repl :history]) current-index)]
+          (swap! state assoc-in [:repl :command] (:request history-item))
+          (swap! state assoc-in [:repl :history-index] (min (inc current-index) history-length))))))
+
+(defn- repl-history-next []
+  (let [history-length (count (get-in @state [:repl :history]))
+        current-index (min (or (get-in @state [:repl :history-index]) 0) (- history-length 2))]
+    (if (>= current-index 0)
+      (let [history-item (nth (get-in @state [:repl :history]) current-index)]
+        (swap! state assoc-in [:repl :command] (:request history-item))
+        (swap! state assoc-in [:repl :history-index] (max (dec current-index) -1)))
+      (swap! state assoc-in [:repl :command] nil))))
+
 (defmethod page [:render :repl] [_ _]
   [:div.container-fluid
    [<available-commands>]
@@ -120,6 +137,11 @@
                             :placeholder "Type command here"
                             :autoFocus true
                             :value (get-in @state [:repl :command])
+                            :on-key-down (fn [key]
+                                         (case (.-which key)
+                                           38 (repl-history-previous)
+                                           40 (repl-history-next)
+                                           nil))
                             :on-change (fn [e]
                                          (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
       [:span.input-group-addon
