@@ -50,7 +50,8 @@
            [:i.fa.fa-angle-down]]
           " " [:code req]]
          [:div.col-sm-6.text-right
-          [:a.chrysalis-link-button {:on-click (fn [e]
+          [:a.chrysalis-link-button {:href "#"
+                                     :on-click (fn [e]
                                                  (.preventDefault e)
                                                  (swap! state assoc-in [:repl :command] req)
                                                  (.focus (js/document.getElementById "repl-prompt-input")))}
