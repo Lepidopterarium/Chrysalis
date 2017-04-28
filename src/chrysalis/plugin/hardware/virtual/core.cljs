@@ -18,7 +18,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
             [chrysalis.hardware :refer [scan* open known?]]
-            [clojure.string :as str]))
+            [clojure.string :as s]))
 
 (defmethod known? [0xdead 0xbeef] [device]
   (assoc device :meta {:name "An example virtual device"
@@ -42,10 +42,19 @@
 (defmethod command :version [_ _]
   "Kaleidoscope/<virtual> Chrysalis/Virtual Keyboard | Apr 24 2017 15:25:00")
 
+(defmethod command :fingerpainter.palette [_ _]
+  (s/join " " (map str [0x00 0x00 0x00
+                        230 119 107
+                        229 154 67
+                        242 228 110
+                        155 243 150
+                        150 221 243
+                        255 255 255])))
+
 (defmethod command :help [_ _]
-  (str/join "\n"
-            ["help"
-             "version"]))
+  (s/join "\n"
+          ["help"
+           "version"]))
 
 (defn- format-result [text]
   (str text "\r\n.\r\n"))
