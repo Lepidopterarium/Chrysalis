@@ -20,16 +20,15 @@
             [chrysalis.ui :refer [page]]))
 
 (defn <device> [device]
-  (let [current? (and (:current-device @state)
-                      (= (:comName device) (get-in @state [:current-device :device :comName])))]
+  (let [current? (= device (:device (device/current)))]
     [:a.card.chrysalis-page-selector-device {:key (:comName device)
                                              :href "#"
                                              :disabled current?
                                              :class (when current? "card-outline-success")
                                              :on-click (fn [e]
                                                          (if current?
-                                                           (device/close!)
-                                                           (device/open! device)))}
+                                                           (device/switch-to! nil)
+                                                           (device/switch-to! device)))}
      [:div.card-block
       [:div.card-text.text-center
        (if-let [logo-url (get-in device [:meta :logo])]

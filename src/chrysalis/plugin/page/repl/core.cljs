@@ -16,6 +16,7 @@
 
 (ns chrysalis.plugin.page.repl.core
   (:require [chrysalis.core :refer [state pages]]
+            [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.command :as command]
             [chrysalis.ui :refer [page]]))
@@ -147,7 +148,15 @@
                (get-in @state [:repl :history])
                (range (count (get-in @state [:repl :history])) 0 -1)))])
 
+(defmethod page [:enter :repl] [_ _]
+  (swap! state assoc-in [:current-device :port]
+         (hardware/open (get-in (device/current) [:device :comName]))))
+
+(defmethod page [:leave :repl] [_ _]
+  (.close (get-in @state [:current-device :port]))
+  (swap! state assoc-in [:current-device :port] nil))
+
 (swap! pages assoc :repl {:name "REPL"
                           :index 99
-                          :disable? (fn [] (nil? (:port (device/current))))})
+                          :disable? (fn [] (nil? (device/current)))})
 (swap! state assoc :repl {:history []})

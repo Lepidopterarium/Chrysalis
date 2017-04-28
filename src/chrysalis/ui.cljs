@@ -81,7 +81,7 @@
                  (sort-by (fn [[key meta]] (:index meta)) pages)))]]
    [:span.navbar-text {:style {:white-space :pre}}
     (when-let [device (device/current)]
-      (get-in device [:meta :name]))]])
+      (get-in device [:device :meta :name]))]])
 
 ;;; ---- Settings ---- ;;;
 

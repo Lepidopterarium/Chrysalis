@@ -33,20 +33,13 @@
 
 (defn upload [hex-name]
   (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
-        device (:device (device/current))
-        port (:port (device/current))]
+        device (device/current)]
     (firmware-state! :uploading)
-    (.close port
-            (fn [_]
-              (.flash avrgirl hex-name (fn [error]
-                                         (if error
-                                           (do
-                                             (firmware-state! :error)
-                                             (.log js/console error))
-                                           (do
-                                             (firmware-state! :success)
-                                             (device/switch-to! {:port (hardware/open (:comName device))
-                                                                 :device device})))))))))
+    (.flash avrgirl hex-name (fn [error]
+                               (if error
+                                 (firmware-state! :error)
+                                 (firmware-state! :success))
+                               (device/switch-to! device)))))
 
 (defn drop-down []
   (let [hex-file (get-in @state [:firmware :hex-file])]
@@ -86,8 +79,14 @@
                              :on-click #(upload hex-file)}
          "Upload"])]]))
 
+(defn- get-firmware-version []
+  (let [port (hardware/open (get-in (device/current) [:device :comName]))
+        version (command/run port :version)]
+    (.setTimeout js/window #(.close port) 100)
+    version))
+
 (defn firmware-version []
-  (let [version (command/run (:port (device/current)) :version)]
+  (let [version (get-firmware-version)]
     (fn []
       [:div.card-text
        [:div.text-muted
@@ -127,4 +126,4 @@
 (swap! state assoc :firmware {:state :default})
 (swap! pages assoc :firmware {:name "Firmware"
                               :index 80
-                              :disable? (fn [] (nil? (:port (device/current))))})
+                              :disable? (fn [] (nil? (device/current)))})

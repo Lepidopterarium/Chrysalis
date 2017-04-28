@@ -22,25 +22,16 @@
             [cljs.core.async :refer [<!]]))
 
 (defn switch-to! [d]
-  (swap! state assoc :current-device d))
+  (if d
+    (swap! state assoc-in [:current-device :device] d)
+    (swap! state assoc :current-device nil)))
 
 (defn current []
   (:current-device @state))
 
-(defn close! []
-  (when-let [device (current)]
-    (hardware/close (:port device))
-    (switch-to! nil))
-  nil)
-
-(defn open! [device]
-  (close!)
-  (switch-to! {:port (hardware/open (:comName device))
-               :device device}))
-
 (defn detect! []
   (swap! state assoc :devices [])
-  (close!)
+  (switch-to! nil)
 
   (let [in (hardware/detect (hardware/scan))]
     (go-loop []
