@@ -26,6 +26,11 @@
     (swap! state assoc-in [:current-device :device] d)
     (swap! state assoc :current-device nil)))
 
+(defn select-by-serial! [serial]
+  (swap! state assoc-in [:current-device :device]
+         (first (filter (fn [device]
+                          (= (:serialNumber device) serial)) (:devices @state)))))
+
 (defn current []
   (:current-device @state))
 

@@ -35,11 +35,22 @@
   (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
         device (device/current)]
     (firmware-state! :uploading)
+    (device/switch-to! nil)
     (.flash avrgirl hex-name (fn [error]
-                               (if error
-                                 (firmware-state! :error)
-                                 (firmware-state! :success))
-                               (device/switch-to! device)))))
+                               (when error
+                                 (.error js/console error))
+                               (.setTimeout js/window
+                                            (fn []
+                                              (device/detect!)
+
+                                              (.setTimeout js/window
+                                                           (fn []
+                                                             (device/select-by-serial! (get-in device [:device :serialNumber]))
+                                                             (if error
+                                                               (firmware-state! :error)
+                                                               (firmware-state! :success)))
+                                                           1000))
+                                            2000)))))
 
 (defn drop-down []
   (let [hex-file (get-in @state [:firmware :hex-file])]
