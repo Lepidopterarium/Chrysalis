@@ -54,7 +54,8 @@
 (defmethod command :help [_ _]
   (s/join "\n"
           ["help"
-           "version"]))
+           "version"
+           "fingerpainter.palette"]))
 
 (defn- format-result [text]
   (str text "\r\n.\r\n"))
