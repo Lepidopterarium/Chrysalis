@@ -38,16 +38,22 @@
   (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
         device (get-in @state [:current-device :device])
         port (get-in @state [:current-device :port])]
+    (swap! state assoc-in [:firmware :state] :uploading)
     (.close port
             (fn [_]
               (.flash avrgirl hex-name (fn [error]
                                          (if error
-                                           (print error)
-                                           (device-reopen device))))))))
+                                           (do
+                                             (swap! state assoc-in [:firmware :state] :error)
+                                             (.log js/console error)
+                                             )
+                                           (do
+                                             (swap! state assoc-in [:firmware :state] :success)
+                                             (device-reopen device)))))))))
 
 (defn drop-down []
-  (let [firmware-file (get-in @state [:flash :firmware-file])]
-    [:span.dropdown {:class (when firmware-file
+  (let [hex-file (get-in @state [:firmware :hex-file])]
+    [:span.dropdown {:class (when hex-file
                               "show")}
      [:a.dropdown-toggle.chrysalis-link-button {:href "#"
                                                 :data-toggle :dropdown}
@@ -58,27 +64,29 @@
         [:a.chrysalis-link-button
          {:href "#"
           :on-click (fn [e]
+                      (swap! state assoc-in [:firmware :state] :default)
                       (.showOpenDialog dialog  (clj->js {"title" "Select a firmware"
                                                          "filters" [{"name" "Firmware files"
                                                                      "extensions" ["hex"]}
                                                                     {"name" "All files"
                                                                      "extensions" ["*"]}]})
                                        (fn [file-names]
-                                         (swap! state assoc-in [:flash :firmware-file] (first file-names)))))}
+                                         (swap! state assoc-in [:firmware :hex-file] (first file-names)))))}
          [:i.fa.fa-code]]]
        [:input.form-control {:type :text
                              :disabled :true
                              :placeholder "Please select a file"
-                             :title firmware-file
-                             :value (or (basename firmware-file) "")}]
+                             :title hex-file
+                             :value (or (basename hex-file) "")}]
        [:div.input-group-addon
         [:a.chrysalis-link-button {:href "#"
                                    :on-click (fn []
-                                               (swap! state assoc-in [:flash :firmware-file] nil))}
+                                               (swap! state assoc-in [:firmware :state] :default)
+                                               (swap! state assoc-in [:firmware :hex-file] nil))}
          [:i.fa.fa-eraser]]]]
-      (when firmware-file
+      (when hex-file
         [:a.btn.btn-primary {:href "#"
-                             :on-click #(upload firmware-file)}
+                             :on-click #(upload hex-file)}
          "Upload"])]]))
 
 (defn firmware-version []
@@ -98,13 +106,23 @@
      [:h2 "Flash a new firmware"]]]
 
    [:div.row.justify-content-center
-    [:div.card.chrysalis-page-firmware-card
+    [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
+                                                      :success "card-outline-success"
+                                                      :error "card-outline-danger"
+                                                      nil)}
      [:img.card-img-top {:alt "Kaleidoscope Logo"
+                         :class (when (:uploading #{(get-in @state [:firmware :state])})
+                                  "fa-spin")
                          :src "images/kaleidoscope-logo-ph-small.png"}]
      [:div.card-block
-      [:h4.card-title "Kaleidoscope"]
+      [:h4.card-title {:class (condp = (get-in @state [:firmware :state])
+                                :success "text-success"
+                                :error "text-danger"
+                                nil)}
+       "Kaleidoscope"]
       [firmware-version]]]]])
 
+(swap! state assoc :firmware {:state :normal})
 (swap! pages assoc :firmware {:name "Firmware"
                               :index 80
                               :disable? (fn [] (nil? (get-in @state [:current-device :port])))})
