@@ -39,7 +39,7 @@
        [:p.text-mute.chrysalis-link-button
         (get-in device [:meta :name])]]]]))
 
-(defmethod page :devices [_]
+(defmethod page [:render :devices] [_ _]
   [:div.container-fluid
    [:div.row.justify-content-center
     [:div.col-12.text-center

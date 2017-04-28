@@ -26,9 +26,3 @@
 ;;; ---- Pages ---- ;;;
 
 (defonce pages (atom {}))
-
-(defn current-page []
-  (:page @state))
-
-(defn switch-to-page! [p]
-  (swap! state assoc :page p))

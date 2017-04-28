@@ -40,7 +40,7 @@
   [:div
    [ui/<settings>]
    [ui/<main-menu> @state @pages device/detect!]
-   (ui/page (core/current-page))])
+   (ui/page :render (ui/current-page))])
 
 (defn init! []
   (device/detect!)

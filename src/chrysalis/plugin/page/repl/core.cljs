@@ -103,7 +103,7 @@
              {:type :button
               :data-dismiss :modal} "Cancel"]]]]]))))
 
-(defmethod page :repl [_]
+(defmethod page [:render :repl] [_ _]
   [:div.container-fluid
    [<available-commands>]
    [:div.row.justify-content-left.chrysalis-page-repl-prompt

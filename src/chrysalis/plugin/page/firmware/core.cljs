@@ -96,7 +96,10 @@
         "Built on " [:i (:timestamp @version)]
         [drop-down]]])))
 
-(defmethod page :firmware [_]
+(defmethod page [:leave :firmware] [_ _]
+  (swap! state assoc-in [:firmware :state] :default))
+
+(defmethod page [:render :firmware] [_ _]
   [:div.container-fluid
    [:div.row.justify-content-center
     [:div.col-sm-12.text-center

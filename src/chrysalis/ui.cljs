@@ -23,10 +23,18 @@
 ;;; ---- Page ---- ;;;
 
 (defmulti page
-  (fn [p]
-    p))
+  (fn [action p]
+    [action p]))
 
-(defmethod page :default [_])
+(defmethod page :default [_ _ _])
+
+(defn current-page []
+  (:page @core/state))
+
+(defn switch-to-page! [p]
+  (page :leave (current-page))
+  (page :enter p)
+  (swap! core/state assoc :page p))
 
 ;;; ---- Menu ---- ;;;
 
@@ -35,7 +43,7 @@
                        ((:disable? meta)))]
     [:li {:key (str "main-menu-" (name key))
           :class (s/join " " ["nav-item"
-                              (when (= key (core/current-page))
+                              (when (= key (current-page))
                                 "active")])}
      [:a.nav-link {:href "#"
                    :class (when disabled?
@@ -43,7 +51,7 @@
                    :on-click (fn [e]
                                (.preventDefault e)
                                (when-not disabled?
-                                 (core/switch-to-page! key)))}
+                                 (switch-to-page! key)))}
       (:name meta)]]))
 
 (defn <main-menu> [state pages detector]

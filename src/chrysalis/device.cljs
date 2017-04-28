@@ -30,7 +30,6 @@
 (defn close! []
   (when-let [device (current)]
     (hardware/close (:port device))
-    (core/switch-to-page! :devices)
     (switch-to! nil))
   nil)
 
