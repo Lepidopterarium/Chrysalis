@@ -85,7 +85,10 @@
      [:i.fa.fa-spinner] " Chrysalis"]
     [:div.dropdown-menu
      [:a.dropdown-item {:href "#"
-                        :on-click detector}
+                        :on-click (fn []
+                                    (swap! state assoc :current-device nil)
+                                    (swap! state assoc :page :devices)
+                                    (detector))}
       "Scan devices"]
      [:a.dropdown-item {:href "#settings"
                         :data-toggle :modal}
