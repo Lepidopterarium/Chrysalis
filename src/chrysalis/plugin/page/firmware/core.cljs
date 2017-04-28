@@ -104,6 +104,7 @@
 
    [:div.row.justify-content-center
     [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
+                                                      :uploading "card-outline-info"
                                                       :success "card-outline-success"
                                                       :error "card-outline-danger"
                                                       nil)}
@@ -113,6 +114,7 @@
                          :src "images/kaleidoscope-logo-ph-small.png"}]
      [:div.card-block
       [:h4.card-title {:class (condp = (get-in @state [:firmware :state])
+                                :uploading "text-info"
                                 :success "text-success"
                                 :error "text-danger"
                                 nil)}
