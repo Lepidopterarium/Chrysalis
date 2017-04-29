@@ -82,24 +82,39 @@
     (repl-wrap req index device
                [:pre (.stringify js/JSON (clj->js result) nil 2)])))
 
+(defn- <help-command-group> [index [group members]]
+  [:div.card {:key (str "repl-help-" index "-" group)}
+   [:div.card-block
+    [:div.card-title
+     [:h5 group]]
+    [:div.card-text
+     [:div.btn-group
+      (doall (map <command> (sort members)))]]]])
+
+(defn- group-commands [commands]
+  (sort
+   (group-by (fn [s] (first (.split (name s) "."))) commands)))
+
 (defmethod display :help [_ req result device index]
   (when result
     (repl-wrap req index device
-               [:div.list-group.col-sm-2
-                (doall (map <command> (sort result)))])))
+               [:div.card-group
+                (doall (map (partial <help-command-group> index)
+                       (group-commands result)))])))
 
 (defn <available-commands> []
   (when-let [port (:port (device/current))]
     (let [commands (command/run port :help)]
       (fn []
         [:div.modal.fade {:id "repl-available-commands"}
-         [:div.modal-dialog
+         [:div.modal-dialog.modal-lg
           [:div.modal-content
            [:div.modal-header
             [:h5.modal-title "Available commands"]]
            [:div.modal-body
-            [:div.list-group
-             (doall (map <command> (sort @commands)))]]
+            [:div.card-group
+             (doall (map (partial <help-command-group> "avail")
+                         (group-commands @commands)))]]
            [:div.modal-footer
             [:button.btn.btn-secondary
              {:type :button
