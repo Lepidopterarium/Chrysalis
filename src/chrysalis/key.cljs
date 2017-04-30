@@ -314,7 +314,7 @@
   (fn [react-key key]
     [(:plugin key)]))
 
-(defn- key-button [react-key color content]
+(defn key-button [react-key color content]
   [:button.btn {:type :button
                 :class (str "btn-" (name color))
                 :key react-key}
