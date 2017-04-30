@@ -31,6 +31,12 @@
 (defn firmware-state! [s]
   (swap! state assoc-in [:firmware :state] s))
 
+(defn- get-firmware-version []
+  (let [port (hardware/open (get-in (device/current) [:device :comName]))
+        version (command/run port :version)]
+    (.setTimeout js/window #(.close port) 100)
+    (swap! state assoc-in [:firmware :version] version)))
+
 (defn upload [hex-name]
   (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
         device (device/current)]
@@ -90,12 +96,6 @@
         [:a.btn.btn-primary {:href "#"
                              :on-click #(upload hex-file)}
          "Upload"])]]))
-
-(defn- get-firmware-version []
-  (let [port (hardware/open (get-in (device/current) [:device :comName]))
-        version (command/run port :version)]
-    (.setTimeout js/window #(.close port) 100)
-    (swap! state assoc-in [:firmware :version] version)))
 
 (defmethod page [:enter :firmware] [_ _]
   (get-firmware-version))
