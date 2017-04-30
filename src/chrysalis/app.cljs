@@ -32,7 +32,9 @@
 
             [chrysalis.plugin.hardware.virtual.core]
             [chrysalis.plugin.hardware.model01.core]
-            [chrysalis.plugin.hardware.shortcut.core]))
+            [chrysalis.plugin.hardware.shortcut.core]
+
+            [chrysalis.plugin.example.cake.core]))
 
 (enable-console-print!)
 
