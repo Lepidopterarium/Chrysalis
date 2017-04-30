@@ -84,7 +84,11 @@
 (defmethod pre-process* :default [_ args]
   args)
 
-(defn run [device command & args]
+(defmulti run
+  (fn [_ command & _]
+    command))
+
+(defmethod run :default [device command & args]
   (let [result (atom nil)]
     (if args
       (send* device
