@@ -18,7 +18,9 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
             [clojure.string :as s]
-            [reagent.core :refer [atom]]))
+            [reagent.core :refer [atom]]
+
+            [chrysalis.key :as key]))
 
 (defn- drop-trailing-dot [s]
   (.substring s 0 (- (.-length s) 5)))
@@ -75,6 +77,14 @@
             (->> (map (fn [state idx] [idx (= state "1")]) text (range))
                  (filter second)
                  (map first)
+                 vec))))
+
+(defmethod process* :keymap.map [_ result]
+  (fn [text]
+    (reset! result
+            (->> (.split (.trim text) #" ")
+                 (map js/parseInt)
+                 (map key/from-code)
                  vec))))
 
 (defmulti pre-process*
