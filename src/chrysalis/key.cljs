@@ -73,7 +73,7 @@
    {:type :keyboard, :usage :semicolon}
    {:type :keyboard, :usage :quote}
    {:type :keyboard, :usage :backtick}
-   {:type :keyboard, :usage :colon}
+   {:type :keyboard, :usage :comma}
    {:type :keyboard, :usage :dot}
    {:type :keyboard, :usage :slash}
    {:type :keyboard, :usage :caps-lock}
@@ -222,7 +222,7 @@
    {:type :keypad, :usage :&&}
    {:type :keypad, :usage :|}
    {:type :keypad, :usage :||}
-   {:type :keypad, :usage :double-colon}
+   {:type :keypad, :usage :colon}
    {:type :keypad, :usage :#}
    {:type :keypad, :usage :space}
    {:type :keypad, :usage :at}
