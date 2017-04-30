@@ -46,6 +46,7 @@
                                               (.setTimeout js/window
                                                            (fn []
                                                              (device/select-by-serial! (get-in device [:device :serialNumber]))
+                                                             (get-firmware-version)
                                                              (if error
                                                                (firmware-state! :error)
                                                                (firmware-state! :success)))
@@ -94,45 +95,44 @@
   (let [port (hardware/open (get-in (device/current) [:device :comName]))
         version (command/run port :version)]
     (.setTimeout js/window #(.close port) 100)
-    version))
+    (swap! state assoc-in [:firmware :version] version)))
 
-(defn firmware-version []
-  (let [version (get-firmware-version)]
-    (fn []
-      [:div.card-text
-       [:div.text-muted
-        [:code (:firmware-version @version)]]
-       [:div.text-muted
-        "Built on " [:i (:timestamp @version)]
-        [drop-down]]])))
+(defmethod page [:enter :firmware] [_ _]
+  (get-firmware-version))
 
 (defmethod page [:leave :firmware] [_ _]
   (swap! state assoc-in [:firmware :state] :default))
 
 (defmethod page [:render :firmware] [_ _]
-  [:div.container-fluid
-   [:div.row.justify-content-center
-    [:div.col-sm-12.text-center
-     [:h2 "Flash a new firmware"]]]
+  (let [version (get-in @state [:firmware :version])]
+    [:div.container-fluid
+     [:div.row.justify-content-center
+      [:div.col-sm-12.text-center
+       [:h2 "Flash a new firmware"]]]
 
-   [:div.row.justify-content-center
-    [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
-                                                      :uploading "card-outline-info"
-                                                      :success "card-outline-success"
-                                                      :error "card-outline-danger"
-                                                      nil)}
-     [:img.card-img-top {:alt "Kaleidoscope Logo"
-                         :class (when (:uploading #{(get-in @state [:firmware :state])})
-                                  "fa-spin")
-                         :src "images/kaleidoscope-logo-ph-small.png"}]
-     [:div.card-block
-      [:h4.card-title {:class (condp = (get-in @state [:firmware :state])
-                                :uploading "text-info"
-                                :success "text-success"
-                                :error "text-danger"
-                                nil)}
-       "Kaleidoscope"]
-      [firmware-version]]]]])
+     [:div.row.justify-content-center
+      [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
+                                                        :uploading "card-outline-info"
+                                                        :success "card-outline-success"
+                                                        :error "card-outline-danger"
+                                                        nil)}
+       [:img.card-img-top {:alt "Kaleidoscope Logo"
+                           :class (when (:uploading #{(get-in @state [:firmware :state])})
+                                    "fa-spin")
+                           :src "images/kaleidoscope-logo-ph-small.png"}]
+       [:div.card-block
+        [:h4.card-title {:class (condp = (get-in @state [:firmware :state])
+                                  :uploading "text-info"
+                                  :success "text-success"
+                                  :error "text-danger"
+                                  nil)}
+         "Kaleidoscope"]
+        [:div.card-text
+         [:div.text-muted
+          [:code (:firmware-version @version)]]
+         [:div.text-muted
+          "Built on " [:i (:timestamp @version)]
+          [drop-down]]]]]]]))
 
 (swap! state assoc :firmware {:state :default})
 (swap! pages assoc :firmware {:name "Firmware"
