@@ -30,6 +30,7 @@
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
             [chrysalis.plugin.Kaleidoscope.HostOS.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]
+            [chrysalis.plugin.Kaleidoscope.OneShot.core]
 
             [chrysalis.plugin.hardware.virtual.core]
             [chrysalis.plugin.hardware.model01.core]
