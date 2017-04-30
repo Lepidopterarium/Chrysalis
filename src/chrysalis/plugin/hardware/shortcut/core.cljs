@@ -18,4 +18,5 @@
   (:require [chrysalis.hardware :refer [known?]]))
 
 (defmethod known? [0xfeed 0x6060] [device]
-  (assoc device :meta {:name "Shortcut v0.4"}))
+  (assoc device :meta {:name "Shortcut v0.4"
+                       :matrix [14 4]}))
