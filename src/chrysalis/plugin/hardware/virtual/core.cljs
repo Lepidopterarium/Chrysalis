@@ -22,7 +22,8 @@
 
 (defmethod known? [0xdead 0xbeef] [device]
   (assoc device :meta {:name "An example virtual device"
-                       :logo "images/plugins/virtual-keyboard.png"}))
+                       :logo "images/plugins/virtual-keyboard.png"
+                       :matrix [4 4]}))
 
 (defmethod scan* :virtual [_ out]
   (go
@@ -55,7 +56,14 @@
   (s/join "\n"
           ["help"
            "version"
-           "fingerpainter.palette"]))
+           "fingerpainter.palette"
+           "keymap.map"]))
+
+(defmethod command :keymap.map [_ _]
+  (s/join " " [89 90 91 0
+               92 93 94 98
+               95 96 97 0
+               0  0  0  0]))
 
 (defn- format-result [text]
   (str text "\r\n.\r\n"))
