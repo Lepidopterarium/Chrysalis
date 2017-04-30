@@ -117,7 +117,7 @@
 
 (defmethod display :keymap.map [_ req result device index]
   (when result
-    (let [layer-size (apply * (get-in @state [:current-device :device :meta :matrix]))]
+    (let [layer-size (apply * (get-in device [:meta :matrix]))]
       (repl-wrap req index device
                  [:div.row
                   (doall (map (partial <layer> index)
