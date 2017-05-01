@@ -8,7 +8,8 @@
                  [reagent "0.6.0"]
                  [ring/ring-core "1.5.0"]
                  [org.clojure/core.async "0.3.442"]
-                 [com.cemerick/piggieback "0.2.1"]]
+                 [com.cemerick/piggieback "0.2.1"]
+                 [hickory "0.7.1"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.0.0"]
                        [bootstrap "^4.0.0-alpha.4"]
@@ -76,7 +77,7 @@
                               ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]
                               ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]
                               ["src/chrysalis/plugin/page/firmware" {:target-path "resources/public/css/plugins/firmware"}]]
-             :includes [#".*\.png" #".*\.css"]
+             :includes [#".*\.png" #".*\.css" #".*\.svg"]
              :target-path "resources/public/images/plugins"
              :skip-stencil [#".*"]}
 

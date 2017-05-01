@@ -15,7 +15,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.Kaleidoscope.LEDControl.core
-  (:require [chrysalis.command :refer [pre-process* process*]]))
+  (:require [chrysalis.command :refer [pre-process* process*]]
+            [chrysalis.plugin.page.led.core :as led-page]
+            [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]))
 
 (defmethod pre-process* :led.mode [_ args]
   (condp = (first args)
@@ -30,3 +32,8 @@
   (fn [text]
     (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
       (reset! result theme))))
+
+(defmethod display :led.theme [_ req result device index]
+  (when result
+    (repl-wrap req index device
+               [led-page/svg (get-in device [:meta :layout]) (atom result)])))
