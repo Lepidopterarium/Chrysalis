@@ -15,16 +15,16 @@ and [Node](https://nodejs.org/en/), the follow these steps:
 lein deps
 ```
 
-### Copying assets
+### Compiling & preparing
 
 ```bash
-lein resource
+lein build
 ```
 
-### Running in development mode
+### Running the user interface
 
 ```bash
-lein npm run start
+lein start-ui
 ```
 
 ## License

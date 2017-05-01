@@ -18,9 +18,11 @@
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
                        [usb "^1.2.0"]]
         :devDependencies [[electron "^1.6.6"]
+                          [electron-rebuild "^1.5.7"]
                           [foreman "^2.0.0"]]
         :root "resources/public"
         :package {:scripts {:start-ui "electron .."
+                            :build "electron-rebuild -w usb,serialport && lein cljsbuild once electron-dev && lein cljsbuild once frontend-dev"
                             :start "nf -j ../../Procfile start"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
@@ -76,4 +78,7 @@
                               ["src/chrysalis/plugin/page/firmware" {:target-path "resources/public/css/plugins/firmware"}]]
              :includes [#".*\.png" #".*\.css"]
              :target-path "resources/public/images/plugins"
-             :skip-stencil [#".*"]})
+             :skip-stencil [#".*"]}
+
+  :aliases {"build" ["do" ["npm" "run" "build"] "resource"]
+            "start-ui" ["do" ["npm" "run" "start-ui"]]})
