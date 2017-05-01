@@ -18,5 +18,12 @@
   (:require [chrysalis.hardware :refer [known?]]))
 
 (defmethod known? [0xfeed 0x6060] [device]
-  (assoc device :meta {:name "Shortcut v0.4"
-                       :matrix [14 4]}))
+  (assoc device
+         :meta {:name "Shortcut v0.4"
+                :matrix [14 4]}
+         :board {:name "Shortcut v0.4"
+                 :baud 9600
+                 :productId ["0x6060" "0x0036"]
+                 :protocol "avr109"
+                 :manualReset true
+                 :signature (js/Buffer. #js [0x43 0x41 0x54 0x45 0x52 0x49 0x4e])}))
