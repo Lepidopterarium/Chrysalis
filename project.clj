@@ -15,7 +15,8 @@
                        [jquery "^3.1.0"]
                        [font-awesome "^4.7.0"]
                        [tether "^1.3.7"]
-                       [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]]
+                       [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
+                       [usb "^1.2.0"]]
         :devDependencies [[electron "^1.6.6"]
                           [foreman "^2.0.0"]]
         :root "resources/public"

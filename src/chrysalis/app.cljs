@@ -52,9 +52,13 @@
   (.setTimeout js/window (fn []
                            (reagent/render
                             [root-component]
-                            (js/document.getElementById "application"))
-                           (.setInterval js/window device/detect!
-                                         10000))
-               2000))
+                            (js/document.getElementById "application")))
+               2000)
+
+  (let [usb (js/require "usb")]
+    (.on usb "attach" (fn [device]
+                        (device/detect!)))
+    (.on usb "detach" (fn [device]
+                        (device/detect!)))))
 
 (init!)
