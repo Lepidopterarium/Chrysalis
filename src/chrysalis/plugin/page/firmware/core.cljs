@@ -38,7 +38,8 @@
     (swap! state assoc-in [:firmware :version] version)))
 
 (defn upload [hex-name]
-  (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])}))
+  (let [avrgirl (Avrgirl. (clj->js {"board" (get-in @state [:current-device :device :board])
+                                    "debug" true}))
         device (device/current)]
     (firmware-state! :uploading)
     (device/switch-to! nil)
