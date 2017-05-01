@@ -35,15 +35,11 @@
   (:current-device @state))
 
 (defn detect! []
-  (swap! state assoc :devices [])
-  (switch-to! nil)
-
   (let [in (hardware/detect (hardware/scan))]
-    (go-loop []
-      (when-let [device (<! in)]
-        (swap! state (fn [state device]
-                       (update-in state [:devices] conj device)) device)
-        (recur))))
+    (go-loop [device (<! in)
+              devices []]
+      (if (= device {})
+        (swap! state assoc :devices devices)
+        (recur (<! in)
+               (conj devices device)))))
   nil)
-
-

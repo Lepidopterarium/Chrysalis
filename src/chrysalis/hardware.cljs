@@ -37,11 +37,11 @@
 
 (defmethod scan* :serial [_ out]
   (.list SerialPort (fn [err ports]
-                      (go
-                        (loop [devices ports]
-                          (when-let [device (first devices)]
-                            (>! out device)
-                            (recur (rest devices)))))))
+                      (go-loop [devices ports]
+                        (when-let [device (first devices)]
+                          (>! out device)
+                          (recur (rest devices)))
+                        (>! out {}))))
   out)
 
 (defmethod scan* :default [_ out]
@@ -55,12 +55,12 @@
 
 (defn detect [list]
   (let [out (chan)]
-    (go-loop []
-      (when-let [device (<! list)]
-        (when-let [known-device (known? (jsx->clj device))]
-          (>! out known-device))
-        (recur))
-      (close! out))
+    (go-loop [device (<! list)]
+      (if-let [known-device (known? (jsx->clj device))]
+        (>! out known-device)
+        (when (= device {})
+          (>! out {})))
+      (recur (<! list)))
     out))
 
 (defmulti open

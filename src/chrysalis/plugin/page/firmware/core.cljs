@@ -48,6 +48,7 @@
                                  (.error js/console error))
                                (.setTimeout js/window
                                             (fn []
+                                              (device/switch-to! nil)
                                               (device/detect!)
 
                                               (.setTimeout js/window
