@@ -52,7 +52,9 @@
   (.setTimeout js/window (fn []
                            (reagent/render
                             [root-component]
-                            (js/document.getElementById "application")))
+                            (js/document.getElementById "application"))
+                           (.setInterval js/window device/detect!
+                                         10000))
                2000))
 
 (init!)
