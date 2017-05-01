@@ -7,7 +7,7 @@
 ## Quick start
 
 First of all, install [Leiningen](https://leiningen.org/)
-and [Node](https://nodejs.org/en/), the follow these steps:
+and [Node](https://nodejs.org/en/), then follow these steps:
 
 ### Installing dependencies
 
