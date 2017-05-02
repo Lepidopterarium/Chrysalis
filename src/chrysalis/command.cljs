@@ -31,7 +31,7 @@
             (.drain device (fn []
                              (.setTimeout js/window (fn []
                                                       (callback (drop-trailing-dot (str (.read device)))))
-                                          100))))))
+                                          1000))))))
 
 (defn send [device command]
   (let [result (atom nil)]
