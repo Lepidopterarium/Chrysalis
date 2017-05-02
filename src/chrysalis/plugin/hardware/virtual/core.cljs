@@ -22,9 +22,11 @@
             [chrysalis.hardware :refer [scan* open known?]]))
 
 (defmethod known? [0xdead 0xbeef] [device]
-  (assoc device :meta {:name "An example virtual device"
-                       :logo "images/plugins/virtual-keyboard.png"
-                       :matrix [4 4]}))
+  (assoc device
+         :meta {:name "An example virtual device"
+                :logo "images/plugins/virtual-keyboard.png"
+                :layout "images/plugins/virtual-keyboard.svg"
+                :matrix [4 4]}))
 
 (defmethod scan* :virtual [_ out]
   (go
