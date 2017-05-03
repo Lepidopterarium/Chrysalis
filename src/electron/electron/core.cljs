@@ -17,14 +17,6 @@
   (.on @main-window "closed" #(reset! main-window nil)))
 
 
-(comment
-  (.start crash-reporter
-         (clj->js
-          {:companyName "The MadHouse Project"
-           :productName "Chrysalis"
-           :submitURL "https://example.com/submit-url"
-           :autoSubmit false})))
-
 (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")
                                 (.quit app)))
 (.on app "ready" init-browser)
