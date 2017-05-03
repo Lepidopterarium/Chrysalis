@@ -106,3 +106,14 @@
       [:a.btn.btn-secondary {:href "#"
                              :data-dismiss :modal}
        "Cancel"]]]]])
+
+;;; ---- Helpers ---- ;;;
+
+(defn- toHex [i]
+  (let [hex (.toString i 16)]
+    (if (= (.-length hex) 1)
+      (str "0" hex)
+      hex)))
+
+(defn color->hex [color]
+  (str "#" (apply str (map toHex color))))

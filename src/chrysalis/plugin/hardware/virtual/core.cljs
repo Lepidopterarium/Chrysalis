@@ -17,8 +17,9 @@
 (ns chrysalis.plugin.hardware.virtual.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
-            [chrysalis.hardware :refer [scan* open known?]]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+
+            [chrysalis.hardware :refer [scan* open known?]]))
 
 (defmethod known? [0xdead 0xbeef] [device]
   (assoc device :meta {:name "An example virtual device"

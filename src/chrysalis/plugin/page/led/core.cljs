@@ -17,7 +17,7 @@
 (ns chrysalis.plugin.page.led.core
   (:refer-clojure :exclude [slurp])
   (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :refer [page]]
+            [chrysalis.ui :refer [page color->hex]]
             [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.command :as command]
@@ -31,12 +31,6 @@
         theme (command/run port :led.theme)]
     (.setTimeout js/window #(.close port) 100)
     (swap! state assoc-in [:led :theme] theme)))
-
-(defn- toHex [i]
-  (let [hex (.toString i 16)]
-    (if (= (.-length hex) 1)
-      (str "0" hex)
-      hex)))
 
 (defn- gamma-correct* [gamma-map color]
   (let [color-indexes (map first (filter #(= color (second %)) (map-indexed vector gamma-map)))
@@ -61,8 +55,7 @@
       (let [[rows cols] (get-in (device/current) [:device :meta :matrix])
             index (key-index r c cols)
             color (nth theme index [0 0 0])]
-        (assoc node :fill (str "#"
-                               (apply str (map #(toHex (gamma-correct %)) color)))))
+        (assoc node :fill (color->hex (map gamma-correct color))))
       node)))
 
 (defn with-colors [svg theme]

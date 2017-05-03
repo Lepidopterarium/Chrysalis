@@ -15,13 +15,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.Kaleidoscope.FingerPainter.core
-  (:require [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]))
-
-(defn- toHex [i]
-  (let [hex (.toString i 16)]
-    (if (= (.-length hex) 1)
-      (str "0" hex)
-      hex)))
+  (:require [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]
+            [chrysalis.ui :refer [color->hex]]))
 
 (defmethod display :fingerpainter.palette [_ req result device index]
   (when result
@@ -35,5 +30,5 @@
                                    :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
                                    :display "inline-block"
                                    :margin-right "1em"}}
-                          (str "#" (toHex r) (toHex g) (toHex b))])
+                          (color->hex [r g b])])
                        palette (range))]))))
