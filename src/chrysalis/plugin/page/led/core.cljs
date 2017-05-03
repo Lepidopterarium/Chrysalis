@@ -81,7 +81,7 @@
                                                 :height "320"
                                                 :view-box "0 0 2048 1280"}))))))
     (fn []
-      (with-colors @result theme))))
+      (with-colors @result @theme))))
 
 (defmethod page [:enter :led] [_ _]
   (get-theme!))
