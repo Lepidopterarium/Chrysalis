@@ -4,6 +4,7 @@
 (def app            (.-app electron))
 (def browser-window (.-BrowserWindow electron))
 (def crash-reporter (.-crashReporter electron))
+(def context-menu   (js/require "electron-context-menu"))
 
 (def main-window (atom nil))
 
@@ -27,3 +28,5 @@
 (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")
                                 (.quit app)))
 (.on app "ready" init-browser)
+
+(context-menu #js {"showInspectElement" true})
