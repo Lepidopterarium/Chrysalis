@@ -60,13 +60,20 @@
           ["help"
            "version"
            "fingerpainter.palette"
-           "keymap.map"]))
+           "keymap.map"
+           "led.theme"]))
 
 (defmethod command :keymap.map [_ _]
   (s/join " " [89 90 91 0
                92 93 94 98
                95 96 97 0
                0  0  0  0]))
+
+(defmethod command :led.theme [_ _]
+  (s/join " " [230 119 107   150 221 243   155 243 150   242 228 110
+               229 154  67   230 119 107   150 221 243   155 243 150
+               242 228 110   229 154  67   230 119 107   150 221 243
+               155 243 150   242 228 110   229 154  67   230 119 107]))
 
 (defn- format-result [text]
   (str text "\r\n.\r\n"))

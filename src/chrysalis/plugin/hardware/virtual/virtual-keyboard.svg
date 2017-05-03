@@ -1,27 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="1.5" clip-rule="evenodd" viewBox="0 0 497 497">
-    <path id="R3C6_F" fill="#ffffff" stroke="#797979" stroke-width="2.5" d="M1.25 1.25h71v71h-71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M106.951 1.25h71v71h-71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M212.652 1.25h71v71h-71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M424.054 1.25h71v71h-71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M318.353 1.25h71v71h-71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M495.054 177.951v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 177.951v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 177.951v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 177.951v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 177.951v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M495.054 283.652v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 283.652v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 283.652v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 283.652v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 283.652v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M495.054 495.054v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 495.054v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 495.054v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 495.054v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 495.054v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M495.054 389.353v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 389.353v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 389.353v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 389.353v-71h-71v71h71z"/>
-    <path fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 389.353v-71h-71v71h71z"/>
+    <path id="R0C0_F" fill="#ffffff" stroke="#797979" stroke-width="2.5" d="M1.25 1.25h71v71h-71z"/>
+    <path id="R0C1_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M106.951 1.25h71v71h-71z"/>
+    <path id="R0C2_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M212.652 1.25h71v71h-71z"/>
+    <path id="R0C3_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M318.353 1.25h71v71h-71z"/>
+    <path id="R1C0_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 177.951v-71h-71v71h71z"/>
+    <path id="R1C1_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 177.951v-71h-71v71h71z"/>
+    <path id="R1C2_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 177.951v-71h-71v71h71z"/>
+    <path id="R1C3_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 177.951v-71h-71v71h71z"/>
+    <path id="R2C0_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 283.652v-71h-71v71h71z"/>
+    <path id="R2C1_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 283.652v-71h-71v71h71z"/>
+    <path id="R2C2_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 283.652v-71h-71v71h71z"/>
+    <path id="R2C3_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 283.652v-71h-71v71h71z"/>
+    <path id="R3C0_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M72.25 389.353v-71h-71v71h71z"/>
+    <path id="R3C1_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M177.951 389.353v-71h-71v71h71z"/>
+    <path id="R3C2_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M283.652 389.353v-71h-71v71h71z"/>
+    <path id="R3C3_F" fill="#ffffff" stroke="#000000" stroke-width="2.5" d="M389.353 389.353v-71h-71v71h71z"/>
 </svg>
