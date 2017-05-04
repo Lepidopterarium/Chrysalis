@@ -97,4 +97,5 @@
       (get-in @state [:led :theme])]]]])
 
 (swap! pages assoc :led {:name "LED Theme Editor"
-                         :index 10})
+                         :index 10
+                         :disable? (fn [] (nil? (device/current)))})
