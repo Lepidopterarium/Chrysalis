@@ -36,4 +36,5 @@
 (defmethod display :led.theme [_ req result device index]
   (when result
     (repl-wrap req index device
-               [led-page/svg (get-in device [:meta :layout]) (atom result)])))
+               [led-page/<led-theme> (get-in device [:meta :layout]) (atom result)
+                {:width 512 :height 320}])))

@@ -65,7 +65,7 @@
                     node))
                 svg))
 
-(defn svg [file-name theme]
+(defn <led-theme> [file-name theme props]
   (let [fs (js/require "fs")
         result (atom nil)]
     (.readFile fs file-name "utf8"
@@ -77,9 +77,7 @@
                                       first
                                       (nth 3)
                                       (nth 2)
-                                      (assoc 1 {:width "512"
-                                                :height "320"
-                                                :view-box "0 0 2048 1280"}))))))
+                                      (assoc 1 (assoc props :view-box "0 0 2048 1280")))))))
     (fn []
       (with-colors @result @theme))))
 
@@ -93,8 +91,9 @@
      [:h2 "LED Theme Editor"]]]
    [:div.row
     [:div.col-sm-12.text-center
-     [svg (get-in (device/current) [:device :meta :layout])
-      (get-in @state [:led :theme])]]]])
+     [<led-theme> (get-in (device/current) [:device :meta :layout])
+      (get-in @state [:led :theme])
+      {:width 1024 :height 640}]]]])
 
 (swap! pages assoc :led {:name "LED Theme Editor"
                          :index 10
