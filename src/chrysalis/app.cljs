@@ -43,6 +43,7 @@
 
 (defn root-component []
   [:div
+   [ui/<about>]
    [ui/<settings>]
    [ui/<main-menu> @state @pages device/detect!]
    (ui/page :render (ui/current-page))])
