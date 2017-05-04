@@ -4,6 +4,7 @@
 (def app            (.-app electron))
 (def browser-window (.-BrowserWindow electron))
 (def crash-reporter (.-crashReporter electron))
+(def shell          (.-shell electron))
 (def context-menu   (js/require "electron-context-menu"))
 
 (def main-window (atom nil))
@@ -14,6 +15,10 @@
                                   :height 600
                                   :autoHideMenuBar true})))
   (.loadURL @main-window (str "file://" js/__dirname "/index.html"))
+  (.on (.-webContents @main-window)
+       "will-navigate" (fn [e url]
+                         (.preventDefault e)
+                         (.openExternal shell url)))
   (.on @main-window "closed" #(reset! main-window nil)))
 
 
