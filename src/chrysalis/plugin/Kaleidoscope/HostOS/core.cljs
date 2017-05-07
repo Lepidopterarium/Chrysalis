@@ -22,8 +22,8 @@
                    "Windows"
                    "Other"])
 
-(defmethod process* :hostos.type [_ result]
-  (fn [text]
+(defmethod process* :hostos.type [_]
+  (fn [result text]
     (let [type-index (js/parseInt text)]
       (if (= type-index 255)
         (reset! result "Automatic")

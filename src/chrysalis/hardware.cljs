@@ -16,7 +16,9 @@
 
 (ns chrysalis.hardware
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :refer [chan <! >! close!]]))
+  (:require [cljs.core.async :refer [chan <! >! close!]]
+
+            [chrysalis.command :as command]))
 
 (def SerialPort (js/require "serialport"))
 
@@ -73,4 +75,5 @@
                          (.flush port)
                          (.drain port)
                          (.read port)))
+    (.on port "data" command/on-data)
     port))

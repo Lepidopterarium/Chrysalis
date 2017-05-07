@@ -19,6 +19,7 @@
   (:require [cljs.core.async :refer [chan <! >! close!]]
             [clojure.string :as s]
 
+            [chrysalis.command :as command]
             [chrysalis.hardware :refer [scan* open known?]]))
 
 (defmethod known? [0xdead 0xbeef] [device]
@@ -87,9 +88,8 @@
                (aset self "req" (.substring text 0 (dec (.-length text)))))
              (callback))
    "drain" (fn [callback]
-             (callback))
-   "read" (fn []
-            (this-as self
-              (let [req (aget self "req")
-                    cmd (-> req (.split #" ") first)]
-                (format-result (command cmd req)))))))
+             (callback)
+             (this-as self
+               (let [req (aget self "req")
+                     cmd (-> req (.split #" ") first)]
+                 (command/on-data (format-result (command cmd req))))))))

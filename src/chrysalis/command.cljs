@@ -20,34 +20,44 @@
             [clojure.string :as s]
             [reagent.core :refer [atom]]
 
+            [chrysalis.core :refer [state]]
             [chrysalis.key :as key]))
 
-(defn- drop-trailing-dot [s]
-  (.substring s 0 (- (.-length s) 5)))
+(defn on-data [data]
+  (swap! state update-in [:command :result :buffer] str data)
+  (let [buff (get-in @state [:command :result :buffer])
+        commandEnd (.indexOf buff "\r\n.\r\n")]
+    (when (>= commandEnd 0)
+      (let [[result callback] (first (get-in @state [:command :queue]))]
+        (callback result (.substring buff 0 commandEnd))
+        (swap! state update-in [:command :result :buffer]
+               (fn [old]
+                 (.substring old (+ commandEnd 5))))
+        (swap! state update-in [:command :queue]
+               (fn [old]
+                 (rest old)))))))
 
 (defn send* [device command callback]
-  (.write device (str command "\n")
-          (fn []
-            (.drain device (fn []
-                             (.setTimeout js/window (fn []
-                                                      (callback (drop-trailing-dot (str (.read device)))))
-                                          1000))))))
-
-(defn send [device command]
   (let [result (atom nil)]
-    (send* device command (fn [text] (reset! result text)))
+    (.write device (str command "\n")
+            (fn []
+              (.drain device (fn []
+                               (swap! state update-in [:command :queue] concat [[result callback]])))))
     result))
 
+(defn send [device command]
+  (send* device command (fn [out text] (reset! out text))))
+
 (defmulti process*
-  (fn [command _]
+  (fn [command]
     (keyword command)))
 
-(defmethod process* :default [_ result]
-  (fn [text]
+(defmethod process* :default [_]
+  (fn [result text]
     (reset! result text)))
 
-(defmethod process* :version [_ result]
-  (fn [text]
+(defmethod process* :version [_]
+  (fn [result text]
     (let [[version-and-device date] (.split text #" \| ")
           t (.split version-and-device #" ")
           fwver (-> t
@@ -64,15 +74,15 @@
                       :timestamp date}))
     result))
 
-(defmethod process* :help [_ result]
-  (fn [text]
+(defmethod process* :help [_]
+  (fn [result text]
     (let [lines (.split text #"\r?\n")]
       (reset! result (->> lines
                           (map keyword)
                           vec)))))
 
 (defmethod process* :layer.getState [_ result]
-  (fn [text]
+  (fn [result text]
     (reset! result
             (->> (map (fn [state idx] [idx (= state "1")]) text (range))
                  (filter second)
@@ -80,7 +90,7 @@
                  vec))))
 
 (defmethod process* :keymap.map [_ result]
-  (fn [text]
+  (fn [result text]
     (reset! result
             (->> (.split (.trim text) #" ")
                  (map js/parseInt)
@@ -99,11 +109,9 @@
     command))
 
 (defmethod run :default [device command & args]
-  (let [result (atom nil)]
-    (if args
-      (send* device
-             (str (name command) " "
-                  (s/join " " (pre-process* command args)))
-             (process* :none result))
-      (send* device (name command) (process* command result)))
-    result))
+  (if args
+    (send* device
+           (str (name command) " "
+                (s/join " " (pre-process* command args)))
+           (process* :none))
+    (send* device (name command) (process* command))))

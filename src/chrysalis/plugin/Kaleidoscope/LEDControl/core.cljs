@@ -28,8 +28,8 @@
     :previous ["p"]
     args))
 
-(defmethod process* :led.theme [_ result]
-  (fn [text]
+(defmethod process* :led.theme [_]
+  (fn [result text]
     (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
       (reset! result theme))))
 
