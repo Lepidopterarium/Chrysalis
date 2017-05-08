@@ -26,14 +26,14 @@
 (defn on-data [data]
   (swap! state update-in [:command :result :buffer] str data)
   (let [buff (get-in @state [:command :result :buffer])
-        commandEnd (.indexOf buff "\r\n.\r\n")]
+        commandEnd (.indexOf buff ".\r\n")]
     (when (>= commandEnd 0)
       (let [[result callback] (first (get-in @state [:command :queue]))]
-        (callback result (.substring buff 0 commandEnd))
+        (callback result (.trim (.substring buff 0 commandEnd)))
         (swap! state update-in [:command :spy] concat [(.substring buff 0 (+ commandEnd 5))])
         (swap! state update-in [:command :result :buffer]
                (fn [old]
-                 (.substring old (+ commandEnd 5))))
+                 (.substring old (+ commandEnd 3))))
         (swap! state update-in [:command :queue]
                (fn [old]
                  (rest old)))))))
