@@ -79,7 +79,9 @@
                                       (nth 2)
                                       (assoc 1 (assoc props :view-box "0 0 2048 1280")))))))
     (fn []
-      (with-colors @result @theme))))
+      (if @theme
+        (with-colors @result @theme)
+        [:i.fa.fa-refresh.fa-spin.fa-5x]))))
 
 (defmethod page [:enter :led] [_ _]
   (get-theme!))
