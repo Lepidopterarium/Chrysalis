@@ -92,4 +92,6 @@
              (this-as self
                (let [req (aget self "req")
                      cmd (-> req (.split #" ") first)]
-                 (command/on-data (format-result (command cmd req))))))))
+                 (.setTimeout js/window
+                              #(command/on-data (format-result (command cmd req)))
+                              500))))))
