@@ -19,16 +19,16 @@
             [chrysalis.ui :refer [color->hex]]))
 
 (defmethod display :fingerpainter.palette [_ req result device index]
-  (when result
-    (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
-      (repl-wrap req index device
-                 [:pre
-                  (map (fn [[r g b] index]
-                         [:span.badge
-                          {:key (str "repl-fingerpainter-palette-" index)
-                           :style {:background-color (str "rgb(" r "," g "," b ")")
-                                   :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
-                                   :display "inline-block"
-                                   :margin-right "1em"}}
-                          (color->hex [r g b])])
-                       palette (range))]))))
+    (repl-wrap req index device result
+               [:pre
+                (when result
+                  (let [palette (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split result #" *(\d+ \d+ \d+) *")))]
+                    (map (fn [[r g b] index]
+                           [:span.badge
+                            {:key (str "repl-fingerpainter-palette-" index)
+                             :style {:background-color (str "rgb(" r "," g "," b ")")
+                                     :color (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")")
+                                     :display "inline-block"
+                                     :margin-right "1em"}}
+                            (color->hex [r g b])])
+                         palette (range))))]))

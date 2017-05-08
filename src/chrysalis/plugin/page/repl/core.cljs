@@ -37,7 +37,7 @@
             :result result
             :device (:device (device/current))})))
 
-(defn repl-wrap [req index device result]
+(defn repl-wrap [req index device result output]
   (let [latest? (= index (count (get-in @state [:repl :history])))]
     [:div.row.chrysalis-page-repl-box {:key (str "repl-history-" index)}
      [:div.col-sm-12
@@ -58,9 +58,11 @@
                                                  (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
         [:div.collapse.show {:id (str "repl-history-collapse-" index)}
-         (if-not (= result [:pre "\"\""])
-           result
-           [:pre [:i "<no output>"]])
+         (if result
+           (if-not (= output [:pre "\"\""])
+             output
+             [:pre [:i "<no output>"]])
+           [:i.fa.fa-refresh.fa-spin])
          [:div.text-muted.text-right
           (get-in device [:meta :name])]]]]]]))
 
@@ -79,9 +81,8 @@
     command))
 
 (defmethod display :default [_ req result device index]
-  (when result
-    (repl-wrap req index device
-               [:pre (.stringify js/JSON (clj->js result) nil 2)])))
+  (repl-wrap req index device result
+             [:pre (.stringify js/JSON (clj->js result) nil 2)]))
 
 (defn- <help-command-group> [index [group members]]
   [:div.card {:key (str "repl-help-" index "-" group)}
@@ -97,11 +98,10 @@
    (group-by (fn [s] (first (.split (name s) "."))) commands)))
 
 (defmethod display :help [_ req result device index]
-  (when result
-    (repl-wrap req index device
-               [:div.card-group
-                (doall (map (partial <help-command-group> index)
-                            (group-commands result)))])))
+  (repl-wrap req index device result
+             [:div.card-group
+              (doall (map (partial <help-command-group> index)
+                          (group-commands result)))]))
 
 (defn- <key> [history-index layer key idx]
   (key/display (str "repl-keymap-layer-" history-index "-" layer "-" idx) key))
@@ -116,13 +116,12 @@
       (doall (map (partial <key> index layer) keymap (range)))]]]])
 
 (defmethod display :keymap.map [_ req result device index]
-  (when result
-    (let [layer-size (apply * (get-in device [:meta :matrix]))]
-      (repl-wrap req index device
-                 [:div.row
-                  (doall (map (partial <layer> index)
-                              (partition layer-size result)
-                              (range)))]))))
+  (let [layer-size (apply * (get-in device [:meta :matrix]))]
+    (repl-wrap req index device result
+               [:div.row
+                (doall (map (partial <layer> index)
+                            (partition layer-size result)
+                            (range)))])))
 
 (defn <available-commands> []
   (when-let [port (:port (device/current))]

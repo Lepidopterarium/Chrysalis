@@ -34,7 +34,6 @@
       (reset! result theme))))
 
 (defmethod display :led.theme [_ req result device index]
-  (when result
-    (repl-wrap req index device
-               [led-page/<led-theme> (get-in device [:meta :layout]) (atom result)
-                {:width 512 :height 320}])))
+  (repl-wrap req index device result
+             [led-page/<led-theme> (get-in device [:meta :layout]) (atom result)
+              {:width 512 :height 320}]))
