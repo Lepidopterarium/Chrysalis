@@ -31,7 +31,7 @@
 (defmethod process* :led.theme [_]
   (fn [result text]
     (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
-      (reset! result theme))))
+      (reset! result (vec theme)))))
 
 (defmethod display :led.theme [_ req result device index]
   (repl-wrap req index device result
