@@ -21,7 +21,7 @@
 (defn <spy-item> [index [command response]]
   [:div.row.chrysalis-page-repl-box {:key (str "spy-history-" index)}
    [:div.col-sm-12
-    [:div.card
+    [:div.card.bg-faded
      [:div.card-block
       [:div.card-title.row
        [:div.col-sm-6.text-left
