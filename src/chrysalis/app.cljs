@@ -27,6 +27,7 @@
             [chrysalis.plugin.page.repl.core]
             [chrysalis.plugin.page.firmware.core]
             [chrysalis.plugin.page.led.core]
+            [chrysalis.plugin.page.spy.core]
 
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
             [chrysalis.plugin.Kaleidoscope.HostOS.core]

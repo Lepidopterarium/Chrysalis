@@ -30,6 +30,7 @@
     (when (>= commandEnd 0)
       (let [[result callback] (first (get-in @state [:command :queue]))]
         (callback result (.substring buff 0 commandEnd))
+        (swap! state update-in [:command :spy] concat [(.substring buff 0 (+ commandEnd 5))])
         (swap! state update-in [:command :result :buffer]
                (fn [old]
                  (.substring old (+ commandEnd 5))))
@@ -38,8 +39,10 @@
                  (rest old)))))))
 
 (defn send* [device command callback]
-  (let [result (atom nil)]
-    (.write device (str command "\n")
+  (let [result (atom nil)
+        wire-command (str command "\n")]
+    (swap! state update-in [:command :spy] concat [wire-command])
+    (.write device wire-command
             (fn []
               (.drain device (fn []
                                (swap! state update-in [:command :queue] concat [[result callback]])))))
