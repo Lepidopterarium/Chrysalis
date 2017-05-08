@@ -151,7 +151,7 @@
 
 (defn- toHex [i]
   (let [hex (.toString i 16)]
-    (if (= (.-length hex) 1)
+    (if (< i 16)
       (str "0" hex)
       hex)))
 
