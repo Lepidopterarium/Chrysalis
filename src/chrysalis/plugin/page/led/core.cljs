@@ -56,32 +56,35 @@
       (and (= r cr) (= c cc)))
     false))
 
-(defn- node-augment [node theme]
+(defn- node-augment [node theme interactive?]
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_F" (:id node))))]
     (if (and r c)
       (let [[rows cols] (get-in (device/current) [:device :meta :matrix])
             index (key-index r c cols)
             color (nth theme index [0 0 0])]
-        (assoc node
-               :data-row r
-               :data-column c
-               :data-index index
-               :fill (color->hex color)
-               :stroke-width (if (current-node? r c)
-                               3
-                               0)
-               :stroke (if (current-node? r c)
-                         "#ff0000"
-                         "#000000")
-               :on-click (fn [e]
-                           (let [target (.-target e)]
-                             (swap! state assoc-in [:led :current-target] target)))))
+        (if interactive?
+          (assoc node
+                 :data-row r
+                 :data-column c
+                 :data-index index
+                 :fill (color->hex color)
+                 :stroke-width (if (current-node? r c)
+                                 3
+                                 0)
+                 :stroke (if (current-node? r c)
+                           "#ff0000"
+                           "#000000")
+                 :on-click (fn [e]
+                             (let [target (.-target e)]
+                               (swap! state assoc-in [:led :current-target] target))))
+          (assoc node
+                 :fill (color->hex color))))
       node)))
 
-(defn with-colors [svg theme]
+(defn with-colors [svg theme interactive?]
   (walk/prewalk (fn [node]
                   (if (and (map? node) (get node :id))
-                    (node-augment node theme)
+                    (node-augment node theme interactive?)
                     node))
                 svg))
 
@@ -97,10 +100,10 @@
                                       first
                                       (nth 3)
                                       (nth 2)
-                                      (assoc 1 (assoc props :view-box "0 0 2048 1280")))))))
+                                      (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 2048 1280")))))))
     (fn []
       (if @theme
-        (with-colors @result @theme)
+        (with-colors @result @theme (:interactive? props))
         [:i.fa.fa-refresh.fa-spin.fa-5x]))))
 
 (defmethod page [:enter :led] [_ _]
@@ -122,8 +125,71 @@
                                           (swap! state assoc-in [:led :new-color] (.-value (.-target e))))}]
        [:tt.input-group-addon {:style {:background-color color}} color]])))
 
+(defn preset [[name theme]]
+  [:div.card {:href "#"
+              :key (str "chrysalis-plugin-led-preset-" name)
+              :on-click (fn [e]
+                          (let [main-theme (get-in @state [:led :theme])]
+                            (reset! main-theme theme)))}
+   [:h5.card-header name]
+   [:div.card-block
+    [:a.card-text {:href "#"
+                   :on-click (fn [e]
+                               (let [main-theme (get-in @state [:led :theme])]
+                                 (reset! main-theme theme)))}
+     [<led-theme> (get-in (device/current) [:device :meta :layout])
+      (atom theme)
+      {:width 102 :height 64}]]]
+   [:div.card-footer.text-right
+    [:a.card-text.text-right {:style {:float :right
+                                      :font-size "50%"}
+                              :href "#"
+                              :on-click (fn [e]
+                                          (let [presets (get-in @state [:led :presets])]
+                                            (swap! state assoc-in [:led :presets] (dissoc presets name))))}
+     [:small "Remove"]]]])
+
+(defn presets []
+  [:div.card-group
+   (doall (map preset (get-in @state [:led :presets])))])
+
+(defn <save-theme> []
+  [:div.modal.fade {:id "chrysalis-plugin-page-led-save-theme"}
+   [:div.modal-dialog.modal-lg
+    [:div.modal-content.bg-faded
+     [:div.modal-header
+      [:h5.modal-title "Save theme"]
+      [:button.close {:type :close
+                      :data-dismiss :modal}
+       [:span "×"]]]
+     [:div.modal-body
+      [:div.container-fluid
+       [:div.row
+        [:div.col-sm-12
+         [:form.input-group {:on-submit (fn [e]
+                                          (.preventDefault e)
+                                          (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
+                                          (let [name (get-in @state [:led :save-theme :name])]
+                                            (swap! state assoc-in [:led :presets name] @(get-in @state [:led :theme]))))}
+          [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
+          [:input.form-control {:type :text
+                                :placeholder "Name your theme..."
+                                :on-change (fn [e]
+                                             (swap! state assoc-in [:led :save-theme :name] (.-value (.-target e))))}]]]]]]
+     [:div.modal-footer
+      [:a.btn.btn-primary {:href "#"
+                           :data-dismiss :modal
+                           :on-click (fn [e]
+                                       (let [name (get-in @state [:led :save-theme :name])]
+                                         (swap! state assoc-in [:led :presets name] @(get-in @state [:led :theme]))))}
+       "Save"]
+      [:a.btn.btn-secondary {:href "#"
+                             :data-dismiss :modal}
+       "Cancel"]]]]])
+
 (defmethod page [:render :led] [_ _]
   [:div.container-fluid
+   [<save-theme>]
    [:div.row.justify-content-center
     [:div.col-sm-12.text-center
      [:h2 "LED Theme Editor"]]]
@@ -131,16 +197,25 @@
     [:div.col-sm-9.text-center
      [<led-theme> (get-in (device/current) [:device :meta :layout])
       (get-in @state [:led :theme])
-      {:width 1024 :height 640}]
+      {:width 1024 :height 640 :interactive? true}]
+     [:div.btn-group
      [:button.btn.btn-primary {:type :button
                                :on-click (fn [e]
                                            (let [theme (get-in @state [:led :theme])
                                                  theme-str (s/join " " (flatten @theme))]
                                              (set-theme! theme-str)))}
-      "Apply"]]
+      "Apply"]
+      [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
+                           :data-toggle :modal
+                           :on-click (fn [e]
+                                       (swap! state assoc-in [:led :save-theme :name] nil))}
+      "Save"]]]
     [:div.col-sm-3.text-center.bg-faded
-     "Color picker"
-     [picker]]]])
+     [:h4 "Color picker"]
+     [picker]
+     [:hr]
+     [:h4 "Presets"]
+     [presets]]]])
 
 (swap! pages assoc :led {:name "LED Theme Editor"
                          :index 10
