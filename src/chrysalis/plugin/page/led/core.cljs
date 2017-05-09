@@ -110,6 +110,9 @@
 (defmethod page [:enter :led] [_ _]
   (get-theme!))
 
+(defmethod page [:leave :led] [_ _]
+  (settings/save!))
+
 (defn picker []
   (if-let [target (get-in @state [:led :current-target])]
     (when-let [color (.getAttribute target "fill")]

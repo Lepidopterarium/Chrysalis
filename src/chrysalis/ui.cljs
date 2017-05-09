@@ -33,7 +33,6 @@
   (:page @core/state))
 
 (defn switch-to-page! [p]
-  (settings/save!)
   (page :leave (current-page))
   (page :enter p)
   (swap! core/state assoc :page p))
