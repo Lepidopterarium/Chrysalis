@@ -52,6 +52,32 @@
 
 (defn init! []
   (device/detect!)
+
+  (let [electron-app (.-app (.-remote (js/require "electron")))
+        browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+    (swap! settings/hooks assoc :window {:save (fn []
+                                                 (let [bounds (js->clj (.getBounds browser-window))]
+                                                   (swap! settings/data assoc-in [:window]
+                                                          (merge (get-in @settings/data [:window])
+                                                                 {:width (bounds "width")
+                                                                  :height (bounds "height")
+                                                                  :x (bounds "x")
+                                                                  :y (bounds "y")
+                                                                  :isMaximized (.isMaximized browser-window)}))))
+                                         :load (fn []
+                                                 (when (and (get-in @settings/data [:window :x])
+                                                            (get-in @settings/data [:window :y]))
+                                                   (.setPosition browser-window
+                                                                 (get-in @settings/data [:window :x])
+                                                                 (get-in @settings/data [:window :y])))
+                                                 (.setSize browser-window
+                                                           (or (get-in @settings/data [:window :width]) 1200)
+                                                           (or (get-in @settings/data [:window :height]) 600))
+                                                 (if (get-in @settings/data [:window :isMaximized])
+                                                   (.maximize browser-window)
+                                                   (.unmaximize browser-window)))})
+    (.on electron-app "window-all-closed" #(settings/save! :window)))
+
   (settings/load!)
 
   (.setTimeout js/window (fn []
