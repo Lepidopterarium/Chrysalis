@@ -19,7 +19,8 @@
             [chrysalis.device :as device]
             [chrysalis.ui :refer [page]]
             [chrysalis.command :as command]
-            [chrysalis.hardware :as hardware]))
+            [chrysalis.hardware :as hardware]
+            [chrysalis.settings :as settings]))
 
 (def dialog (.-dialog (.-remote (js/require "electron"))))
 (def Avrgirl (js/require "avrgirl-arduino"))
@@ -100,9 +101,13 @@
          "Upload"])]]))
 
 (defmethod page [:enter :firmware] [_ _]
-  (get-firmware-version))
+  (get-firmware-version)
+  (let [device (keyword (get-in (device/current) [:device :meta :name]))]
+    (swap! state assoc-in [:firmware :hex-file]
+           (get-in @settings/data [:devices device :firmware :latest-hex]))))
 
 (defmethod page [:leave :firmware] [_ _]
+  (settings/save! :firmware)
   (swap! state assoc-in [:firmware :state] :default))
 
 (defmethod page [:render :firmware] [_ _]
@@ -140,3 +145,9 @@
 (swap! pages assoc :firmware {:name "Firmware"
                               :index 80
                               :disable? (fn [] (nil? (device/current)))})
+
+(swap! settings/hooks assoc :firmware {:save (fn []
+                                               (let [device (keyword (get-in (device/current) [:device :meta :name]))]
+                                                 (swap! settings/data assoc-in [:devices device :firmware :latest-hex]
+                                                        (get-in @state [:firmware :hex-file]))))
+                                       :load (fn [] nil)})
