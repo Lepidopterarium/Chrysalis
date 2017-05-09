@@ -18,6 +18,7 @@
   (:require [clojure.string :as s]
 
             [chrysalis.core :as core]
+            [chrysalis.settings :as settings]
             [chrysalis.device :as device]))
 
 ;;; ---- Page ---- ;;;
@@ -32,6 +33,7 @@
   (:page @core/state))
 
 (defn switch-to-page! [p]
+  (settings/save!)
   (page :leave (current-page))
   (page :enter p)
   (swap! core/state assoc :page p))

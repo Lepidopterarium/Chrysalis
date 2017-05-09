@@ -20,6 +20,7 @@
             [chrysalis.core :as core :refer [state pages]]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
+            [chrysalis.settings :as settings]
 
             ;; Plugins
 
@@ -51,6 +52,10 @@
 
 (defn init! []
   (device/detect!)
+  (settings/load!)
+
+  (let [electron-app (.-app (.-remote (js/require "electron")))]
+    (.on electron-app "window-all-closed" #(settings/save!)))
 
   (.setTimeout js/window (fn []
                            (reagent/render

@@ -21,6 +21,7 @@
             [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.command :as command]
+            [chrysalis.settings :as settings]
 
             [reagent.core :as reagent :refer [atom]]
             [hickory.core :as h]
@@ -220,3 +221,10 @@
 (swap! pages assoc :led {:name "LED Theme Editor"
                          :index 10
                          :disable? (fn [] (nil? (device/current)))})
+
+(swap! settings/hooks assoc :led {:save (fn []
+                                          (swap! settings/data assoc-in [:led :presets]
+                                                 (get-in @state [:led :presets])))
+                                  :load (fn []
+                                          (swap! state assoc-in [:led :presets]
+                                                 (get-in @settings/data [:led :presets])))})
