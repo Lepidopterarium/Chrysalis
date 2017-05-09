@@ -38,18 +38,6 @@
     (command/run port :led.theme theme)
     (.setTimeout js/window #(.close port) 2000)))
 
-(defn- gamma-correct* [gamma-map color]
-  (let [color-indexes (map first (filter #(= color (second %)) (map-indexed vector gamma-map)))
-        new-color (int (last color-indexes))]
-    (if (zero? color)
-      color
-      new-color)))
-
-(defn gamma-correct [color]
-  (if-let [gamma-map (get-in (device/current) [:device :led :gamma])]
-    (gamma-correct* gamma-map color)
-    color))
-
 (defn hex->color [hex]
   (let [r (js/parseInt (.substring hex 1 3) 16)
         g (js/parseInt (.substring hex 3 5) 16)
@@ -78,7 +66,7 @@
                :data-row r
                :data-column c
                :data-index index
-               :fill (color->hex (map gamma-correct color))
+               :fill (color->hex color)
                :stroke-width (if (current-node? r c)
                                3
                                0)
@@ -147,7 +135,7 @@
      [:button.btn.btn-primary {:type :button
                                :on-click (fn [e]
                                            (let [theme (get-in @state [:led :theme])
-                                                 theme-str (s/join " " (map gamma-correct (flatten @theme)))]
+                                                 theme-str (s/join " " (flatten @theme))]
                                              (set-theme! theme-str)))}
       "Apply"]]
     [:div.col-sm-3.text-center.bg-faded
