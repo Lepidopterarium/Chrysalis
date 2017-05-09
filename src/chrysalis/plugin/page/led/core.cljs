@@ -120,7 +120,7 @@
                              :placeholder color
                              :on-change (fn [e]
                                           (swap! state assoc-in [:led :new-color] (.-value (.-target e))))}]
-       [:button.input-group-addon.btn {:style {:background-color color}} [:tt color]]])))
+       [:tt.input-group-addon {:style {:background-color color}} color]])))
 
 (defmethod page [:render :led] [_ _]
   [:div.container-fluid
