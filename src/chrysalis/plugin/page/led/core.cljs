@@ -108,7 +108,10 @@
         [:i.fa.fa-refresh.fa-spin.fa-5x]))))
 
 (defmethod page [:enter :led] [_ _]
-  (get-theme!))
+  (get-theme!)
+  (let [device (keyword (get-in (device/current) [:device :meta :name]))
+        presets (get-in @settings/data [:devices device :led :presets])]
+    (swap! state assoc-in [:led :presets] presets)))
 
 (defmethod page [:leave :led] [_ _]
   (settings/save!))
@@ -226,8 +229,7 @@
                          :disable? (fn [] (nil? (device/current)))})
 
 (swap! settings/hooks assoc :led {:save (fn []
-                                          (swap! settings/data assoc-in [:led :presets]
-                                                 (get-in @state [:led :presets])))
-                                  :load (fn []
-                                          (swap! state assoc-in [:led :presets]
-                                                 (get-in @settings/data [:led :presets])))})
+                                          (let [device (keyword (get-in (device/current) [:device :meta :name]))]
+                                            (swap! settings/data assoc-in [:devices device :led :presets]
+                                                   (get-in @state [:led :presets]))))
+                                  :load (fn [] nil)})
