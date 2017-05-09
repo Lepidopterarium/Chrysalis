@@ -114,7 +114,7 @@
     (swap! state assoc-in [:led :presets] presets)))
 
 (defmethod page [:leave :led] [_ _]
-  (settings/save!))
+  (settings/save! :led))
 
 (defn picker []
   (if-let [target (get-in @state [:led :current-target])]

@@ -54,9 +54,6 @@
   (device/detect!)
   (settings/load!)
 
-  (let [electron-app (.-app (.-remote (js/require "electron")))]
-    (.on electron-app "window-all-closed" #(settings/save!)))
-
   (.setTimeout js/window (fn []
                            (reagent/render
                             [root-component]

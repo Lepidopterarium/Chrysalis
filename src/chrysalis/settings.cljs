@@ -27,14 +27,20 @@
 (def hooks (atom {}))
 (def data (atom {}))
 
-(defn save! []
-  (doall (map (fn [[name hooks]]
-                ((:save hooks)))
-              @hooks))
-
-  (let [fs (js/require "fs")]
-    (.writeFileSync fs config-file (.stringify js/JSON (clj->js @data))
-                    #js {"mode" 0644})))
+(defn save!
+  ([component]
+   (let [hook-fns (component @hooks)]
+     ((:save hook-fns)))
+   (let [fs (js/require "fs")]
+     (.writeFileSync fs config-file (.stringify js/JSON (clj->js @data))
+                     #js {"mode" 0644})))
+  ([]
+   (doall (map (fn [[name hooks]]
+                 ((:save hooks)))
+               @hooks))
+   (let [fs (js/require "fs")]
+     (.writeFileSync fs config-file (.stringify js/JSON (clj->js @data))
+                     #js {"mode" 0644}))))
 
 (defn load! []
   (let [fs (js/require "fs")
