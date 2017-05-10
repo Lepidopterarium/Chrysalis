@@ -43,10 +43,11 @@
                      #js {"mode" 0644}))))
 
 (defn load! []
-  (let [fs (js/require "fs")
-        contents (js->clj (.parse js/JSON (.readFileSync fs config-file #js {"encoding" "utf-8"}))
-                          :keywordize-keys true)]
-    (reset! data contents))
+  (let [fs (js/require "fs")]
+    (when (.existsSync fs config-file)
+      (let [contents (js->clj (.parse js/JSON (.readFileSync fs config-file #js {"encoding" "utf-8"}))
+                              :keywordize-keys true)]
+        (reset! data contents))))
   (doall (map (fn [[name hooks]]
                 ((:load hooks)))
               @hooks))
