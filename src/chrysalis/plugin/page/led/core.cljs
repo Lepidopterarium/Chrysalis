@@ -206,17 +206,17 @@
       (get-in @state [:led :theme])
       {:width 1024 :height 640 :interactive? true}]
      [:div.btn-group
-     [:button.btn.btn-primary {:type :button
-                               :on-click (fn [e]
-                                           (let [theme (get-in @state [:led :theme])
-                                                 theme-str (s/join " " (flatten @theme))]
-                                             (set-theme! theme-str)))}
-      "Apply"]
+      [:button.btn.btn-primary {:type :button
+                                :on-click (fn [e]
+                                            (let [theme (get-in @state [:led :theme])
+                                                  theme-str (s/join " " (flatten @theme))]
+                                              (set-theme! theme-str)))}
+       "Apply"]
       [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
                            :data-toggle :modal
                            :on-click (fn [e]
                                        (swap! state assoc-in [:led :save-theme :name] nil))}
-      "Save"]]]
+       "Save"]]]
     [:div.col-sm-3.text-center.bg-faded
      [:h4 "Color picker"]
      [picker]
