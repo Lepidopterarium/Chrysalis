@@ -76,7 +76,10 @@
                                                  (if (get-in @settings/data [:window :isMaximized])
                                                    (.maximize browser-window)
                                                    (.unmaximize browser-window)))})
-    (.on electron-app "window-all-closed" #(settings/save! :window)))
+
+    (doall (map (fn [event]
+                  (.on browser-window (name event) #(settings/save! :window)))
+                [:maximize :unmaximize :resize :move])))
 
   (settings/load!)
 
