@@ -147,14 +147,18 @@
      [<led-theme> (get-in (device/current) [:device :meta :layout])
       (atom theme)
       {:width 102 :height 64}]]]
-   [:div.card-footer.text-right
-    [:a.card-text.text-right {:style {:float :right
-                                      :font-size "50%"}
-                              :href "#"
-                              :on-click (fn [e]
-                                          (let [presets (get-in @state [:led :presets])]
-                                            (swap! state assoc-in [:led :presets] (dissoc presets name))))}
-     [:small "Remove"]]]])
+   [:div.card-footer.text-left
+    [:span.card-text
+     [:a {:href "#"}
+      "Export"]]
+    [:span.card-text
+     [:a {:style {:float :right}
+          :href "#"
+          :title "Remove"
+          :on-click (fn [e]
+                      (let [presets (get-in @state [:led :presets])]
+                        (swap! state assoc-in [:led :presets] (dissoc presets name))))}
+     [:i.fa.fa-minus]]]]])
 
 (defn presets []
   [:div.card-group
@@ -223,7 +227,11 @@
      [:h4 "Color picker"]
      [picker]
      [:hr]
-     [:h4 "Presets"]
+     [:h4 "Presets"
+      [:small {:style {:float :right}}
+       [:a {:href "#"
+            :title "Import a preset..."}
+        [:i.fa.fa-plus]]]]
      [presets]]]])
 
 (swap! pages assoc :led {:name "LED Theme Editor"
