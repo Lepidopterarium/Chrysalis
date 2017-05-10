@@ -205,18 +205,20 @@
      [<led-theme> (get-in (device/current) [:device :meta :layout])
       (get-in @state [:led :theme])
       {:width 1024 :height 640 :interactive? true}]
-     [:div.btn-group
-      [:button.btn.btn-primary {:type :button
-                                :on-click (fn [e]
-                                            (let [theme (get-in @state [:led :theme])
-                                                  theme-str (s/join " " (flatten @theme))]
-                                              (set-theme! theme-str)))}
-       "Apply"]
-      [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
-                           :data-toggle :modal
-                           :on-click (fn [e]
-                                       (swap! state assoc-in [:led :save-theme :name] nil))}
-       "Save"]]]
+     [:div.btn-toolbar.justify-content-center
+      [:div.btn-group.mr-2
+       [:a.btn.btn-primary {:href "#"
+                            :on-click (fn [e]
+                                        (let [theme (get-in @state [:led :theme])
+                                              theme-str (s/join " " (flatten @theme))]
+                                          (set-theme! theme-str)))}
+        [:i.fa.fa-paint-brush] " Apply"]]
+      [:div.btn-group.mr-2
+       [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
+                            :data-toggle :modal
+                            :on-click (fn [e]
+                                        (swap! state assoc-in [:led :save-theme :name] nil))}
+        [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.bg-faded
      [:h4 "Color picker"]
      [picker]
