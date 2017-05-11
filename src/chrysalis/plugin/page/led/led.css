@@ -1,4 +1,6 @@
 .chrysalis-plugin-page-led-key:hover {
     cursor: pointer;
+    stroke-width: 3px;
+    stroke: #0000ff;
 }
 
