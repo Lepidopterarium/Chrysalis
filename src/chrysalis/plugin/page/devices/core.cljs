@@ -41,9 +41,6 @@
 (defmethod page [:render :devices] [_ _]
   [:div.container-fluid
    [:div.row.justify-content-center
-    [:div.col-12.text-center
-     [:h2 "Available devices"]]]
-   [:div.row.justify-content-center
     [:div.card-deck
      (doall (map <device> (:devices @state)))]]])
 

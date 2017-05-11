@@ -114,10 +114,6 @@
   (let [version (get-in @state [:firmware :version])]
     [:div.container-fluid
      [:div.row.justify-content-center
-      [:div.col-sm-12.text-center
-       [:h2 "Flash a new firmware"]]]
-
-     [:div.row.justify-content-center
       [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
                                                         :uploading "card-outline-info"
                                                         :success "card-outline-success"

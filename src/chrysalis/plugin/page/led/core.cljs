@@ -204,9 +204,6 @@
 (defmethod page [:render :led] [_ _]
   [:div.container-fluid
    [<save-theme>]
-   [:div.row.justify-content-center
-    [:div.col-sm-12.text-center
-     [:h2 "LED Theme Editor"]]]
    [:div.row
     [:div.col-sm-9.text-center
      [<led-theme> (get-in (device/current) [:device :meta :layout])

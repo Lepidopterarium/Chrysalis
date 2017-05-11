@@ -91,7 +91,9 @@
                                (.preventDefault e)
                                (when-not disabled?
                                  (switch-to-page! key)))}
-      (:name meta)]]))
+      (if (= key (current-page))
+        [:b (:name meta)]
+        (:name meta))]]))
 
 (defn <main-menu> [state pages detector]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
