@@ -65,6 +65,7 @@
             color (nth theme index [0 0 0])]
         (if interactive?
           (assoc node
+                 :class :chrysalis-plugin-page-led-key
                  :data-row r
                  :data-column c
                  :data-index index
