@@ -114,6 +114,8 @@
     (swap! state assoc-in [:led :presets] presets)))
 
 (defmethod page [:leave :led] [_ _]
+  (swap! state assoc-in [:led :current-target] nil)
+  (swap! state assoc-in [:led :new-color] nil)
   (settings/save! :led))
 
 (defn picker []
