@@ -1,6 +1,7 @@
 @import 'plugins/page/repl.css';
 @import 'plugins/devices/devices.css';
 @import 'plugins/firmware/firmware.css';
+@import 'plugins/led/led.css';
 
 #application { margin-top: 5rem; }
 

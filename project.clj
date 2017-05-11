@@ -77,6 +77,7 @@
                               "src/chrysalis/plugin/hardware/virtual"
                               ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]
                               ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]
+                              ["src/chrysalis/plugin/page/led" {:target-path "resources/public/css/plugins/led"}]
                               ["src/chrysalis/plugin/page/firmware" {:target-path "resources/public/css/plugins/firmware"}]]
              :includes [#".*\.png" #".*\.css" #".*\.svg"]
              :target-path "resources/public/images/plugins"
