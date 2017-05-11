@@ -13,6 +13,7 @@
   (reset! main-window (browser-window.
                         (clj->js {:width 1200
                                   :height 600
+                                  :icon "images/kaleidoscope-logo-ph.png"
                                   :autoHideMenuBar true})))
   (.loadURL @main-window (str "file://" js/__dirname "/index.html"))
   (.on (.-webContents @main-window)
