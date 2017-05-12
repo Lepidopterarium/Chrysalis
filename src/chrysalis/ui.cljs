@@ -95,7 +95,7 @@
         [:b (:name meta)]
         (:name meta))]]))
 
-(defn <main-menu> [state pages detector]
+(defn <main-menu> [state pages]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
    [:button.navbar-toggler.navbar-toggler-right {:type :button
                                                  :data-toggle :collapse
@@ -106,9 +106,6 @@
                                                        :href "#"}
      [:i.fa.fa-spinner] " Chrysalis"]
     [:div.dropdown-menu
-     [:a.dropdown-item {:href "#"
-                        :on-click detector}
-      "Scan devices"]
      [:a.dropdown-item {:href "#settings"
                         :data-toggle :modal}
       "Settings"]
