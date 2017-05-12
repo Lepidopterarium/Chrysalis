@@ -19,7 +19,7 @@
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
                        [usb "^1.2.0"]
                        [electron-context-menu "^0.9.0"]]
-        :devDependencies [[electron "^1.6.8-beta"]
+        :devDependencies [[electron "1.6.9"]
                           [electron-rebuild "^1.5.7"]
                           [foreman "^2.0.0"]]
         :root "resources/public"
