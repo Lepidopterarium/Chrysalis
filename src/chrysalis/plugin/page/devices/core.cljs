@@ -44,5 +44,5 @@
     [:div.card-deck
      (doall (map <device> (:devices @state)))]]])
 
-(swap! pages assoc :devices {:name "Devices"
+(swap! pages assoc :devices {:name "Device Selector"
                              :index 0})

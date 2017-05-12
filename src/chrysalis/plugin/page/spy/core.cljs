@@ -40,5 +40,5 @@
                (reverse (partition 2 2 (get-in @state [:command :spy])))
                (range (count (get-in @state [:command :spy])) 0 -1)))])
 
-(swap! pages assoc :spy {:name "Spy"
+(swap! pages assoc :spy {:name "Wire Traffic Spy"
                          :index 100})

@@ -138,7 +138,7 @@
           [drop-down]]]]]]]))
 
 (swap! state assoc :firmware {:state :default})
-(swap! pages assoc :firmware {:name "Firmware"
+(swap! pages assoc :firmware {:name "Firmware Flasher"
                               :index 80
                               :disable? (fn [] (nil? (device/current)))})
 
