@@ -79,21 +79,18 @@
 
 (defn- <menu-item> [state [key meta]]
   (let [disabled? (and (:disable? meta)
-                       ((:disable? meta)))]
-    [:li {:key (str "main-menu-" (name key))
-          :class (s/join " " ["nav-item"
-                              (when (= key (current-page))
-                                "active")])}
-     [:a.nav-link {:href "#"
-                   :class (when disabled?
-                            "disabled")
-                   :on-click (fn [e]
-                               (.preventDefault e)
-                               (when-not disabled?
-                                 (switch-to-page! key)))}
-      (if (= key (current-page))
-        [:b (:name meta)]
-        (:name meta))]]))
+                       ((:disable? meta)))
+        current? (= key (current-page))]
+    [:a.dropdown-item {:href "#"
+                       :key (str "main-menu-" (name key))
+                       :class (when (or disabled? current?) "disabled")
+                       :on-click (fn [e]
+                                   (.preventDefault e)
+                                   (when-not disabled?
+                                     (switch-to-page! key)))}
+     (if current?
+       [:b (:name meta)]
+       (:name meta))]))
 
 (defn <main-menu> [state pages]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
@@ -104,8 +101,13 @@
    [:div.dropdown
     [:a.navbar-brand.chrysalis-link-button.text-white {:data-toggle :dropdown
                                                        :href "#"}
-     [:i.fa.fa-spinner] " Chrysalis"]
+     [:i.fa.fa-spinner] " Chrysalis: " [:i (-> (current-page)
+                                               pages
+                                               :name)]]
     [:div.dropdown-menu
+     (doall (map (partial <menu-item> state)
+                 (sort-by (fn [[key meta]] (:index meta)) pages)))
+     [:hr]
      [:a.dropdown-item {:href "#settings"
                         :data-toggle :modal}
       "Settings"]
@@ -114,11 +116,7 @@
                         :data-toggle :modal} "About"]
      [:a.dropdown-item {:href "#"
                         :on-click #(.close js/window)} "Quit"]]]
-
-   [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}
-    [:ul.navbar-nav.mr-auto
-     (doall (map (partial <menu-item> state)
-                 (sort-by (fn [[key meta]] (:index meta)) pages)))]]
+   [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}]
    [:span.navbar-text {:style {:white-space :pre}}
     (when-let [device (device/current)]
       (get-in device [:device :meta :name]))]])
