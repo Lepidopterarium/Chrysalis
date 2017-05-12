@@ -1,4 +1,4 @@
-(defproject Chrysalis "0.1.0-SNAPSHOT"
+(defproject Chrysalis "0.0.2-SNAPSHOT"
   :source-paths ["src"]
   :description "Kaleidoscope Command Center"
   :dependencies [[org.clojure/clojure "1.8.0"]
