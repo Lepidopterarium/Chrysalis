@@ -108,10 +108,6 @@
      (doall (map (partial <menu-item> state)
                  (sort-by (fn [[key meta]] (:index meta)) pages)))
      [:hr]
-     [:a.dropdown-item {:href "#settings"
-                        :data-toggle :modal}
-      "Settings"]
-     [:hr]
      [:a.dropdown-item {:href "#about"
                         :data-toggle :modal} "About"]
      [:a.dropdown-item {:href "#"
@@ -120,30 +116,6 @@
    [:span.navbar-text {:style {:white-space :pre}}
     (when-let [device (device/current)]
       (get-in device [:device :meta :name]))]])
-
-;;; ---- Settings ---- ;;;
-
-(defn <settings> []
-  [:div.modal.fade {:id "settings"}
-   [:div.modal-dialog.modal-lg
-    [:div.modal-content.bg-faded
-     [:div.modal-header
-      [:h5.modal-title "Settings"]
-      [:button.close {:type :close
-                      :data-dismiss :modal}
-       [:span "×"]]]
-     [:div.modal-body
-      [:div.container-fluid
-       [:div.row
-        [:div.col-sm-12
-         [:i "There will be settings here, at some point..."]]]]]
-     [:div.modal-footer
-      [:a.btn.btn-primary.disabled {:href "#"
-                                    :disabled true}
-       "Save"]
-      [:a.btn.btn-secondary {:href "#"
-                             :data-dismiss :modal}
-       "Cancel"]]]]])
 
 ;;; ---- Helpers ---- ;;;
 

@@ -46,7 +46,6 @@
 (defn root-component []
   [:div
    [ui/<about>]
-   [ui/<settings>]
    [ui/<main-menu> @state @pages]
    (ui/page :render (ui/current-page))])
 
