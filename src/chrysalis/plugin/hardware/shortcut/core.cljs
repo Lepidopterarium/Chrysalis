@@ -20,6 +20,8 @@
 (defmethod known? [0xfeed 0x6060] [device]
   (assoc device
          :meta {:name "Shortcut v0.4"
+                :logo "images/plugins/shortcut-keyboard.png"
+                :layout "images/plugins/shortcut-keyboard.svg"
                 :matrix [14 4]}
          :board {:name "Shortcut v0.4"
                  :baud 9600
