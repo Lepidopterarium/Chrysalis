@@ -11,7 +11,7 @@
                  [com.cemerick/piggieback "0.2.1"]
                  [hickory "0.7.1"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
-  :npm {:dependencies [[avrgirl-arduino "^2.0.0"]
+  :npm {:dependencies [[avrgirl-arduino "^2.1.0"]
                        [bootstrap "^4.0.0-alpha.4"]
                        [jquery "^3.1.0"]
                        [font-awesome "^4.7.0"]
