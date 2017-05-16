@@ -47,7 +47,8 @@
   [:div
    [ui/<about>]
    [ui/<main-menu> @state @pages]
-   (ui/page :render (ui/current-page))])
+   [:div {:id :page}
+    (ui/page :render (ui/current-page))]])
 
 (defn init! []
   (device/detect!)
@@ -85,7 +86,11 @@
   (.setTimeout js/window (fn []
                            (reagent/render
                             [root-component]
-                            (js/document.getElementById "application")))
+                            (js/document.getElementById "application"))
+
+                           (swap! state assoc :page-keys ui/mousetrap)
+                           (ui/switch-to-page! (ui/current-page))
+                           )
                2000)
 
   (let [usb (js/require "usb")]

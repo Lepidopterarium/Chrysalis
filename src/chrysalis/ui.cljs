@@ -21,6 +21,8 @@
             [chrysalis.settings :as settings]
             [chrysalis.device :as device]))
 
+(def mousetrap (js/require "mousetrap"))
+
 ;;; ---- Page ---- ;;;
 
 (defmulti page
@@ -34,6 +36,7 @@
 
 (defn switch-to-page! [p]
   (page :leave (current-page))
+  (.reset mousetrap)
   (page :enter p)
   (swap! core/state assoc :page p))
 
@@ -77,15 +80,14 @@
 
 ;;; ---- Menu ---- ;;;
 
-(def mousetrap (js/require "mousetrap"))
-
 (defn- <menu-item> [state [key meta] index]
   (let [disabled? (and (:disable? meta)
                        ((:disable? meta)))
         current? (= key (current-page))]
-    (.bind mousetrap (str "alt+" index) #((when-not (and (:disable? meta)
-                                                          ((:disable? meta)))
-                                             (switch-to-page! key))))
+    (.bind mousetrap (str "alt+" index) (fn [& _]
+                                          (when-not (and (:disable? meta)
+                                                         ((:disable? meta)))
+                                            (switch-to-page! key))))
      [:a.dropdown-item {:href "#"
                         :key (str "main-menu-" (name key))
                         :class (when (or disabled? current?) "disabled")

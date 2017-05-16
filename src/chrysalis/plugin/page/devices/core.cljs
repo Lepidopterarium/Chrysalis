@@ -20,33 +20,30 @@
             [chrysalis.ui :as ui :refer [page]]))
 
 (defn <device> [device index]
-  (let [current? (= device (:device (device/current)))]
-    (.bind ui/mousetrap (str "ctrl+" index) (fn []
-                                              (if (= device (:device (device/current)))
-                                               (device/switch-to! nil)
-                                               (device/switch-to! device))))
-    [:a.card.chrysalis-page-selector-device {:key (:comName device)
-                                             :href "#"
-                                             :disabled current?
-                                             :class (when current? "card-outline-success")
-                                             :on-click (fn [e]
-                                                         (if current?
-                                                           (device/switch-to! nil)
-                                                           (device/switch-to! device)))}
-     [:div.card-block
-      [:div.card-text.text-center
-       (if-let [logo-url (get-in device [:meta :logo])]
-         [:img {:src logo-url}]
-         [:p
-          "[Image comes here]"])
-       [:p.text-mute.chrysalis-link-button
-        (get-in device [:meta :name])]]]
-     [:div.card-footer
-      [:div.row
-      [:small.col-sm-6.text-muted
-       (:comName device)]
-      [:small.col-sm-6.text-right.text-muted
-       "Ctrl+" index]]]]))
+  (when device
+    (let [current? (= device (:device (device/current)))]
+      [:a.card.chrysalis-page-selector-device {:key (:comName device)
+                                               :href "#"
+                                               :disabled current?
+                                               :class (when current? "card-outline-success")
+                                               :on-click (fn [e]
+                                                           (if current?
+                                                             (device/switch-to! nil)
+                                                             (device/switch-to! device)))}
+       [:div.card-block
+        [:div.card-text.text-center
+         (if-let [logo-url (get-in device [:meta :logo])]
+           [:img {:src logo-url}]
+           [:p
+            "[Image comes here]"])
+         [:p.text-mute.chrysalis-link-button
+          (get-in device [:meta :name])]]]
+       [:div.card-footer
+        [:div.row
+         [:small.col-sm-6.text-muted
+          (:comName device)]
+         [:small.col-sm-6.text-right.text-muted
+          "Ctrl+" index]]]])))
 
 (defmethod page [:render :devices] [_ _]
   [:div.container-fluid
@@ -54,5 +51,16 @@
     [:div.card-deck
      (doall (map <device> (:devices @state) (range)))]]])
 
+(defmethod page [:enter :devices] [_ _]
+  (doall (map (fn [device index]
+                (.bind ui/mousetrap
+                       (str "ctrl+" index)
+                       (fn []
+                         (if (= device (:device (device/current)))
+                           (device/switch-to! nil)
+                           (device/switch-to! device)))))
+              (:devices @state) (range))))
+
+(swap! state assoc :devices {:keys nil})
 (swap! pages assoc :devices {:name "Device Selector"
                              :index 0})
