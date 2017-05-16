@@ -85,4 +85,5 @@
              :skip-stencil [#".*"]}
 
   :aliases {"build" ["do" ["npm" "run" "build"] "resource"]
-            "start-ui" ["do" ["npm" "run" "start-ui"]]})
+            "start-ui" ["do" ["npm" "run" "start-ui"]]
+            "start" ["do" ["npm" "run" "start"]]})
