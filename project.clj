@@ -75,6 +75,7 @@
              :server-port 3449}
   :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
                               "src/chrysalis/plugin/hardware/virtual"
+                              "src/chrysalis/plugin/hardware/shortcut"
                               ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]
                               ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]
                               ["src/chrysalis/plugin/page/led" {:target-path "resources/public/css/plugins/led"}]
