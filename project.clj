@@ -18,6 +18,7 @@
                        [tether "^1.3.7"]
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
                        [usb "^1.2.0"]
+                       [mousetrap "^1.6.1"]
                        [electron-context-menu "^0.9.0"]]
         :devDependencies [[electron "1.6.9"]
                           [electron-rebuild "^1.5.7"]

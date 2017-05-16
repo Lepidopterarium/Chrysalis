@@ -5,6 +5,10 @@
 
 #application { margin-top: 5rem; }
 
+#chrysalis-main-menu {
+    min-width: 20rem;
+}
+
 .chrysalis-link-button {
     color: #292b2c;
 }

@@ -17,10 +17,14 @@
 (ns chrysalis.plugin.page.devices.core
   (:require [chrysalis.device :as device]
             [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :refer [page]]))
+            [chrysalis.ui :as ui :refer [page]]))
 
-(defn <device> [device]
+(defn <device> [device index]
   (let [current? (= device (:device (device/current)))]
+    (.bind ui/mousetrap (str "ctrl+" index) (fn []
+                                              (if (= device (:device (device/current)))
+                                               (device/switch-to! nil)
+                                               (device/switch-to! device))))
     [:a.card.chrysalis-page-selector-device {:key (:comName device)
                                              :href "#"
                                              :disabled current?
@@ -36,13 +40,19 @@
          [:p
           "[Image comes here]"])
        [:p.text-mute.chrysalis-link-button
-        (get-in device [:meta :name])]]]]))
+        (get-in device [:meta :name])]]]
+     [:div.card-footer
+      [:div.row
+      [:small.col-sm-6.text-muted
+       (:comName device)]
+      [:small.col-sm-6.text-right.text-muted
+       "Ctrl+" index]]]]))
 
 (defmethod page [:render :devices] [_ _]
   [:div.container-fluid
    [:div.row.justify-content-center
     [:div.card-deck
-     (doall (map <device> (:devices @state)))]]])
+     (doall (map <device> (:devices @state) (range)))]]])
 
 (swap! pages assoc :devices {:name "Device Selector"
                              :index 0})

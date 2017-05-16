@@ -77,20 +77,27 @@
 
 ;;; ---- Menu ---- ;;;
 
-(defn- <menu-item> [state [key meta]]
+(def mousetrap (js/require "mousetrap"))
+
+(defn- <menu-item> [state [key meta] index]
   (let [disabled? (and (:disable? meta)
                        ((:disable? meta)))
         current? (= key (current-page))]
-    [:a.dropdown-item {:href "#"
-                       :key (str "main-menu-" (name key))
-                       :class (when (or disabled? current?) "disabled")
-                       :on-click (fn [e]
-                                   (.preventDefault e)
-                                   (when-not disabled?
-                                     (switch-to-page! key)))}
-     (if current?
-       [:b (:name meta)]
-       (:name meta))]))
+    (.bind mousetrap (str "alt+" index) #((when-not (and (:disable? meta)
+                                                          ((:disable? meta)))
+                                             (switch-to-page! key))))
+     [:a.dropdown-item {:href "#"
+                        :key (str "main-menu-" (name key))
+                        :class (when (or disabled? current?) "disabled")
+                        :on-click (fn [e]
+                                    (.preventDefault e)
+                                    (when-not disabled?
+                                      (switch-to-page! key)))}
+      (if current?
+        [:b (:name meta)]
+        (:name meta))
+
+      [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
 
 (defn <main-menu> [state pages]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
@@ -104,14 +111,16 @@
      [:i.fa.fa-spinner] " Chrysalis: " [:i (-> (current-page)
                                                pages
                                                :name)]]
-    [:div.dropdown-menu
+    [:div.dropdown-menu {:id "chrysalis-main-menu"}
      (doall (map (partial <menu-item> state)
-                 (sort-by (fn [[key meta]] (:index meta)) pages)))
+                 (sort-by (fn [[key meta]] (:index meta)) pages)
+                 (range)))
      [:hr]
      [:a.dropdown-item {:href "#about"
                         :data-toggle :modal} "About"]
      [:a.dropdown-item {:href "#"
-                        :on-click #(.close js/window)} "Quit"]]]
+                        :on-click #(.close js/window)} "Quit"
+      [:div.text-right.text-mute {:style {:float :right}} "Ctrl+Q"]]]]
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}]
    [:span.navbar-text {:style {:white-space :pre}}
     (when-let [device (device/current)]
