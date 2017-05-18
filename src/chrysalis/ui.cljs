@@ -88,18 +88,18 @@
                                           (when-not (and (:disable? meta)
                                                          ((:disable? meta)))
                                             (switch-to-page! key))))
-     [:a.dropdown-item {:href "#"
-                        :key (str "main-menu-" (name key))
-                        :class (when (or disabled? current?) "disabled")
-                        :on-click (fn [e]
-                                    (.preventDefault e)
-                                    (when-not disabled?
-                                      (switch-to-page! key)))}
-      (if current?
-        [:b (:name meta)]
-        (:name meta))
+    [:a.dropdown-item {:href "#"
+                       :key (str "main-menu-" (name key))
+                       :class (when (or disabled? current?) "disabled")
+                       :on-click (fn [e]
+                                   (.preventDefault e)
+                                   (when-not disabled?
+                                     (switch-to-page! key)))}
+     (if current?
+       [:b (:name meta)]
+       (:name meta))
 
-      [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
+     [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
 
 (defn <main-menu> [state pages]
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
@@ -114,9 +114,8 @@
                                                pages
                                                :name)]]
     [:div.dropdown-menu {:id "chrysalis-main-menu"}
-     (doall (map (partial <menu-item> state)
-                 (sort-by (fn [[key meta]] (:index meta)) pages)
-                 (range)))
+     (doall (for [[index menu-item] (map-indexed vector (sort-by (fn [[key meta]] (:index meta)) pages))]
+              (<menu-item> state menu-item index)))
      [:hr]
      [:a.dropdown-item {:href "#about"
                         :data-toggle :modal} "About"]
