@@ -58,7 +58,7 @@
     false))
 
 (defn- node-augment [node theme interactive?]
-  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_F" (:id node))))]
+  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_F$" (:id node))))]
     (if (and r c)
       (let [[rows cols] (get-in (device/current) [:device :meta :matrix])
             index (key-index r c cols)
