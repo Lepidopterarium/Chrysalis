@@ -110,7 +110,7 @@
    [:div.dropdown
     [:a.navbar-brand.chrysalis-link-button.text-white {:data-toggle :dropdown
                                                        :href "#"}
-     [:i.fa.fa-spinner] " Chrysalis: " [:i (-> (current-page)
+     [:i.fa.fa-spinner] " Chrysalis: " [:b (-> (current-page)
                                                pages
                                                :name)]]
     [:div.dropdown-menu {:id "chrysalis-main-menu"}
