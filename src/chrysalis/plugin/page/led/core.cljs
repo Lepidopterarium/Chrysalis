@@ -17,7 +17,8 @@
 (ns chrysalis.plugin.page.led.core
   (:refer-clojure :exclude [slurp])
   (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :as ui :refer [page color->hex]]
+            [chrysalis.ui :as ui :refer [color->hex]]
+            [chrysalis.ui.page :refer [page]]
             [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.command :as command]

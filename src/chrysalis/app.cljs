@@ -20,6 +20,7 @@
             [chrysalis.core :as core :refer [state pages]]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
+            [chrysalis.ui.page :as page]
             [chrysalis.settings :as settings]
 
             ;; Plugins
@@ -81,8 +82,8 @@
                             [ui/chrysalis]
                             (js/document.getElementById "chrysalis"))
 
-                           (swap! state assoc :page-keys ui/mousetrap)
-                           (ui/switch-to-page! (ui/current-page))
+                           (swap! state assoc :page-keys core/mousetrap)
+                           (page/switch-to! (page/current))
                            )
                2000)
 

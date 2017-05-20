@@ -17,7 +17,8 @@
 (ns chrysalis.plugin.page.firmware.core
   (:require [chrysalis.core :refer [state pages]]
             [chrysalis.device :as device]
-            [chrysalis.ui :as ui :refer [page]]
+            [chrysalis.ui :as ui]
+            [chrysalis.ui.page :refer [page]]
             [chrysalis.command :as command]
             [chrysalis.hardware :as hardware]
             [chrysalis.settings :as settings]

@@ -23,80 +23,13 @@
             [chrysalis.settings :as settings]
             [chrysalis.device :as device]
 
-            [chrysalis.ui.about :refer [<about>]]))
-
-(def mousetrap (js/require "mousetrap"))
-
-;;; ---- Page ---- ;;;
-
-(defmulti page
-  (fn [action p]
-    [action p]))
-
-(defmethod page :default [_ _ _])
-
-(defn current-page []
-  (:page @core/state))
-
-(defn switch-to-page! [p]
-  (page :leave (current-page))
-  (.reset mousetrap)
-  (page :enter p)
-  (swap! core/state assoc :page p))
-
-;;; ---- Menu ---- ;;;
-
-(defn- <menu-item> [state [key meta] index]
-  (let [disabled? (and (:disable? meta)
-                       ((:disable? meta)))
-        current? (= key (current-page))]
-    (.bind mousetrap (str "alt+" index) (fn [& _]
-                                          (when-not (and (:disable? meta)
-                                                         ((:disable? meta)))
-                                            (switch-to-page! key))))
-    [:a.dropdown-item {:href "#"
-                       :key (str "main-menu-" (name key))
-                       :class (when (or disabled? current?) "disabled")
-                       :on-click (fn [e]
-                                   (.preventDefault e)
-                                   (when-not disabled?
-                                     (switch-to-page! key)))}
-     (if current?
-       [:b (:name meta)]
-       (:name meta))
-
-     [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
-
-(defn <main-menu> [state pages]
-  [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
-   [:button.navbar-toggler.navbar-toggler-right {:type :button
-                                                 :data-toggle :collapse
-                                                 :data-target "#navbarSupportedContent"}
-    [:span.navbar-toggler-icon]]
-   [:div.dropdown
-    [:a.navbar-brand.link-button.text-white {:data-toggle :dropdown
-                                             :href "#"}
-     [:i.fa.fa-spinner] " Chrysalis: " [:b (-> (current-page)
-                                               pages
-                                               :name)]]
-    [:div.dropdown-menu {:id "main-menu"}
-     (doall (for [[index menu-item] (map-indexed vector (sort-by (fn [[key meta]] (:index meta)) pages))]
-              (<menu-item> state menu-item index)))
-     [:hr]
-     [:a.dropdown-item {:href "#about"
-                        :data-toggle :modal} "About"]
-     [:a.dropdown-item {:href "#"
-                        :on-click #(.close js/window)} "Quit"
-      [:div.text-right.text-mute {:style {:float :right}} "Ctrl+Q"]]]]
-   [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}]
-   [:span.navbar-text {:style {:white-space :pre}}
-    (when-let [device (device/current)]
-      (get-in device [:device :meta :name]))]])
+            [chrysalis.ui.page :as page]
+            [chrysalis.ui.about :refer [<about>]]
+            [chrysalis.ui.main-menu :refer [<main-menu>]]))
 
 ;;; ---- Helpers ---- ;;;
 
 (defn style
-
   ([styles]
    [:style {:type "text/css"}
     (g/css styles)])
@@ -124,4 +57,4 @@
    [<about>]
    [<main-menu> @core/state @core/pages]
    [:div {:id :page}
-    (page :render (current-page))]])
+    (page/page :render (page/current))]])

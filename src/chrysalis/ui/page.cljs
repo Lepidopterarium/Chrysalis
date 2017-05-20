@@ -14,17 +14,23 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.core
-  (:require [reagent.core :as reagent :refer [atom]]))
+(ns chrysalis.ui.page
+  (:require [chrysalis.core :as core]))
 
-(def mousetrap (js/require "mousetrap"))
+;;; ---- Page ---- ;;;
 
-;;; ---- State ---- ;;;
+(defmulti page
+  (fn [action p]
+    [action p]))
 
-(defonce state (atom {:devices []
-                      :current-device nil
-                      :page :devices}))
+(defmethod page :default [_ _ _])
 
-;;; ---- Pages ---- ;;;
+(defn current []
+  (:page @core/state))
 
-(defonce pages (atom {}))
+(defn switch-to! [p]
+  (page :leave (current))
+  (.reset core/mousetrap)
+  (page :enter p)
+  (swap! core/state assoc :page p))
+

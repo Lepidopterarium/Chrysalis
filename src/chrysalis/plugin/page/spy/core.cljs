@@ -16,7 +16,8 @@
 
 (ns chrysalis.plugin.page.spy.core
   (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :as ui :refer [page]]
+            [chrysalis.ui :as ui]
+            [chrysalis.ui.page :refer [page]]
 
             [chrysalis.plugin.page.repl.core :as repl]))
 

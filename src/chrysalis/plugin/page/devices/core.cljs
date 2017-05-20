@@ -16,8 +16,9 @@
 
 (ns chrysalis.plugin.page.devices.core
   (:require [chrysalis.device :as device]
-            [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :as ui :refer [page]]
+            [chrysalis.core :as core :refer [state pages]]
+            [chrysalis.ui :as ui]
+            [chrysalis.ui.page :as page :refer [page]]
 
             [garden.units :as gu]))
 
@@ -60,7 +61,7 @@
 
 (defmethod page [:enter :devices] [_ _]
   (doall (map (fn [device index]
-                (.bind ui/mousetrap
+                (.bind core/mousetrap
                        (str "ctrl+" index)
                        (fn []
                          (if (= device (:device (device/current)))

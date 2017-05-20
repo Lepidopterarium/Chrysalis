@@ -20,7 +20,8 @@
             [chrysalis.device :as device]
             [chrysalis.key :as key]
             [chrysalis.command :as command]
-            [chrysalis.ui :as ui :refer [page]]
+            [chrysalis.ui :as ui]
+            [chrysalis.ui.page :refer [page]]
 
             [garden.units :as gu]))
 
