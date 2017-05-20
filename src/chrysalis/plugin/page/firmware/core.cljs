@@ -17,10 +17,12 @@
 (ns chrysalis.plugin.page.firmware.core
   (:require [chrysalis.core :refer [state pages]]
             [chrysalis.device :as device]
-            [chrysalis.ui :refer [page]]
+            [chrysalis.ui :as ui :refer [page]]
             [chrysalis.command :as command]
             [chrysalis.hardware :as hardware]
-            [chrysalis.settings :as settings]))
+            [chrysalis.settings :as settings]
+
+            [garden.units :as gu]))
 
 (def dialog (.-dialog (.-remote (js/require "electron"))))
 (def Avrgirl (js/require "avrgirl-arduino"))
@@ -66,13 +68,13 @@
   (let [hex-file (get-in @state [:firmware :hex-file])]
     [:span.dropdown {:class (when hex-file
                               "show")}
-     [:a.dropdown-toggle.chrysalis-link-button {:href "#"
-                                                :data-toggle :dropdown}
+     [:a.dropdown-toggle.link-button {:href "#"
+                                      :data-toggle :dropdown}
       [:small [:i.fa.fa-cog]]]
      [:div.dropdown-menu.text-center
       [:div.input-group
        [:div.input-group-addon
-        [:a.chrysalis-link-button
+        [:a.link-button
          {:href "#"
           :on-click (fn [e]
                       (swap! state assoc-in [:firmware :state] :default)
@@ -90,10 +92,10 @@
                              :title hex-file
                              :value (or (basename hex-file) "")}]
        [:div.input-group-addon
-        [:a.chrysalis-link-button {:href "#"
-                                   :on-click (fn []
-                                               (firmware-state! :default)
-                                               (swap! state assoc-in [:firmware :hex-file] nil))}
+        [:a.link-button {:href "#"
+                         :on-click (fn []
+                                     (firmware-state! :default)
+                                     (swap! state assoc-in [:firmware :hex-file] nil))}
          [:i.fa.fa-eraser]]]]
       (when hex-file
         [:a.btn.btn-primary {:href "#"
@@ -112,13 +114,23 @@
 
 (defmethod page [:render :firmware] [_ _]
   (let [version (get-in @state [:firmware :version])]
-    [:div.container-fluid
+    [:div.container-fluid {:id :firmware}
+     [ui/style [:#page
+                [:#firmware
+                 [:.card {:min-width (gu/px 375)}
+                  [:.dropdown {:float :right}
+                   [:.dropdown-menu {:padding-left (gu/em 0.25)
+                                     :padding-right (gu/em 0.25)
+                                     :left (gu/em -22)}]]
+                  ["input[type=text]" {:padding-left (gu/em 0.5)
+                                       :width (gu/em 20)}]
+                  [:a.btn {:margin-top (gu/em 0.5)}]]]]]
      [:div.row.justify-content-center
-      [:div.card.chrysalis-page-firmware-card {:class (condp = (get-in @state [:firmware :state])
-                                                        :uploading "card-outline-info"
-                                                        :success "card-outline-success"
-                                                        :error "card-outline-danger"
-                                                        nil)}
+      [:div.card {:class (condp = (get-in @state [:firmware :state])
+                           :uploading "card-outline-info"
+                           :success "card-outline-success"
+                           :error "card-outline-danger"
+                           nil)}
        [:img.card-img-top {:alt "Kaleidoscope Logo"
                            :class (when (:uploading #{(get-in @state [:firmware :state])})
                                     "fa-spin")

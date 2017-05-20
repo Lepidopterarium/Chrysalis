@@ -16,6 +16,8 @@
 
 (ns chrysalis.ui
   (:require [clojure.string :as s]
+            [garden.core :as g]
+            [garden.units :as gu]
 
             [chrysalis.core :as core]
             [chrysalis.settings :as settings]
@@ -63,9 +65,9 @@
                                 :src "images/kaleidoscope-logo-ph-small.png"}]]
            [:div.card-block
             [:h4.card-title "Chrysalis " (.getVersion app)
-             [:small " " [:a.chrysalis-link-button {:href (str "https://github.com/algernon/Chrysalis/releases/tag/chrysalis-"
-                                                               (.getVersion app))
-                                                    :title "Release notes"}
+             [:small " " [:a.link-button {:href (str "https://github.com/algernon/Chrysalis/releases/tag/chrysalis-"
+                                                     (.getVersion app))
+                                          :title "Release notes"}
                           [:i.fa.fa-id-card-o]]]]
             [:div.card-text
              [:div.text-muted
@@ -108,12 +110,12 @@
                                                  :data-target "#navbarSupportedContent"}
     [:span.navbar-toggler-icon]]
    [:div.dropdown
-    [:a.navbar-brand.chrysalis-link-button.text-white {:data-toggle :dropdown
-                                                       :href "#"}
+    [:a.navbar-brand.link-button.text-white {:data-toggle :dropdown
+                                             :href "#"}
      [:i.fa.fa-spinner] " Chrysalis: " [:b (-> (current-page)
                                                pages
                                                :name)]]
-    [:div.dropdown-menu {:id "chrysalis-main-menu"}
+    [:div.dropdown-menu {:id "main-menu"}
      (doall (for [[index menu-item] (map-indexed vector (sort-by (fn [[key meta]] (:index meta)) pages))]
               (<menu-item> state menu-item index)))
      [:hr]
@@ -128,6 +130,19 @@
       (get-in device [:device :meta :name]))]])
 
 ;;; ---- Helpers ---- ;;;
+
+(defn style
+
+  ([styles]
+   [:style {:type "text/css"}
+    (g/css styles)])
+
+  ([]
+   (style [:#chrysalis {:margin-top (gu/rem 5)}
+           [:#main-menu {:min-width (gu/rem 20)}]
+           [:.navbar-brand:hover
+            [:i {:animation "fa-spin 2s infinite linear"}]]
+           [:.link-button {:color "#292b2c"}]])))
 
 (defn- toHex [i]
   (let [hex (.toString i 16)]

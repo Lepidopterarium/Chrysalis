@@ -17,7 +17,7 @@
 (ns chrysalis.plugin.page.led.core
   (:refer-clojure :exclude [slurp])
   (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :refer [page color->hex]]
+            [chrysalis.ui :as ui :refer [page color->hex]]
             [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.command :as command]
@@ -25,6 +25,7 @@
 
             [reagent.core :as reagent :refer [atom]]
             [hickory.core :as h]
+            [garden.units :as gu]
             [clojure.walk :as walk]
             [clojure.string :as s]))
 
@@ -65,7 +66,7 @@
             color (nth theme index [0 0 0])]
         (if interactive?
           (assoc node
-                 :class :chrysalis-plugin-page-led-key
+                 :class :key
                  :data-row r
                  :data-column c
                  :data-index index
@@ -202,7 +203,12 @@
        "Cancel"]]]]])
 
 (defmethod page [:render :led] [_ _]
-  [:div.container-fluid
+  [:div.container-fluid {:id :led}
+   [ui/style [:#page
+              [:#led
+               [:.key:hover {:cursor :pointer
+                             :stroke-width (gu/px 3)
+                             :stroke "#0000ff"}]]]]
    [<save-theme>]
    [:div.row
     [:div.col-sm-9.text-center

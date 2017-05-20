@@ -20,7 +20,9 @@
             [chrysalis.device :as device]
             [chrysalis.key :as key]
             [chrysalis.command :as command]
-            [chrysalis.ui :refer [page]]))
+            [chrysalis.ui :as ui :refer [page]]
+
+            [garden.units :as gu]))
 
 (defn- send-command! [req]
   (let [[command & args] (.split req #" +")
@@ -39,23 +41,23 @@
 
 (defn repl-wrap [req index device result output]
   (let [latest? (= index (count (get-in @state [:repl :history])))]
-    [:div.row.chrysalis-page-repl-box {:key (str "repl-history-" index)}
+    [:div.row.box {:key (str "repl-history-" index)}
      [:div.col-sm-12
       [:div.card {:class (when latest? "card-outline-success")}
        [:div.card-block
         [:div.card-title.row
          [:div.col-sm-6.text-left
-          [:a.chrysalis-link-button.chrysalis-page-repl-collapse-toggle
+          [:a.link-button.collapse-toggle
            {:href (str "#repl-history-collapse-" index)
             :data-toggle :collapse}
            [:i.fa.fa-angle-down]]
           " " [:code req]]
          [:div.col-sm-6.text-right
-          [:a.chrysalis-link-button {:href "#"
-                                     :on-click (fn [e]
-                                                 (.preventDefault e)
-                                                 (swap! state assoc-in [:repl :command] req)
-                                                 (.focus (js/document.getElementById "repl-prompt-input")))}
+          [:a.link-button {:href "#"
+                           :on-click (fn [e]
+                                       (.preventDefault e)
+                                       (swap! state assoc-in [:repl :command] req)
+                                       (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
         [:div.collapse.show {:id (str "repl-history-collapse-" index)}
          (if result
@@ -158,10 +160,36 @@
         (swap! state assoc-in [:repl :history-index] (max (dec current-index) -1)))
       (swap! state assoc-in [:repl :command] nil))))
 
+(defn style [page]
+  [:#page
+   [page
+    [:.prompt :.box {:margin-bottom (gu/em 1)}]
+    [:.prompt
+     ["[type=submit]" {:background :none
+                       :padding (gu/px 0)
+                       :border (gu/px 0)
+                       :cursor :pointer}]
+     ["[type=submit]:hover" {:color "#014c8c"}]
+     [:.dropdown-menu {:min-width (gu/px 0)
+                       :left :auto
+                       :right (gu/px 0)}]]
+
+    [:.box
+     [:.card-block
+      [:.collapse
+       [:pre {:white-space :pre-wrap}]]]]
+
+    [:.collapse-toggle
+     [:i {:width (gu/px 10.38)
+          :display :inline-block}]]
+    [:.collapse-toggle.collapsed
+     [:i:before {:content "\f105"}]]]])
+
 (defmethod page [:render :repl] [_ _]
-  [:div.container-fluid
+  [:div.container-fluid {:id :repl}
+   [ui/style (style :#repl)]
    [<available-commands>]
-   [:div.row.justify-content-left.chrysalis-page-repl-prompt
+   [:div.row.justify-content-left.prompt
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
                                    (send-command! (get-in @state [:repl :command]))
@@ -186,21 +214,21 @@
                          :value ""
                          :title "Run!"}]]
       [:div.dropdown.input-group-addon
-       [:a.dropdown-toggle.chrysalis-link-button {:href "#"
-                                                  :data-toggle :dropdown}
+       [:a.dropdown-toggle.link-button {:href "#"
+                                        :data-toggle :dropdown}
         [:i.fa.fa-cogs]]
        [:div.dropdown-menu.text-right
-        [:a.chrysalis-link-button.dropdown-item {:href "#"
-                                                 :data-toggle :modal
-                                                 :data-target "#repl-available-commands"
-                                                 :title "List of available commands"}
+        [:a.link-button.dropdown-item {:href "#"
+                                       :data-toggle :modal
+                                       :data-target "#repl-available-commands"
+                                       :title "List of available commands"}
          "Help"]
         [:hr]
-        [:a.chrysalis-link-button.dropdown-item {:href "#"
-                                                 :title "Clear the REPL history"
-                                                 :on-click (fn [e]
-                                                             (.preventDefault e)
-                                                             (swap! state assoc-in [:repl :history] []))}
+        [:a.link-button.dropdown-item {:href "#"
+                                       :title "Clear the REPL history"
+                                       :on-click (fn [e]
+                                                   (.preventDefault e)
+                                                   (swap! state assoc-in [:repl :history] []))}
          "Clear history"]]]]]]
    (doall (map (fn [item index]
                  (display (:command item) (:request item) @(:result item) (:device item) index))

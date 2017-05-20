@@ -17,26 +17,28 @@
 (ns chrysalis.plugin.page.devices.core
   (:require [chrysalis.device :as device]
             [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :as ui :refer [page]]))
+            [chrysalis.ui :as ui :refer [page]]
+
+            [garden.units :as gu]))
 
 (defn <device> [device index]
   (when device
     (let [current? (= device (:device (device/current)))]
-      [:a.card.chrysalis-page-selector-device {:key (:comName device)
-                                               :href "#"
-                                               :disabled current?
-                                               :class (when current? "card-outline-success")
-                                               :on-click (fn [e]
-                                                           (if current?
-                                                             (device/switch-to! nil)
-                                                             (device/switch-to! device)))}
+      [:a.card.device {:key (:comName device)
+                       :href "#"
+                       :disabled current?
+                       :class (when current? "card-outline-success")
+                       :on-click (fn [e]
+                                   (if current?
+                                     (device/switch-to! nil)
+                                     (device/switch-to! device)))}
        [:div.card-block
         [:div.card-text.text-center
          (if-let [logo-url (get-in device [:meta :logo])]
            [:img {:src logo-url}]
            [:p
             "[Image comes here]"])
-         [:p.text-mute.chrysalis-link-button
+         [:p.text-mute.link-button
           (get-in device [:meta :name])]]]
        [:div.card-footer
         [:div.row
@@ -46,7 +48,12 @@
           "Ctrl+" index]]]])))
 
 (defmethod page [:render :devices] [_ _]
-  [:div.container-fluid
+  [:div.container-fluid {:id "devices"}
+   [ui/style [:#page [:#devices
+                      [:.device {:margin (gu/em 0.5)
+                                 :min-width (gu/px 350)}]
+                      [:.device:hover :device:focus {:text-decoration :none}]
+                      [:.device:hover {:border-color "#5bc0de"}]]]]
    [:div.row.justify-content-center
     [:div.card-deck
      (doall (map <device> (:devices @state) (range)))]]])

@@ -16,16 +16,18 @@
 
 (ns chrysalis.plugin.page.spy.core
   (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :refer [page]]))
+            [chrysalis.ui :as ui :refer [page]]
+
+            [chrysalis.plugin.page.repl.core :as repl]))
 
 (defn <spy-item> [index [command response]]
-  [:div.row.chrysalis-page-repl-box {:key (str "spy-history-" index)}
+  [:div.row.box {:key (str "spy-history-" index)}
    [:div.col-sm-12
     [:div.card.bg-faded
      [:div.card-block
       [:div.card-title.row
        [:div.col-sm-6.text-left
-        [:a.chrysalis-link-button.chrysalis-page-repl-collapse-toggle
+        [:a.link-button.collapse-toggle
          {:href (str "#spy-history-collapse-" index)
           :data-toggle :collapse}
          [:i.fa.fa-angle-down]]
@@ -34,7 +36,8 @@
        [:pre response]]]]]])
 
 (defmethod page [:render :spy] [_ _]
-  [:div.container-fluid
+  [:div.container-fluid {:id :spy}
+   [ui/style (repl/style :#spy)]
    (doall (map (fn [item index]
                  (<spy-item> index item))
                (reverse (partition 2 2 (get-in @state [:command :spy])))

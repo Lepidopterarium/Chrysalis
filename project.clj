@@ -9,7 +9,8 @@
                  [ring/ring-core "1.5.0"]
                  [org.clojure/core.async "0.3.442"]
                  [com.cemerick/piggieback "0.2.1"]
-                 [hickory "0.7.1"]]
+                 [hickory "0.7.1"]
+                 [garden "1.3.2"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.1.0"]
                        [bootstrap "^4.0.0-alpha.4"]
@@ -76,12 +77,8 @@
              :server-port 3449}
   :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
                               "src/chrysalis/plugin/hardware/virtual"
-                              "src/chrysalis/plugin/hardware/shortcut"
-                              ["src/chrysalis/plugin/page/repl" {:target-path "resources/public/css/plugins/page"}]
-                              ["src/chrysalis/plugin/page/devices" {:target-path "resources/public/css/plugins/devices"}]
-                              ["src/chrysalis/plugin/page/led" {:target-path "resources/public/css/plugins/led"}]
-                              ["src/chrysalis/plugin/page/firmware" {:target-path "resources/public/css/plugins/firmware"}]]
-             :includes [#".*\.png" #".*\.css" #".*\.svg"]
+                              "src/chrysalis/plugin/hardware/shortcut"]
+             :includes [#".*\.png" #".*\.svg"]
              :target-path "resources/public/images/plugins"
              :skip-stencil [#".*"]}
 

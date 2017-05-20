@@ -45,6 +45,7 @@
 
 (defn root-component []
   [:div
+   [ui/style]
    [ui/<about>]
    [ui/<main-menu> @state @pages]
    [:div {:id :page}
@@ -86,7 +87,7 @@
   (.setTimeout js/window (fn []
                            (reagent/render
                             [root-component]
-                            (js/document.getElementById "application"))
+                            (js/document.getElementById "chrysalis"))
 
                            (swap! state assoc :page-keys ui/mousetrap)
                            (ui/switch-to-page! (ui/current-page))
