@@ -17,7 +17,7 @@
 (ns chrysalis.core
   (:require [reagent.core :as reagent :refer [atom]]))
 
-(def mousetrap (js/require "mousetrap"))
+(defonce mousetrap (js/require "mousetrap"))
 
 ;;; ---- State ---- ;;;
 

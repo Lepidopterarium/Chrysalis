@@ -16,9 +16,8 @@
 
 (ns chrysalis.ui.main-menu
   (:require [chrysalis.ui.page :as page]
-            [chrysalis.device :as device]))
-
-(def mousetrap (js/require "mousetrap"))
+            [chrysalis.device :as device]
+            [chrysalis.core :refer [mousetrap]]))
 
 (defn- <menu-item> [state [key meta] index]
   (let [disabled? (and (:disable? meta)
