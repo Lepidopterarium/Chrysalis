@@ -10,7 +10,8 @@
                  [org.clojure/core.async "0.3.442"]
                  [com.cemerick/piggieback "0.2.1"]
                  [hickory "0.7.1"]
-                 [garden "1.3.2"]]
+                 [garden "1.3.2"]
+                 [binaryage/devtools "0.8.2"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.1.0"]
                        [bootstrap "^4.0.0-alpha.4"]
@@ -55,7 +56,9 @@
                 :asset-path "js/ui-out"
                 :optimizations :none
                 :cache-analysis true
-                :main "dev.core"}}
+                :main "dev.core"
+                :preloads [devtools.preload]
+                :external-config {:devtools/config {:features-to-install :all}}}}
     {:source-paths ["src/electron"]
      :id "electron-release"
      :compiler {:output-to "resources/public/main.js"
