@@ -152,3 +152,12 @@
 
 (defn color->hex [color]
   (str "#" (apply str (map toHex color))))
+
+;;; ---- Main application ---- ;;;
+(defn chrysalis []
+  [:div
+   [style]
+   [<about>]
+   [<main-menu> @core/state @core/pages]
+   [:div {:id :page}
+    (page :render (current-page))]])
