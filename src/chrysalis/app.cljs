@@ -25,6 +25,7 @@
             [chrysalis.hardware :as hardware]
             [chrysalis.ui :as ui]
             [chrysalis.device :as device]
+            [chrysalis.settings :as settings]
 
             ;; Hardware plugins
 
@@ -49,55 +50,72 @@
 (enable-re-frisk! {:width "600px"
                    :height "400px"})
 
-(comment (defn init! []
-   (let [electron-app (.-app (.-remote (js/require "electron")))
-         browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
-     (swap! settings/hooks assoc :window {:save (fn []
-                                                  (let [bounds (js->clj (.getBounds browser-window))]
-                                                    (swap! settings/data assoc-in [:window]
-                                                           (merge (get-in @settings/data [:window])
-                                                                  {:width (bounds "width")
-                                                                   :height (bounds "height")
-                                                                   :x (bounds "x")
-                                                                   :y (bounds "y")
-                                                                   :isMaximized (.isMaximized browser-window)}))))
-                                          :load (fn []
-                                                  (when (and (get-in @settings/data [:window :x])
-                                                             (get-in @settings/data [:window :y]))
-                                                    (.setPosition browser-window
-                                                                  (get-in @settings/data [:window :x])
-                                                                  (get-in @settings/data [:window :y])))
-                                                  (.setSize browser-window
-                                                            (or (get-in @settings/data [:window :width]) 1200)
-                                                            (or (get-in @settings/data [:window :height]) 600))
-                                                  (if (get-in @settings/data [:window :isMaximized])
-                                                    (.maximize browser-window)
-                                                    (.unmaximize browser-window)))})
-
-     (doall (map (fn [event]
-                   (.on browser-window (name event) #(settings/save! :window)))
-                 [:maximize :unmaximize :resize :move])))
-
-   (settings/load!)
-
-           
-
-           ))
-
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :db
- (fn [_ _]
-   {:page/current :devices}))
+ [(re-frame/inject-cofx :settings/load)]
+ (fn [{:keys [settings]} _]
+   {:db {:page/current :devices
+         :settings settings}}))
+
+(re-frame/reg-event-fx
+ :settings/window
+ (fn [cofx _]
+   {:settings/window (get-in cofx [:db :settings])}))
+
+(re-frame/reg-fx
+ :settings/window
+ (fn [settings]
+   (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+     (when (and (get-in settings [:window :x])
+                (get-in settings [:window :y]))
+       (.setPosition browser-window
+                     (get-in settings [:window :x])
+                     (get-in settings [:window :y])))
+     (.setSize browser-window
+               (or (get-in settings [:window :width]) 1200)
+               (or (get-in settings [:window :height]) 600))
+     (if (get-in settings [:window :isMaximized])
+       (.maximize browser-window)
+       (.unmaximize browser-window)))))
+
+(re-frame/reg-fx
+ :settings/window.update
+ (fn [settings]
+   (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)
+         bounds (js->clj (.getBounds browser-window))]
+     (re-frame/dispatch [:settings/window.save
+                         (update settings :window merge
+                                 {:width (bounds "width")
+                                  :height (bounds "height")
+                                  :x (bounds "x")
+                                  :y (bounds "y")
+                                  :isMaximized (.isMaximized browser-window)})]))))
+
+(re-frame/reg-event-fx
+ :settings/window.save
+ (fn [cofx [_ new-settings]]
+   {:db (assoc (:db cofx) :settings new-settings)
+    :settings/save new-settings}))
+
+(re-frame/reg-event-fx
+ :settings/window.update
+ (fn [cofx _]
+   {:settings/window.update (get-in cofx [:db :settings])}))
 
 (defn ^:export start []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:db])
   (device/detect!)
+  (re-frame/dispatch-sync [:settings/window])
   (let [usb (js/require "usb")]
     (.on usb "attach" (fn [device]
                         (device/detect!)))
     (.on usb "detach" (fn [device]
                         (device/detect!))))
+  (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+    (doall (map (fn [event]
+                  (.on browser-window (name event) #(re-frame/dispatch [:settings/window.update])))
+                [:maximize :unmaximize :resize :move])))
   (ui/mount-root))
 
 (defn ^:export reload! []

@@ -16,7 +16,9 @@
 
 (ns chrysalis.ui.page
   (:refer-clojure :exclude [list])
-  (:require [re-frame.core :as re-frame]))
+  (:require [re-frame.core :as re-frame]
+
+            [chrysalis.settings :as settings]))
 
 ;;; ---- re-frame events & handlers ---- ;;;
 
@@ -40,10 +42,12 @@
 
 (re-frame/reg-event-fx
  :page/select
+ [settings/interceptor]
  (fn [cofx [_ page]]
    (let [resp {:db (assoc (:db cofx)
                           :page/current page)
-               :key-bindings/reset true}
+               :key-bindings/reset true
+               :settings/save (get-in cofx [:db :settings])}
          new-page (get-in (:db cofx) [:pages page])]
      (merge
       (if (:device/need? new-page)

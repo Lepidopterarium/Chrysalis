@@ -15,40 +15,60 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.settings
-  (:require [clojure.string :as s]
-            [reagent.core :as reagent :refer [atom]]
+  (:require [re-frame.core :as re-frame]))
 
-            [chrysalis.core :as core]))
+(defonce config-file (str (.getPath (.-app (.-remote (js/require "electron")))
+                                    "userData")
+                          "/settings.json"))
 
-(def config-file (str (.getPath (.-app (.-remote (js/require "electron")))
-                                "userData")
-                      "/settings.json"))
-
-(def hooks (atom {}))
-(def data (atom {}))
-
-(defn save!
-  ([component]
-   (let [hook-fns (component @hooks)]
-     ((:save hook-fns)))
+(re-frame/reg-cofx
+ :settings/load
+ (fn [cofx _]
    (let [fs (js/require "fs")]
-     (.writeFileSync fs config-file (.stringify js/JSON (clj->js @data))
-                     #js {"mode" 0644})))
-  ([]
-   (doall (map (fn [[name hooks]]
-                 ((:save hooks)))
-               @hooks))
+     (when (.existsSync fs config-file)
+       (let [contents (js->clj (.parse js/JSON (.readFileSync fs config-file #js {"encoding" "utf-8"}))
+                               :keywordize-keys true)]
+         (assoc cofx :settings contents))))))
+
+(re-frame/reg-fx
+ :settings/save
+ (fn [settings]
    (let [fs (js/require "fs")]
-     (.writeFileSync fs config-file (.stringify js/JSON (clj->js @data))
+     (.writeFileSync fs config-file (.stringify js/JSON (clj->js settings))
                      #js {"mode" 0644}))))
 
-(defn load! []
-  (let [fs (js/require "fs")]
-    (when (.existsSync fs config-file)
-      (let [contents (js->clj (.parse js/JSON (.readFileSync fs config-file #js {"encoding" "utf-8"}))
-                              :keywordize-keys true)]
-        (reset! data contents))))
-  (doall (map (fn [[name hooks]]
-                ((:load hooks)))
-              @hooks))
-  nil)
+(defmulti apply!
+  (fn [_ page]
+    [page]))
+
+(defmethod apply! :default [db _]
+  db)
+
+(defn copy-> [db settings-path db-path]
+  (assoc-in db db-path
+         (get-in (:settings db) settings-path)))
+
+(defn <-copy [db settings-path db-path]
+  (assoc-in (:settings db) settings-path
+            (get-in db db-path)))
+
+(defmulti save!
+  (fn [_ page]
+    [page]))
+
+(defmethod save! :default [db _]
+  db)
+
+(def interceptor
+  (re-frame/->interceptor
+   :id :settings/interceptor
+   :before (fn [context]
+             (let [db (-> context :coeffects :db)
+                   page (:page/current db)]
+               (assoc-in context [:effects :db]
+                         (save! db page))))
+   :after (fn [context]
+            (let [{:keys [db]} (:effects context)
+                  [_ page] (-> context :coeffects :event)]
+              (assoc-in context [:effects :db]
+                        (apply! db page))))))

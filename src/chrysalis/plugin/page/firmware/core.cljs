@@ -17,20 +17,21 @@
 (ns chrysalis.plugin.page.firmware.core
   (:require [chrysalis.device :as device]
             [chrysalis.ui.page :as page]
-            ;;[chrysalis.settings :as settings]
+            [chrysalis.settings :as settings]
 
             [chrysalis.plugin.page.firmware.events :as events]
             [chrysalis.plugin.page.firmware.views :as views]))
 
 
-(comment
+(defmethod settings/apply! [:firmware] [db _]
+  (settings/copy-> db
+   [:devices (keyword (get-in (device/current) [:meta :name])) :firmware :latest-hex]
+   [:firmware/hex-file]))
 
-(swap! settings/hooks assoc :firmware {:save (fn []
-                                               (let [device (keyword (get-in (device/current) [:device :meta :name]))]
-                                                 (swap! settings/data assoc-in [:devices device :firmware :latest-hex]
-                                                        (get-in @state [:firmware :hex-file]))))
-                                       :load (fn [] nil)})
-)
+(defmethod settings/save! [:firmware] [db _]
+  (settings/<-copy db
+   [:devices (keyword (get-in (device/current) [:meta name])) :firmware :latest-hex]
+   [:firmware/hex-file]))
 
 (page/add! :firmware {:name "Firmware Flasher"
                       :index 80
