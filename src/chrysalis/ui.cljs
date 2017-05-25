@@ -51,7 +51,7 @@
 (defn chrysalis []
   [:div
    (style)
-   (<about>)
+   [<about>]
    (<main-menu>)
 
    [:div {:id :page}
