@@ -16,17 +16,12 @@
 
 (ns chrysalis.ui.main-menu
   (:require [chrysalis.ui.page :as page]
-            [chrysalis.device :as device]
-            [chrysalis.core :refer [mousetrap]]))
+            [chrysalis.device :as device]))
 
 (defn- <menu-item> [[key meta] index]
   (let [disabled? (and (:disable? meta)
                        ((:disable? meta)))
         current? (= key (:key (page/current)))]
-    (.bind mousetrap (str "alt+" index) (fn [& _]
-                                          (when-not (and (:disable? meta)
-                                                         ((:disable? meta)))
-                                            (page/switch-to! key))))
     [:a.dropdown-item {:href "#"
                        :key (str "main-menu-" (name key))
                        :class (when (or disabled? current?) "disabled")

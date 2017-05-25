@@ -18,20 +18,18 @@
   (:require [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
-            [chrysalis.core :as core]
+            [chrysalis.key-bindings :as key-bindings]
 
             [garden.units :as gu]))
 
 (defn <device> [device index]
   (when device
     (let [current? (= (:comName device) (:comName (device/current)))]
-      (.bind core/mousetrap
-             (str "ctrl+" index)
-             (fn []
-               (if current?
-                 (device/select! nil)
-                 (device/select! device))))
-
+      (key-bindings/add! (str "ctrl+" index)
+                         (fn []
+                           (if current?
+                             (device/select! nil)
+                             (device/select! device))))
       [:a.card.device {:key (:comName device)
                        :href "#"
                        :disabled current?

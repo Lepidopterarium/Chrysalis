@@ -42,7 +42,8 @@
  :page/select
  (fn [cofx [_ page]]
    (let [resp {:db (assoc (:db cofx)
-                          :page/current page)}
+                          :page/current page)
+               :key-bindings/reset true}
          new-page (get-in (:db cofx) [:pages page])]
      (merge
       (if (:device/need? new-page)

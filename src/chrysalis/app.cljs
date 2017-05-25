@@ -21,6 +21,7 @@
             ;;; ---- Chrysalis ---- ;;;
 
             ;; Core
+            [chrysalis.key-bindings]
             [chrysalis.hardware :as hardware]
             [chrysalis.ui :as ui]
             [chrysalis.device :as device]
