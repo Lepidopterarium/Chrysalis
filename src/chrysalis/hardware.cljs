@@ -20,7 +20,7 @@
 
             [chrysalis.command :as command]))
 
-(def SerialPort (js/require "serialport"))
+(defonce SerialPort (js/require "serialport"))
 
 (defmulti known?
   (fn [device]

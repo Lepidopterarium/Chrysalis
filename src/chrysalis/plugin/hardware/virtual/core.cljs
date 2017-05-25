@@ -18,6 +18,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! close!]]
             [clojure.string :as s]
+            [re-frame.core :as re-frame]
 
             [chrysalis.command :as command]
             [chrysalis.hardware :refer [scan* open known?]]))
@@ -26,7 +27,7 @@
   (assoc device
          :meta {:name "An example virtual device"
                 :logo "images/plugins/virtual-keyboard.png"
-                :layout "images/plugins/virtual-keyboard.svg"
+                :layout (re-frame/subscribe [:device/svg "images/plugins/virtual-keyboard.svg"])
                 :matrix [4 4]}))
 
 (defmethod scan* :virtual [_ out]

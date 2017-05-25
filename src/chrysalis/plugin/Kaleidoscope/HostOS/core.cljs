@@ -15,21 +15,20 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.Kaleidoscope.HostOS.core
-  (:require [chrysalis.command :refer [pre-process* process*]]))
+  (:require [chrysalis.command.post-process :as post-process]))
 
-(def hostos-types ["Linux"
-                   "MacOS X"
-                   "Windows"
-                   "Other"])
+(defonce hostos-types ["Linux"
+                       "MacOS X"
+                       "Windows"
+                       "Other"])
 
-(defmethod process* :hostos.type [_]
-  (fn [result text]
-    (let [type-index (js/parseInt text)]
-      (if (= type-index 255)
-        (reset! result "Automatic")
-        (reset! result (nth hostos-types type-index))))))
+(defmethod post-process/format [:hostos.type] [_ text]
+  (let [type-index (js/parseInt text)]
+    (if (= type-index 255)
+      "Automatic"
+      (nth hostos-types type-index))))
 
-(defmethod pre-process* :hostos.type [_ args]
+#_(defmethod pre-process* :hostos.type [_ args]
   (condp = (first args)
     "linux" ["0"]
     "osx" ["1"]

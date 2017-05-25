@@ -16,23 +16,30 @@
 
 (ns chrysalis.plugin.page.devices.core
   (:require [chrysalis.device :as device]
-            [chrysalis.core :as core :refer [state pages]]
             [chrysalis.ui :as ui]
-            [chrysalis.ui.page :as page :refer [page]]
+            [chrysalis.ui.page :as page]
+            [chrysalis.core :as core]
 
             [garden.units :as gu]))
 
 (defn <device> [device index]
   (when device
-    (let [current? (= device (:device (device/current)))]
+    (let [current? (= (:comName device) (:comName (device/current)))]
+      (.bind core/mousetrap
+             (str "ctrl+" index)
+             (fn []
+               (if current?
+                 (device/select! nil)
+                 (device/select! device))))
+
       [:a.card.device {:key (:comName device)
                        :href "#"
                        :disabled current?
                        :class (when current? "card-outline-success")
                        :on-click (fn [e]
                                    (if current?
-                                     (device/switch-to! nil)
-                                     (device/switch-to! device)))}
+                                     (device/select! nil)
+                                     (device/select! device)))}
        [:div.card-block
         [:div.card-text.text-center
          (if-let [logo-url (get-in device [:meta :logo])]
@@ -48,7 +55,7 @@
          [:small.col-sm-6.text-right.text-muted
           "Ctrl+" index]]]])))
 
-(defmethod page [:render :devices] [_ _]
+(defn render []
   [:div.container-fluid {:id "devices"}
    [ui/style [:#page [:#devices
                       [:.device {:margin (gu/em 0.5)
@@ -57,18 +64,10 @@
                       [:.device:hover {:border-color "#5bc0de"}]]]]
    [:div.row.justify-content-center
     [:div.card-deck
-     (doall (map <device> (:devices @state) (range)))]]])
+     (doall (map <device>
+                 (device/list)
+                 (range)))]]])
 
-(defmethod page [:enter :devices] [_ _]
-  (doall (map (fn [device index]
-                (.bind core/mousetrap
-                       (str "ctrl+" index)
-                       (fn []
-                         (if (= device (:device (device/current)))
-                           (device/switch-to! nil)
-                           (device/switch-to! device)))))
-              (:devices @state) (range))))
-
-(swap! state assoc :devices {:keys nil})
-(swap! pages assoc :devices {:name "Device Selector"
-                             :index 0})
+(page/add! :devices {:name "Device Selector"
+                     :index 0
+                     :render render})

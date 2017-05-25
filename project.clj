@@ -11,7 +11,9 @@
                  [com.cemerick/piggieback "0.2.1"]
                  [hickory "0.7.1"]
                  [garden "1.3.2"]
-                 [binaryage/devtools "0.8.2"]]
+                 [binaryage/devtools "0.8.2"]
+                 [re-frame "0.9.2"]
+                 [re-frisk "0.3.2"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.1.0"]
                        [bootstrap "^4.0.0-alpha.4"]

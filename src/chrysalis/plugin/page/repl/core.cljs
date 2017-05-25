@@ -15,33 +15,21 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.repl.core
-  (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.hardware :as hardware]
+  (:require [chrysalis.hardware :as hardware]
             [chrysalis.device :as device]
             [chrysalis.key :as key]
-            [chrysalis.command :as command]
+            [chrysalis.command.post-process :as post-process]
             [chrysalis.ui :as ui]
-            [chrysalis.ui.page :refer [page]]
+            [chrysalis.ui.page :as page]
 
+            [chrysalis.plugin.page.repl.events :as events]
+
+            [clojure.string :as s]
             [garden.units :as gu]))
 
-(defn- send-command! [req]
-  (let [[command & args] (.split req #" +")
-        full-args (vec (cons (keyword command) (map (fn [arg]
-                                                      (if (= (first arg) ":")
-                                                        (.substring arg 1)
-                                                        arg))
-                                                    args)))
-        result (apply command/run (:port (device/current)) full-args)]
-    (swap! state update-in [:repl :history] (fn [s x]
-                                              (cons x s))
-           {:command (keyword command)
-            :request req
-            :result result
-            :device (:device (device/current))})))
 
 (defn repl-wrap [req index device result output]
-  (let [latest? (= index (count (get-in @state [:repl :history])))]
+  (let [latest? (= index (count (events/history)))]
     [:div.row.box {:key (str "repl-history-" index)}
      [:div.col-sm-12
       [:div.card {:class (when latest? "card-outline-success")}
@@ -57,7 +45,7 @@
           [:a.link-button {:href "#"
                            :on-click (fn [e]
                                        (.preventDefault e)
-                                       (swap! state assoc-in [:repl :command] req)
+                                       (events/input! req)
                                        (.focus (js/document.getElementById "repl-prompt-input")))}
            [:i.fa.fa-repeat]]]]
         [:div.collapse.show {:id (str "repl-history-collapse-" index)}
@@ -75,7 +63,7 @@
     :key (str "repl-avail-command-modal-" cmd)
     :data-dismiss :modal
     :on-click (fn [e]
-                (swap! state assoc-in [:repl :command] (name cmd))
+                (events/input! (name cmd))
                 (.focus (js/document.getElementById "repl-prompt-input")))}
    cmd])
 
@@ -126,41 +114,6 @@
                             (partition layer-size result)
                             (range)))])))
 
-(defn <available-commands> []
-  (when-let [port (:port (device/current))]
-    (let [commands (command/run port :help)]
-      (fn []
-        [:div.modal.fade {:id "repl-available-commands"}
-         [:div.modal-dialog.modal-lg
-          [:div.modal-content
-           [:div.modal-header
-            [:h5.modal-title "Available commands"]]
-           [:div.modal-body
-            [:div.card-group
-             (doall (map (partial <help-command-group> "avail")
-                         (group-commands @commands)))]]
-           [:div.modal-footer
-            [:button.btn.btn-secondary
-             {:type :button
-              :data-dismiss :modal} "Cancel"]]]]]))))
-
-(defn- repl-history-previous []
-  (let [history-length (count (get-in @state [:repl :history]))
-        current-index (max (or (get-in @state [:repl :history-index]) 0) 0)]
-    (when (< current-index history-length)
-        (let [history-item (nth (get-in @state [:repl :history]) current-index)]
-          (swap! state assoc-in [:repl :command] (:request history-item))
-          (swap! state assoc-in [:repl :history-index] (min (inc current-index) history-length))))))
-
-(defn- repl-history-next []
-  (let [history-length (count (get-in @state [:repl :history]))
-        current-index (min (or (get-in @state [:repl :history-index]) 0) (- history-length 2))]
-    (if (>= current-index 0)
-      (let [history-item (nth (get-in @state [:repl :history]) current-index)]
-        (swap! state assoc-in [:repl :command] (:request history-item))
-        (swap! state assoc-in [:repl :history-index] (max (dec current-index) -1)))
-      (swap! state assoc-in [:repl :command] nil))))
-
 (defn style [page]
   [:#page
    [page
@@ -186,15 +139,13 @@
     [:.collapse-toggle.collapsed
      [:i:before {:content "\f105"}]]]])
 
-(defmethod page [:render :repl] [_ _]
+(defn render []
   [:div.container-fluid {:id :repl}
    [ui/style (style :#repl)]
-   [<available-commands>]
    [:div.row.justify-content-left.prompt
     [:form.col-sm-12 {:on-submit (fn [e]
                                    (.preventDefault e)
-                                   (send-command! (get-in @state [:repl :command]))
-                                   (swap! state assoc-in [:repl :command] nil))}
+                                   (events/command:send!))}
      [:div.input-group
       [:span.input-group-addon
        [:i.fa.fa-angle-right]]
@@ -202,14 +153,13 @@
                             :type :text
                             :placeholder "Type command here"
                             :autoFocus true
-                            :value (get-in @state [:repl :command])
+                            :value (events/input)
                             :on-key-down (fn [key]
-                                         (case (.-which key)
-                                           38 (repl-history-previous)
-                                           40 (repl-history-next)
-                                           nil))
-                            :on-change (fn [e]
-                                         (swap! state assoc-in [:repl :command] (.-value (.-target e))))}]
+                                           (case (.-which key)
+                                             38 (events/history:previous!)
+                                             40 (events/history:next!)
+                                             nil))
+                            :on-change #(events/input! (-> % .-target .-value))}]
       [:span.input-group-addon
        [:input.nav-link {:type :submit
                          :value ""
@@ -220,31 +170,24 @@
         [:i.fa.fa-cogs]]
        [:div.dropdown-menu.text-right
         [:a.link-button.dropdown-item {:href "#"
-                                       :data-toggle :modal
-                                       :data-target "#repl-available-commands"
-                                       :title "List of available commands"}
+                                       :title "List of available commands"
+                                       :on-click #(events/command:run! "help")}
          "Help"]
         [:hr]
         [:a.link-button.dropdown-item {:href "#"
                                        :title "Clear the REPL history"
                                        :on-click (fn [e]
                                                    (.preventDefault e)
-                                                   (swap! state assoc-in [:repl :history] []))}
+                                                   (events/history:clear!))}
          "Clear history"]]]]]]
-   (doall (map (fn [item index]
-                 (display (:command item) (:request item) @(:result item) (:device item) index))
-               (get-in @state [:repl :history])
-               (range (count (get-in @state [:repl :history])) 0 -1)))])
+   (let [history (events/history post-process/format)]
+     (doall (map (fn [[device command args response] index]
+                   (display command (str (name command) " " args) response device index))
+                 history
+                 (range (count history) 0 -1))))])
 
-(defmethod page [:enter :repl] [_ _]
-  (swap! state assoc-in [:current-device :port]
-         (hardware/open (get-in (device/current) [:device :comName]))))
-
-(defmethod page [:leave :repl] [_ _]
-  (.close (get-in @state [:current-device :port]))
-  (swap! state assoc-in [:current-device :port] nil))
-
-(swap! pages assoc :repl {:name "REPL"
-                          :index 99
-                          :disable? (fn [] (nil? (device/current)))})
-(swap! state assoc :repl {:history []})
+(page/add! :repl {:name "REPL"
+                  :index 99
+                  :disable? (fn [] (nil? (device/current)))
+                  :render render
+                  :device/need? true})

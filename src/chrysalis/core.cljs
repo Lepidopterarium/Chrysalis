@@ -14,17 +14,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.core
-  (:require [reagent.core :as reagent :refer [atom]]))
+(ns chrysalis.core)
 
 (defonce mousetrap (js/require "mousetrap"))
-
-;;; ---- State ---- ;;;
-
-(defonce state (atom {:devices []
-                      :current-device nil
-                      :page :devices}))
-
-;;; ---- Pages ---- ;;;
-
-(defonce pages (atom {}))

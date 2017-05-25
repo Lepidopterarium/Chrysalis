@@ -15,31 +15,134 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.device
+  (:refer-clojure :exclude [list])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chrysalis.hardware :as hardware]
-            [chrysalis.core :as core :refer [state]]
 
+            [reagent.ratom :as rv]
+            [hickory.core :as h]
+            [re-frame.core :as re-frame]
             [cljs.core.async :refer [<!]]))
 
-(defn switch-to! [d]
-  (if d
-    (swap! state assoc-in [:current-device :device] d)
-    (swap! state assoc :current-device nil)))
+;;; ---- re-frame ---- ;;;
 
-(defn select-by-serial! [serial]
-  (swap! state assoc-in [:current-device :device]
-         (first (filter (fn [device]
-                          (= (:serialNumber device) serial)) (:devices @state)))))
+;; I/O
 
-(defn current []
-  (:current-device @state))
+(re-frame/reg-fx
+ :device/open
+ (fn [device]
+   (re-frame/dispatch [:device/opened (hardware/open (:comName device))])))
+
+(re-frame/reg-event-fx
+ :device/open.current
+ (fn [cofx _]
+   {:device/open (get-in cofx [:db :device/current])}))
+
+(re-frame/reg-fx
+ :device/close
+ (fn [device]
+   (when-let [port (:port device)]
+     (re-frame/dispatch [:device/closed])
+     (.close port))))
+
+(re-frame/reg-event-db
+ :device/opened
+ (fn [db [_ port]]
+   (assoc-in db [:device/current :port] port)))
+
+(re-frame/reg-event-db
+ :device/closed
+ (fn [db _]
+   (assoc-in db [:device/current :port] nil)))
+
+(re-frame/reg-event-db
+ :files/add
+ (fn [db [_ file-name data]]
+   (assoc-in db [:files file-name] data)))
+
+(re-frame/reg-sub-raw
+ :device/svg
+ (fn [app-db [_ file-name]]
+   (when file-name
+     (let [fs (js/require "fs")]
+      (.readFile fs file-name "utf8"
+                 (fn [err data]
+                   (when-not err
+                     (let [svg (-> data
+                                   h/parse
+                                   h/as-hiccup
+                                   first
+                                   (nth 3)
+                                   (nth 2))]
+                       (re-frame/dispatch [:files/add file-name svg])))))))
+   (rv/make-reaction
+    (fn [] (get-in @app-db [:files file-name])))))
+
+;; Scanning
+
+(re-frame/reg-fx
+ :device/scan
+ (fn []
+   (let [in (hardware/detect (hardware/scan))]
+     (go-loop [device (<! in)
+               devices []]
+       (if (= device {})
+         (re-frame/dispatch [:device/scan-finished devices])
+         (recur (<! in)
+                (conj devices device)))))))
+
+(re-frame/reg-event-fx
+ :device/scan-finished
+ (fn [cofx [_ devices]]
+   {:db (assoc (:db cofx)
+               :device/list devices)}))
+
+(re-frame/reg-event-fx
+ :device/scan
+ (fn [cofx _]
+   {:device/scan true}))
+
+;; Listing
+
+(re-frame/reg-sub
+ :device/list
+ (fn [db _]
+   (:device/list db)))
+
+(re-frame/reg-sub
+ :device/current
+ (fn [db _]
+   (:device/current db)))
+
+;; Selecting
+
+(re-frame/reg-event-fx
+ :device/select
+ (fn [cofx [_ device]]
+   {:db (assoc (:db cofx)
+               :device/current device)}))
+
+(re-frame/reg-event-db
+ :device/select-by-serial
+ (fn [db [_ serial]]
+   (assoc db
+          :device/current (first (filter (fn [device]
+                                           (= (:serialNumber device) serial))
+                                         (:device/list db))))))
+
+;;; ---- API ---- ;;;
 
 (defn detect! []
-  (let [in (hardware/detect (hardware/scan))]
-    (go-loop [device (<! in)
-              devices []]
-      (if (= device {})
-        (swap! state assoc :devices devices)
-        (recur (<! in)
-               (conj devices device)))))
-  nil)
+  (re-frame/dispatch [:device/scan]))
+
+(defn list []
+  @(re-frame/subscribe [:device/list]))
+
+(defn current []
+  @(re-frame/subscribe [:device/current]))
+
+(defn select! [id]
+  (re-frame/dispatch [:device/select id]))
+
+(defn select-by-serial! [serial]
+  (re-frame/dispatch [:device/select-by-serial serial]))

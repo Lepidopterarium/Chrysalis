@@ -15,106 +15,98 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.command
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :refer [chan <! >! close!]]
-            [clojure.string :as s]
-            [reagent.core :refer [atom]]
+  (:require [clojure.string :as s]
+            [re-frame.core :as re-frame]
 
-            [chrysalis.core :refer [state]]
-            [chrysalis.key :as key]))
+            [chrysalis.command.post-process :as post-process]))
+
+;;; ---- re-frame events & fxes ---- ;;;
+
+(re-frame/reg-event-db
+ :command/queue
+ (fn [db [_ device command args event]]
+   (update db :command/queue conj [device command args event])))
+
+(re-frame/reg-fx
+ :command/send
+ (fn [[device command args event]]
+   (let [wire-command (str (name command) " " args "\n")]
+     (.write (:port device) wire-command
+             (fn []
+               (.drain (:port device) (fn []
+                                        (re-frame/dispatch [:command/queue device command args event]))))))))
+
+(re-frame/reg-event-fx
+ :command/send
+ (fn [cofx [_ command args event]]
+   {:command/send [(:device/current (:db cofx)) command args event]}))
+
+
+(re-frame/reg-event-fx
+ :command/input.data
+ (fn [cofx [_ data]]
+   {:db (update (:db cofx) :command/input.buffer str data)
+    :dispatch-later [{:ms 200
+                      :dispatch [:command/input.process]}]}))
+
+(defn- split-buffer [buffer]
+  (loop [responses []
+         buffer buffer
+         index (.indexOf buffer ".\r\n")]
+    (if (>= index 0)
+      (let [remain (.substring buffer (+ index 3))]
+        (recur (conj responses (s/trim (.substring buffer 0 index)))
+               remain
+               (.indexOf remain ".\r\n")))
+      [responses buffer])))
+
+(re-frame/reg-event-fx
+ :command/input.process
+ (fn [cofx _]
+   (let [db (:db cofx)
+         buffer (:command/input.buffer db)
+         queue (:command/queue db)
+         [responses remain] (split-buffer buffer)]
+     {:dispatch-n (concat
+                   (map (fn [[device cmd args event] response]
+                          [event [device cmd args response]])
+                        queue (reverse responses))
+                   (map (fn [[device cmd args event] response]
+                          [:command/history.append [device cmd args response]])
+                        queue (reverse responses))
+                   [[:command/input.clear (count responses) remain]])})))
+
+(re-frame/reg-event-db
+ :command/input.clear
+ (fn [db [_ drop-from-queue remain]]
+   (assoc (update db :command/queue #(drop drop-from-queue %))
+          :command/input.buffer remain)))
+
+(re-frame/reg-sub
+ :command/history
+ (fn [db _]
+   (:command/history db)))
+
+(re-frame/reg-event-db
+ :command/history.append
+ (fn [db [_ item]]
+   (update db :command/history conj item)))
+
+;;; ---- API ---- ;;;
+(defn history-append! [item]
+  (re-frame/dispatch [:command/history.append item]))
+
+(defn run [command args event]
+   (re-frame/dispatch [:command/send command args event]))
 
 (defn on-data [data]
-  (swap! state update-in [:command :result :buffer] str data)
-  (let [buff (get-in @state [:command :result :buffer])
-        commandEnd (.indexOf buff ".\r\n")]
-    (when (>= commandEnd 0)
-      (let [[result callback] (first (get-in @state [:command :queue]))]
-        (callback result (.trim (.substring buff 0 commandEnd)))
-        (swap! state update-in [:command :spy] concat [(.substring buff 0 (+ commandEnd 5))])
-        (swap! state update-in [:command :result :buffer]
-               (fn [old]
-                 (.substring old (+ commandEnd 3))))
-        (swap! state update-in [:command :queue]
-               (fn [old]
-                 (rest old)))))))
+  (re-frame/dispatch [:command/input.data data]))
 
-(defn send* [device command callback]
-  (let [result (atom nil)
-        wire-command (str command "\n")]
-    (swap! state update-in [:command :spy] concat [wire-command])
-    (.write device wire-command
-            (fn []
-              (.drain device (fn []
-                               (swap! state update-in [:command :queue] concat [[result callback]])))))
-    result))
-
-(defn send [device command]
-  (send* device command (fn [out text] (reset! out text))))
-
-(defmulti process*
-  (fn [command]
-    (keyword command)))
-
-(defmethod process* :default [_]
-  (fn [result text]
-    (reset! result text)))
-
-(defmethod process* :version [_]
-  (fn [result text]
-    (let [[version-and-device date] (.split text #" \| ")
-          t (.split version-and-device #" ")
-          fwver (-> t
-                    first
-                    (.split #"/")
-                    second)
-          [manufacturer product] (-> t
-                                     (.slice 1)
-                                     (.join " ")
-                                     (.split #"/"))]
-      (reset! result {:device {:manufacturer manufacturer
-                               :product product}
-                      :firmware-version fwver
-                      :timestamp date}))
-    result))
-
-(defmethod process* :help [_]
-  (fn [result text]
-    (let [lines (.split text #"\r?\n")]
-      (reset! result (->> lines
-                          (map keyword)
-                          vec)))))
-
-(defmethod process* :layer.getState [_ result]
-  (fn [result text]
-    (reset! result
-            (->> (map (fn [state idx] [idx (= state "1")]) text (range))
-                 (filter second)
-                 (map first)
-                 vec))))
-
-(defmethod process* :keymap.map [_ result]
-  (fn [result text]
-    (reset! result
-            (->> (.split (.trim text) #" ")
-                 (map js/parseInt)
-                 (map key/from-code)
-                 vec))))
-
-(defmulti pre-process*
-  (fn [command args]
-    (keyword command)))
-
-(defmethod pre-process* :default [_ args]
-  args)
-
-(defmulti run
-  (fn [_ command & _]
-    command))
-
-(defmethod run :default [device command & args]
-  (if args
-    (send* device
-           (str (name command) " "
-                (s/join " " (pre-process* command args)))
-           (process* :none))
-    (send* device (name command) (process* command))))
+(defn history
+  ([] (history nil))
+  ([processor] (let [items @(re-frame/subscribe [:command/history])]
+                 (for [[device command args response] items]
+                   (let [proc (if processor
+                                (partial processor command)
+                                identity)]
+                     [device command args (proc response)])))))

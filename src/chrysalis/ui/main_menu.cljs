@@ -19,10 +19,10 @@
             [chrysalis.device :as device]
             [chrysalis.core :refer [mousetrap]]))
 
-(defn- <menu-item> [state [key meta] index]
+(defn- <menu-item> [[key meta] index]
   (let [disabled? (and (:disable? meta)
                        ((:disable? meta)))
-        current? (= key (page/current))]
+        current? (= key (:key (page/current)))]
     (.bind mousetrap (str "alt+" index) (fn [& _]
                                           (when-not (and (:disable? meta)
                                                          ((:disable? meta)))
@@ -40,7 +40,7 @@
 
      [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
 
-(defn <main-menu> [state pages]
+(defn <main-menu> []
   [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
    [:button.navbar-toggler.navbar-toggler-right {:type :button
                                                  :data-toggle :collapse
@@ -50,11 +50,14 @@
     [:a.navbar-brand.link-button.text-white {:data-toggle :dropdown
                                              :href "#"}
      [:i.fa.fa-spinner] " Chrysalis: " [:b (-> (page/current)
-                                               pages
                                                :name)]]
     [:div.dropdown-menu {:id "main-menu"}
-     (doall (for [[index menu-item] (map-indexed vector (sort-by (fn [[key meta]] (:index meta)) pages))]
-              (<menu-item> state menu-item index)))
+     (let [pages (map-indexed vector (sort-by (fn [[key meta]]
+                                                (:index meta))
+                                              (page/list)))]
+       (doall
+        (for [[index menu-item] pages]
+          (<menu-item> menu-item index))))
      [:hr]
      [:a.dropdown-item {:href "#about"
                         :data-toggle :modal} "About"]
@@ -64,4 +67,4 @@
    [:div.collapse.navbar-collapse {:id "navbarSupportedContent"}]
    [:span.navbar-text {:style {:white-space :pre}}
     (when-let [device (device/current)]
-      (get-in device [:device :meta :name]))]])
+      (get-in device [:meta :name]))]])

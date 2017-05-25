@@ -15,13 +15,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui
-  (:require [clojure.string :as s]
-            [garden.core :as g]
+  (:require [garden.core :as g]
             [garden.units :as gu]
-
-            [chrysalis.core :as core]
-            [chrysalis.settings :as settings]
-            [chrysalis.device :as device]
+            [reagent.core :as reagent]
+            [re-frame.core :as re-frame]
 
             [chrysalis.ui.page :as page]
             [chrysalis.ui.about :refer [<about>]]
@@ -55,6 +52,13 @@
   [:div
    [style]
    [<about>]
-   [<main-menu> @core/state @core/pages]
+   [<main-menu>]
+
    [:div {:id :page}
-    (page/page :render (page/current))]])
+    (when-let [page (page/current)]
+      [page :render])]])
+
+(defn mount-root []
+  (reagent/render
+   [chrysalis]
+   (js/document.getElementById "chrysalis")))

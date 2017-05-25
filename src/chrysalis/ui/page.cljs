@@ -15,22 +15,51 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.ui.page
-  (:require [chrysalis.core :as core]))
+  (:refer-clojure :exclude [list])
+  (:require [re-frame.core :as re-frame]))
 
-;;; ---- Page ---- ;;;
+;;; ---- re-frame events & handlers ---- ;;;
 
-(defmulti page
-  (fn [action p]
-    [action p]))
+(re-frame/reg-event-fx
+ :page/add!
+ (fn [cofx [_ key page-data]]
+   {:db (assoc-in (:db cofx)
+                  [:pages key]
+                  page-data)}))
 
-(defmethod page :default [_ _ _])
+(re-frame/reg-sub
+ :page/current
+ (fn [db _]
+   (assoc (get-in db [:pages (:page/current db)])
+          :key (:page/current db))))
+
+(re-frame/reg-sub
+ :page/list
+ (fn [db _]
+   (:pages db)))
+
+(re-frame/reg-event-fx
+ :page/select
+ (fn [cofx [_ page]]
+   (let [resp {:db (assoc (:db cofx)
+                          :page/current page)}
+         new-page (get-in (:db cofx) [:pages page])]
+     (merge
+      (if (:device/need? new-page)
+        (assoc resp :device/open (:device/current (:db cofx)))
+        (assoc resp :device/close (:device/current (:db cofx))))
+      (:events new-page)))))
+
+;;; ---- helpers ---- ;;;
+
+(defn add! [key page-data]
+  (re-frame/dispatch [:page/add! key page-data]))
 
 (defn current []
-  (:page @core/state))
+  @(re-frame/subscribe [:page/current]))
 
-(defn switch-to! [p]
-  (page :leave (current))
-  (.reset core/mousetrap)
-  (page :enter p)
-  (swap! core/state assoc :page p))
+(defn list []
+  @(re-frame/subscribe [:page/list]))
 
+(defn switch-to! [page]
+  (re-frame/dispatch [:page/select page]))

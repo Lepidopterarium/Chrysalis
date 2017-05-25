@@ -15,13 +15,14 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.hardware.model01.core
-  (:require [chrysalis.hardware :refer [known?]]))
+  (:require [chrysalis.hardware :refer [known?]]
+            [re-frame.core :as re-frame]))
 
 (defmethod known? [0x1209 0x2301] [device]
   (assoc device
          :meta {:name "Keyboardio Model 01"
                 :logo "images/plugins/model01.png"
-                :layout "images/plugins/model01.svg"
+                :layout (re-frame/subscribe [:device/svg "images/plugins/model01.svg"])
                 :matrix [16 4]}
          :led {:map [[3 4 11 12 19 20 26 27      36 37 43 44 51 52 59 60]
                      [2 5 10 13 18 21 25 28      35 38 42 45 50 53 58 61]

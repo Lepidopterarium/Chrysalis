@@ -15,25 +15,18 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.Kaleidoscope.LEDControl.core
-  (:require [chrysalis.command :refer [pre-process* process*]]
-            [chrysalis.plugin.page.led.core :as led-page]
+  (:require [chrysalis.command.post-process :as post-process]
+            [chrysalis.plugin.page.led.theme :refer [<led-theme>]]
             [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]))
 
-(defmethod pre-process* :led.mode [_ args]
-  (condp = (first args)
-    :n ["n"]
-    :next ["n"]
-    :p ["p"]
-    :prev ["p"]
-    :previous ["p"]
-    args))
-
-(defmethod process* :led.theme [_]
-  (fn [result text]
-    (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
-      (reset! result (vec theme)))))
+(defmethod post-process/format [:led.theme] [_ text]
+  (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
+    (vec theme)))
 
 (defmethod display :led.theme [_ req result device index]
   (repl-wrap req index device result
-             [led-page/<led-theme> (get-in device [:meta :layout]) (atom result)
+             [<led-theme>
+              device
+              @(get-in device [:meta :layout])
+              result
               {:width 512 :height 320}]))

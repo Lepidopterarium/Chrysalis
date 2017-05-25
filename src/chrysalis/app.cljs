@@ -15,82 +15,90 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.app
-  (:require [reagent.core :as reagent]
+  (:require [re-frame.core :as re-frame]
+            [re-frisk.core :refer [enable-re-frisk!]]
 
-            [chrysalis.core :as core :refer [state pages]]
-            [chrysalis.device :as device]
+            ;;; ---- Chrysalis ---- ;;;
+
+            ;; Core
+            [chrysalis.hardware :as hardware]
             [chrysalis.ui :as ui]
-            [chrysalis.ui.page :as page]
-            [chrysalis.settings :as settings]
+            [chrysalis.device :as device]
 
-            ;; Plugins
-
-            [chrysalis.plugin.page.devices.core]
-            [chrysalis.plugin.page.repl.core]
-            [chrysalis.plugin.page.firmware.core]
-            [chrysalis.plugin.page.led.core]
-            [chrysalis.plugin.page.spy.core]
-
-            [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
-            [chrysalis.plugin.Kaleidoscope.HostOS.core]
-            [chrysalis.plugin.Kaleidoscope.LEDControl.core]
-            [chrysalis.plugin.Kaleidoscope.OneShot.core]
+            ;; Hardware plugins
 
             [chrysalis.plugin.hardware.virtual.core]
             [chrysalis.plugin.hardware.model01.core]
             [chrysalis.plugin.hardware.shortcut.core]
 
-            [chrysalis.plugin.example.cake.core]))
+            ;; Page plugins
+            [chrysalis.plugin.page.devices.core]
+            [chrysalis.plugin.page.led.core]
+            [chrysalis.plugin.page.firmware.core]
+            [chrysalis.plugin.page.repl.core]
+            [chrysalis.plugin.page.spy.core]
+
+            ;; Kaleidoscope plugins
+            [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
+            [chrysalis.plugin.Kaleidoscope.HostOS.core]
+            [chrysalis.plugin.Kaleidoscope.LEDControl.core]
+            [chrysalis.plugin.Kaleidoscope.OneShot.core]))
 
 (enable-console-print!)
+(enable-re-frisk! {:width "600px"
+                   :height "400px"})
 
-(defn init! []
+(comment (defn init! []
+   (let [electron-app (.-app (.-remote (js/require "electron")))
+         browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+     (swap! settings/hooks assoc :window {:save (fn []
+                                                  (let [bounds (js->clj (.getBounds browser-window))]
+                                                    (swap! settings/data assoc-in [:window]
+                                                           (merge (get-in @settings/data [:window])
+                                                                  {:width (bounds "width")
+                                                                   :height (bounds "height")
+                                                                   :x (bounds "x")
+                                                                   :y (bounds "y")
+                                                                   :isMaximized (.isMaximized browser-window)}))))
+                                          :load (fn []
+                                                  (when (and (get-in @settings/data [:window :x])
+                                                             (get-in @settings/data [:window :y]))
+                                                    (.setPosition browser-window
+                                                                  (get-in @settings/data [:window :x])
+                                                                  (get-in @settings/data [:window :y])))
+                                                  (.setSize browser-window
+                                                            (or (get-in @settings/data [:window :width]) 1200)
+                                                            (or (get-in @settings/data [:window :height]) 600))
+                                                  (if (get-in @settings/data [:window :isMaximized])
+                                                    (.maximize browser-window)
+                                                    (.unmaximize browser-window)))})
+
+     (doall (map (fn [event]
+                   (.on browser-window (name event) #(settings/save! :window)))
+                 [:maximize :unmaximize :resize :move])))
+
+   (settings/load!)
+
+           
+
+           ))
+
+(re-frame/reg-event-db
+ :db
+ (fn [_ _]
+   {:page/current :devices}))
+
+(defn ^:export start []
+  (re-frame/clear-subscription-cache!)
+  (re-frame/dispatch-sync [:db])
   (device/detect!)
-
-  (let [electron-app (.-app (.-remote (js/require "electron")))
-        browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
-    (swap! settings/hooks assoc :window {:save (fn []
-                                                 (let [bounds (js->clj (.getBounds browser-window))]
-                                                   (swap! settings/data assoc-in [:window]
-                                                          (merge (get-in @settings/data [:window])
-                                                                 {:width (bounds "width")
-                                                                  :height (bounds "height")
-                                                                  :x (bounds "x")
-                                                                  :y (bounds "y")
-                                                                  :isMaximized (.isMaximized browser-window)}))))
-                                         :load (fn []
-                                                 (when (and (get-in @settings/data [:window :x])
-                                                            (get-in @settings/data [:window :y]))
-                                                   (.setPosition browser-window
-                                                                 (get-in @settings/data [:window :x])
-                                                                 (get-in @settings/data [:window :y])))
-                                                 (.setSize browser-window
-                                                           (or (get-in @settings/data [:window :width]) 1200)
-                                                           (or (get-in @settings/data [:window :height]) 600))
-                                                 (if (get-in @settings/data [:window :isMaximized])
-                                                   (.maximize browser-window)
-                                                   (.unmaximize browser-window)))})
-
-    (doall (map (fn [event]
-                  (.on browser-window (name event) #(settings/save! :window)))
-                [:maximize :unmaximize :resize :move])))
-
-  (settings/load!)
-
-  (.setTimeout js/window (fn []
-                           (reagent/render
-                            [ui/chrysalis]
-                            (js/document.getElementById "chrysalis"))
-
-                           (swap! state assoc :page-keys core/mousetrap)
-                           (page/switch-to! (page/current))
-                           )
-               2000)
-
   (let [usb (js/require "usb")]
     (.on usb "attach" (fn [device]
                         (device/detect!)))
     (.on usb "detach" (fn [device]
-                        (device/detect!)))))
+                        (device/detect!))))
+  (ui/mount-root))
 
-(init!)
+(defn ^:export reload! []
+  (re-frame/clear-subscription-cache!)
+  (ui/mount-root))

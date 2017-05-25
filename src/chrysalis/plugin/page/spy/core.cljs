@@ -15,34 +15,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.spy.core
-  (:require [chrysalis.core :refer [state pages]]
-            [chrysalis.ui :as ui]
-            [chrysalis.ui.page :refer [page]]
+  (:require [chrysalis.ui.page :as page]
 
-            [chrysalis.plugin.page.repl.core :as repl]))
+            [chrysalis.plugin.page.spy.views :as views]))
 
-(defn <spy-item> [index [command response]]
-  [:div.row.box {:key (str "spy-history-" index)}
-   [:div.col-sm-12
-    [:div.card.bg-faded
-     [:div.card-block
-      [:div.card-title.row
-       [:div.col-sm-6.text-left
-        [:a.link-button.collapse-toggle
-         {:href (str "#spy-history-collapse-" index)
-          :data-toggle :collapse}
-         [:i.fa.fa-angle-down]]
-        " " [:code command]]]
-      [:div.collapse.show {:id (str "spy-history-collapse-" index)}
-       [:pre response]]]]]])
-
-(defmethod page [:render :spy] [_ _]
-  [:div.container-fluid {:id :spy}
-   [ui/style (repl/style :#spy)]
-   (doall (map (fn [item index]
-                 (<spy-item> index item))
-               (reverse (partition 2 2 (get-in @state [:command :spy])))
-               (range (count (get-in @state [:command :spy])) 0 -1)))])
-
-(swap! pages assoc :spy {:name "Wire Traffic Spy"
-                         :index 100})
+(page/add! :spy {:name "Wire Traffic Spy"
+                 :index 100
+                 :render views/render})
