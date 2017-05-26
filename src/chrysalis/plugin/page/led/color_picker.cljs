@@ -15,20 +15,31 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.led.color-picker
-  (:require [chrysalis.plugin.page.led.events :as events]))
+  (:require [chrysalis.plugin.page.led.events :as events]
+            [re-frame.core :as re-frame]))
+
+(defonce react-color (js/require "react-color"))
+
+(re-frame/reg-event-db
+ :led/picker.update
+ (fn [db [_ index color]]
+   (let [{:keys [r g b]} (js->clj (:rgb color)
+                                  :keywordize-keys true)]
+     (when (>= index 0)
+       (assoc-in db [:led/theme index] [r g b])))))
 
 (defn <color-picker> []
-  (if-let [target (events/current-target)]
-    (when-let [color (.getAttribute target "fill")]
-      [:form.input-group {:on-submit (fn [e]
-                                       (.preventDefault e)
-                                       #_(let [target (get-in @state [:led :current-target])
-                                             index (js/parseInt (.getAttribute target "data-index"))
-                                             new-color (get-in @state [:led :new-color])
-                                             theme (get-in @state [:led :theme])]
-                                         (swap! theme assoc index (hex->color new-color))))}
-       [:input.form-control {:type :text
-                             :placeholder color
-                             :on-change (fn [e]
-                                          #_(swap! state assoc-in [:led :new-color] (.-value (.-target e))))}]
-       [:tt.input-group-addon {:style {:background-color color}} color]])))
+  (let [picker (.-ChromePicker react-color)
+        target (events/current-target)
+        index (if target
+                (js/parseInt (.getAttribute target "data-index"))
+                -1)
+        color (if target
+                (.getAttribute target "fill")
+                "#000000")]
+    [:> picker {:color color
+                :disable-alpha true
+                :triangle :hide
+                :on-change (fn [color event]
+                             (re-frame/dispatch [:led/picker.update index (js->clj color
+                                                                                   :keywordize-keys true)]))}]))

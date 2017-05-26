@@ -22,6 +22,7 @@
                        [jquery "^3.1.0"]
                        [mousetrap "^1.6.1"]
                        [react "^15.4.2"]
+                       [react-color "^2.11.7"]
                        [react-dom "^15.4.2"]
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
                        [tether "^1.3.7"]

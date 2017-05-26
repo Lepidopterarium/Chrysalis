@@ -19,7 +19,8 @@
             [chrysalis.command.post-process :as post-process]
 
             [re-frame.core :as re-frame]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.string :as s]))
 
 ;;; ---- Current target ------ ;;;
 
@@ -61,8 +62,22 @@
  (fn [cofx _]
    {:led/theme :update}))
 
+(re-frame/reg-fx
+ :led/theme.upload
+ (fn [theme]
+   (command/run :led.theme (s/join " " (flatten theme)) :discard)
+   ))
+
+(re-frame/reg-event-fx
+ :led/theme.upload
+ (fn [cofx _]
+   {:led/theme.upload (get-in cofx [:db :led/theme])}))
+
 (defn theme []
   @(re-frame/subscribe [:led/theme]))
 
 (defn theme:update! []
   (re-frame/dispatch [:led/theme.update]))
+
+(defn theme:upload! []
+  (re-frame/dispatch [:led/theme.upload]))
