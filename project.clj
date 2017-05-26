@@ -5,7 +5,7 @@
                  [org.clojure/clojurescript "1.9.293"]
                  [figwheel "0.5.8"]
                  [figwheel-sidecar "0.5.8"]
-                 [reagent "0.6.0"]
+                 [reagent "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [ring/ring-core "1.5.0"]
                  [org.clojure/core.async "0.3.442"]
                  [com.cemerick/piggieback "0.2.1"]
@@ -23,7 +23,9 @@
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
                        [usb "^1.2.0"]
                        [mousetrap "^1.6.1"]
-                       [electron-context-menu "^0.9.0"]]
+                       [electron-context-menu "^0.9.0"]
+                       [react "^15.4.2"]
+                       [react-dom "^15.4.2"]]
         :devDependencies [[electron "1.6.9"]
                           [electron-rebuild "^1.5.7"]
                           [foreman "^2.0.0"]]
@@ -50,7 +52,7 @@
                 :optimizations :simple
                 :pretty-print true
                 :cache-analysis true}}
-    {:source-paths ["src/chrysalis" "src/dev"]
+    {:source-paths ["src/chrysalis" "src/dev" "src/cljsjs"]
      :id "frontend-dev"
      :compiler {:output-to "resources/public/js/ui-core.js"
                 :output-dir "resources/public/js/ui-out"
@@ -68,7 +70,7 @@
                 :optimizations :simple
                 :pretty-print true
                 :cache-analysis true}}
-    {:source-paths ["src/chrysalis"]
+    {:source-paths ["src/chrysalis" "src/cljsjs"]
      :id "frontend-release"
      :compiler {:output-to "resources/public/js/ui-core.js"
                 :output-dir "resources/public/js/ui-release-out"
