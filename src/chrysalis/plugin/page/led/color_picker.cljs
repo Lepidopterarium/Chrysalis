@@ -15,22 +15,23 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.led.color-picker
-  (:require [chrysalis.plugin.page.led.events :as events]
-            [re-frame.core :as re-frame]))
+  (:require [chrysalis.plugin.page.led.events :as led.events]
+            [chrysalis.plugin.page.led.color-picker.events :as picker.events]))
 
 (defonce react-color (js/require "react-color"))
 
-(re-frame/reg-event-db
- :led/picker.update
- (fn [db [_ index color]]
-   (let [{:keys [r g b]} (js->clj (:rgb color)
-                                  :keywordize-keys true)]
-     (when (>= index 0)
-       (assoc-in db [:led/theme index] [r g b])))))
+(defn <live-update> []
+  [:form.form-group.form-check
+   [:label.form-check-label
+    [:input.form-check-input {:type :checkbox
+                              :value (picker.events/live-update)
+                              :on-change (fn [e]
+                                           (picker.events/live-update! (-> e .-target .-checked)))}]
+    " Live update"]])
 
 (defn <color-picker> []
   (let [picker (.-ChromePicker react-color)
-        target (events/current-target)
+        target (led.events/current-target)
         index (if target
                 (js/parseInt (.getAttribute target "data-index"))
                 -1)
@@ -40,6 +41,9 @@
     [:> picker {:color color
                 :disable-alpha true
                 :triangle :hide
-                :on-change (fn [color event]
-                             (re-frame/dispatch [:led/picker.update index (js->clj color
-                                                                                   :keywordize-keys true)]))}]))
+                :on-change (fn [color _]
+                             (picker.events/update! index color))
+                :on-change-complete (fn [color _]
+                                      (picker.events/update! index color)
+                                      (when (picker.events/live-update)
+                                        (led.events/theme:upload!)))}]))

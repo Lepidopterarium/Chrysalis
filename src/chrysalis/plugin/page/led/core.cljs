@@ -22,7 +22,7 @@
 
             [chrysalis.plugin.page.led.events :as events]
             [chrysalis.plugin.page.led.theme :as theme]
-            [chrysalis.plugin.page.led.color-picker :refer [<color-picker>]]
+            [chrysalis.plugin.page.led.color-picker :as color-picker]
             [chrysalis.plugin.page.led.presets :refer [<save-theme> <presets>]]
 
             [garden.units :as gu]))
@@ -31,7 +31,8 @@
   [:div.container-fluid {:id :led}
    [ui/style [:#page
               [:#led
-               [:.chrome-picker {:display :inline-block}]
+               [:.chrome-picker {:display :inline-block
+                                 :margin-bottom (gu/em 1)}]
                [:.key:hover {:cursor :pointer
                              :stroke-width (gu/px 3)
                              :stroke "#0000ff"}]]]]
@@ -57,7 +58,8 @@
         [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
      [:h4 "Color picker"]
-     [<color-picker>]
+     [color-picker/<color-picker>]
+     [color-picker/<live-update>]
      [:hr]
      [:h4 "Presets"
       [:small {:style {:float :right}}
