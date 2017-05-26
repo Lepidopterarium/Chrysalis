@@ -15,14 +15,19 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.hardware.shortcut.core
-  (:require [chrysalis.hardware :refer [known?]]))
+  (:require [chrysalis.hardware :refer [known?]]
+            [re-frame.core :as re-frame]))
 
 (defmethod known? [0xfeed 0x6060] [device]
   (assoc device
          :meta {:name "Shortcut v0.4"
                 :logo "images/plugins/shortcut-keyboard.png"
-                :layout "images/plugins/shortcut-keyboard.svg"
+                :layout (re-frame/subscribe [:device/svg "images/plugins/shortcut-keyboard.svg"])
                 :matrix [14 4]}
+         :led {:map [[-1 -1 -1 -1 -1 -1 -1     -1 -1 -1 -1 -1 -1 -1]
+                     [-1 -1 -1 -1 -1 -1 -1     -1 -1 -1 -1 -1 -1 -1]
+                     [ 1 -1 -1 -1 -1 -1 -1     -1 -1 -1 -1 -1 -1  0]
+                     [-1 -1 -1 -1 -1 -1 -1     -1 -1 -1 -1 -1 -1 -1]]}
          :board {:name "Shortcut v0.4"
                  :baud 9600
                  :productId ["0x6060" "0x0036"]
