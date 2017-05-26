@@ -81,3 +81,20 @@
 
 (defn theme:upload! []
   (re-frame/dispatch [:led/theme.upload]))
+
+;;; ---- Live update ---- ;;;
+(re-frame/reg-event-db
+ :led/live-update
+ (fn [db [_ v]]
+   (assoc db :led/live-update v)))
+
+(re-frame/reg-sub
+ :led/live-update
+ (fn [db _]
+   (:led/live-update db)))
+
+(defn live-update? []
+  @(re-frame/subscribe [:led/live-update]))
+
+(defn live-update! [v]
+  (re-frame/dispatch [:led/live-update v]))

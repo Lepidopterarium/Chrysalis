@@ -27,6 +27,15 @@
 
             [garden.units :as gu]))
 
+(defn <live-update> []
+  [:form.form-group.form-check
+   [:label.form-check-label
+    [:input.form-check-input {:type :checkbox
+                              :value (events/live-update?)
+                              :on-change (fn [e]
+                                           (events/live-update! (-> e .-target .-checked)))}]
+    " Live update"]])
+
 (defn render []
   [:div.container-fluid {:id :led}
    [ui/style [:#page
@@ -57,9 +66,9 @@
                                         #_(swap! state assoc-in [:led :save-theme :name] nil))}
         [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
+     [<live-update>]
      [:h4 "Color picker"]
      [color-picker/<color-picker>]
-     [color-picker/<live-update>]
      [:hr]
      [:h4 "Presets"
       [:small {:style {:float :right}}

@@ -25,22 +25,6 @@
      (when (>= index 0)
        (assoc-in db [:led/theme index] [r g b])))))
 
-(re-frame/reg-event-db
- :led/picker.live-update
- (fn [db [_ v]]
-   (assoc db :led/picker.live-update v)))
-
-(re-frame/reg-sub
- :led/picker.live-update
- (fn [db _]
-   (:led/picker.live-update db)))
-
-(defn live-update []
-  @(re-frame/subscribe [:led/picker.live-update]))
-
-(defn live-update! [v]
-  (re-frame/dispatch [:led/picker.live-update v]))
-
 (defn update! [index color]
   (re-frame/dispatch [:led/picker.update index (js->clj color
                                                         :keywordize-keys true)]))

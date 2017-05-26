@@ -20,15 +20,6 @@
 
 (defonce react-color (js/require "react-color"))
 
-(defn <live-update> []
-  [:form.form-group.form-check
-   [:label.form-check-label
-    [:input.form-check-input {:type :checkbox
-                              :value (picker.events/live-update)
-                              :on-change (fn [e]
-                                           (picker.events/live-update! (-> e .-target .-checked)))}]
-    " Live update"]])
-
 (defn <color-picker> []
   (let [picker (.-ChromePicker react-color)
         target (led.events/current-target)
@@ -45,5 +36,5 @@
                              (picker.events/update! index color))
                 :on-change-complete (fn [color _]
                                       (picker.events/update! index color)
-                                      (when (picker.events/live-update)
+                                      (when (events/live-update?)
                                         (led.events/theme:upload!)))}]))
