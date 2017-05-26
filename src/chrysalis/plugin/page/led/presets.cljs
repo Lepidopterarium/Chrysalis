@@ -16,40 +16,39 @@
 
 (ns chrysalis.plugin.page.led.presets
   (:require [chrysalis.plugin.page.led.events :as events]
-            [chrysalis.plugin.page.led.theme :as theme]))
+            [chrysalis.plugin.page.led.theme :as theme]
 
-(comment
-(defn preset [[name theme]]
-  [:div.card {:href "#"
-              :key (str "chrysalis-plugin-led-preset-" name)
-              :on-click (fn [e]
-                          (let [main-theme (get-in @state [:led :theme])]
-                            (reset! main-theme theme)))}
-   [:h5.card-header name]
-   [:div.card-block
-    [:a.card-text {:href "#"
-                   :on-click (fn [e]
-                               (let [main-theme (get-in @state [:led :theme])]
-                                 (reset! main-theme theme)))}
-     [theme/<led-theme> (get-in (device/current) [:device :meta :layout])
-      (atom theme)
-      {:width 102 :height 64}]]]
-   [:div.card-footer.text-left
-    [:span.card-text
-     [:a {:href "#"}
-      "Export"]]
-    [:span.card-text
-     [:a {:style {:float :right}
-          :href "#"
-          :title "Remove"
-          :on-click (fn [e]
-                      (let [presets (get-in @state [:led :presets])]
-                        (swap! state assoc-in [:led :presets] (dissoc presets name))))}
-     [:i.fa.fa-minus]]]]])
+            [chrysalis.device :as device]
 
-(defn presets []
-  [:div.card-group
-   (doall (map preset (get-in @state [:led :presets])))])
+            [re-frame.core :as re-frame]))
+
+(re-frame/reg-sub
+ :led/presets
+ (fn [db _]
+   (:led/presets db)))
+
+(re-frame/reg-event-db
+ :led/presets.drop
+ (fn [db [_ preset-name]]
+   (update db :led/presets dissoc preset-name)))
+
+(re-frame/reg-event-db
+ :led/presets.add
+ (fn [db [_ preset-name theme]]
+   (update db :led/presets assoc preset-name theme)))
+
+(re-frame/reg-event-db
+ :led/presets.name
+ (fn [db [_ new-name]]
+   (assoc db :led/current-preset-name new-name)))
+
+(re-frame/reg-sub
+ :led/presets.name
+ (fn [db _]
+   (:led/current-preset-name db)))
+
+(defn name! [new-name]
+  (re-frame/dispatch [:led/presets.name new-name]))
 
 (defn <save-theme> []
   [:div.modal.fade {:id "chrysalis-plugin-page-led-save-theme"}
@@ -67,31 +66,52 @@
          [:form.input-group {:on-submit (fn [e]
                                           (.preventDefault e)
                                           (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
-                                          (let [name (get-in @state [:led :save-theme :name])]
-                                            (swap! state assoc-in [:led :presets name] @(get-in @state [:led :theme]))))}
+                                          (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
+                                                              @(re-frame/subscribe [:led/theme])])
+                                          )}
           [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
           [:input.form-control {:type :text
+                                :value @(re-frame/subscribe [:led/presets.name])
                                 :placeholder "Name your theme..."
                                 :on-change (fn [e]
-                                             (swap! state assoc-in [:led :save-theme :name] (.-value (.-target e))))}]]]]]]
+                                             (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
      [:div.modal-footer
       [:a.btn.btn-primary {:href "#"
                            :data-dismiss :modal
                            :on-click (fn [e]
-                                       (let [name (get-in @state [:led :save-theme :name])]
-                                         (swap! state assoc-in [:led :presets name] @(get-in @state [:led :theme]))))}
+                                       (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
+                                                           @(re-frame/subscribe [:led/theme])]))}
        "Save"]
       [:a.btn.btn-secondary {:href "#"
                              :data-dismiss :modal}
        "Cancel"]]]]])
 
-
-
-
-)
-
-(defn <save-theme> []
-  nil)
+(defn- <preset> [[preset-name theme]]
+  [:div.card {:href "#"
+              :key (str "chrysalis-plugin-led-preset-" preset-name)}
+   [:h5.card-header preset-name]
+   [:div.card-block
+    [:a.card-text {:href "#"
+                   :on-click (fn [e]
+                               (re-frame/dispatch [:led/theme! theme]))}
+     [theme/<led-theme>
+      (device/current)
+      @(get-in (device/current) [:meta :layout])
+      theme
+      {:width 102 :height 64}]]]
+   [:div.card-footer.text-left
+    [:span.card-text
+     [:a {:href "#"}
+      "Export"]]
+    [:span.card-text
+     [:a {:style {:float :right}
+          :href "#"
+          :title "Remove"
+          :on-click (fn [e]
+                      (.preventDefault e)
+                      (re-frame/dispatch [:led/presets.drop preset-name]))}
+      [:i.fa.fa-minus]]]]])
 
 (defn <presets> []
-  nil)
+  [:div.card-group
+   (doall (map <preset> @(re-frame/subscribe [:led/presets])))])

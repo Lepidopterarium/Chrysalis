@@ -48,14 +48,23 @@
    (:led/theme db)))
 
 (re-frame/reg-event-db
- :led/theme!
+ :led/theme.process
  (fn [db [_ [_ _ _ response]]]
    (assoc db :led/theme (post-process/format :led.theme response))))
+
+(re-frame/reg-event-fx
+ :led/theme!
+ (fn [cofx [_ theme]]
+   (let [resp {:db (assoc (:db cofx) :led/theme theme)}
+         live? (get-in (:db cofx) [:led/live-update])]
+     (if live?
+       (assoc resp :led/theme.upload theme)
+       resp))))
 
 (re-frame/reg-fx
  :led/theme
  (fn []
-   (command/run :led.theme nil :led/theme!)))
+   (command/run :led.theme nil :led/theme.process)))
 
 (re-frame/reg-event-fx
  :led/theme.update
@@ -65,8 +74,7 @@
 (re-frame/reg-fx
  :led/theme.upload
  (fn [theme]
-   (command/run :led.theme (s/join " " (flatten theme)) :discard)
-   ))
+   (command/run :led.theme (s/join " " (flatten theme)) :discard)))
 
 (re-frame/reg-event-fx
  :led/theme.upload

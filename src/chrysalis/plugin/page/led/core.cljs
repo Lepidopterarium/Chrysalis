@@ -23,7 +23,7 @@
             [chrysalis.plugin.page.led.events :as events]
             [chrysalis.plugin.page.led.theme :as theme]
             [chrysalis.plugin.page.led.color-picker :as color-picker]
-            [chrysalis.plugin.page.led.presets :refer [<save-theme> <presets>]]
+            [chrysalis.plugin.page.led.presets :as presets]
 
             [garden.units :as gu]))
 
@@ -45,7 +45,7 @@
                [:.key:hover {:cursor :pointer
                              :stroke-width (gu/px 3)
                              :stroke "#0000ff"}]]]]
-   [<save-theme>]
+   [presets/<save-theme>]
    [:div.row
     [:div.col-sm-9.text-center
      [theme/<led-theme>
@@ -63,7 +63,7 @@
        [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
                             :data-toggle :modal
                             :on-click (fn [e]
-                                        #_(swap! state assoc-in [:led :save-theme :name] nil))}
+                                        (presets/name! nil))}
         [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
      [<live-update>]
@@ -75,14 +75,17 @@
        [:a {:href "#"
             :title "Import a preset..."}
         [:i.fa.fa-plus]]]]
-     [<presets>]]]])
+     [presets/<presets>]]]])
 
-(comment
-  (swap! settings/hooks assoc :led {:save (fn []
-                                           (let [device (keyword (get-in (device/current) [:device :meta :name]))]
-                                             (swap! settings/data assoc-in [:devices device :led :presets]
-                                                    (get-in @state [:led :presets]))))
-                                   :load (fn [] nil)}))
+(defmethod settings/apply! [:led] [db _]
+  (settings/copy-> db
+                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:led/presets]))
+
+(defmethod settings/save! [:led] [db _]
+  (settings/<-copy db
+                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:led/presets]))
 
 (page/add! :led {:name "LED Theme Editor"
                  :index 10
