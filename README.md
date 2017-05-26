@@ -1,8 +1,13 @@
 # Chrysalis
 
-[Kaleidoscope][kaleidoscope] command center. Nothing spectacularly useful here yet.
+[![Latest release](https://img.shields.io/github/release/algernon/Chrysalis/all.svg?style=flat-square)](https://github.com/algernon/Chrysalis/releases/latest)
+[![Patreon](https://img.shields.io/badge/Patreon-algernon-red.svg?style=flat-square&colorA=FF5900&colorB=555555)](https://www.patreon.com/algernon)
+
+[Kaleidoscope][kaleidoscope] command center, a heavy work in progress.
 
  [kaleidoscope]: https://github.com/keyboardio/Kaleidoscope
+ 
+![Chrysalis](docs/screenshots/led-theme-editor.png)
 
 ## Quick start
 
