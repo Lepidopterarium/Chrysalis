@@ -36,7 +36,7 @@
         " " [:code command " " (apply str args)]]]
       [:div.collapse.show {:id (str "spy-history-collapse-" index)}
        [:pre (clj->js response) "\r\n."]
-       [:div.text-muted.text-right
+       [:div.text-muted.text-right.device-name
         (get-in device [:meta :name])]]]]]])
 
 (defn render []

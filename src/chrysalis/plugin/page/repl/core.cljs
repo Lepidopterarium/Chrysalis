@@ -54,7 +54,7 @@
              output
              [:pre [:i "<no output>"]])
            [:i.fa.fa-refresh.fa-spin])
-         [:div.text-muted.text-right
+         [:div.text-muted.text-right.device-name
           (get-in device [:meta :name])]]]]]]))
 
 (defn- <command> [cmd]
@@ -131,7 +131,8 @@
     [:.box
      [:.card-block
       [:.collapse
-       [:pre {:white-space :pre-wrap}]]]]
+       [:pre {:white-space :pre-wrap}]
+       [:.device-name {:margin-top (gu/em 1)}]]]]
 
     [:.collapse-toggle
      [:i {:width (gu/px 10.38)
