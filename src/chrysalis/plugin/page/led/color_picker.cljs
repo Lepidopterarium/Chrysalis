@@ -33,8 +33,10 @@
                 :disable-alpha true
                 :triangle :hide
                 :on-change (fn [color _]
-                             (picker.events/update! index color))
+                             (when-not (neg? index)
+                               (picker.events/update! index color)))
                 :on-change-complete (fn [color _]
-                                      (picker.events/update! index color)
-                                      (when (events/live-update?)
-                                        (led.events/theme:upload!)))}]))
+                                      (when-not (neg? index)
+                                        (picker.events/update! index color)
+                                        (when (led.events/live-update?)
+                                          (led.events/theme:upload!))))}]))
