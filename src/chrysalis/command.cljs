@@ -90,7 +90,8 @@
 (re-frame/reg-event-db
  :command/history.append
  (fn [db [_ item]]
-   (update db :command/history conj item)))
+   (update db :command/history #(->> (conj % item)
+                                     (take-last 50)))))
 
 ;;; ---- API ---- ;;;
 (defn history-append! [item]

@@ -30,7 +30,8 @@
 (re-frame/reg-event-db
  :repl/history.append
  (fn [db [_ item]]
-   (update db :repl/history conj item)))
+   (update db :repl/history #(->> (conj % item)
+                                  (take-last 50)))))
 
 (re-frame/reg-event-db
  :repl/history.clear
