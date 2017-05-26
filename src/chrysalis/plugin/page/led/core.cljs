@@ -31,7 +31,7 @@
   [:form.form-group.form-check
    [:label.form-check-label
     [:input.form-check-input {:type :checkbox
-                              :value (events/live-update?)
+                              :checked (events/live-update?)
                               :on-change (fn [e]
                                            (events/live-update! (-> e .-target .-checked)))}]
     " Live update"]])
