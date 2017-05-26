@@ -102,6 +102,11 @@
  (fn [cofx _]
    {:settings/window.update (get-in cofx [:db :settings])}))
 
+(re-frame/reg-event-db
+ :discard
+ (fn [db _]
+   db))
+
 (defn ^:export start []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:db])
