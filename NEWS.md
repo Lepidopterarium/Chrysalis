@@ -1,5 +1,37 @@
 <!-- -*- mode: markdown; fill-column: 8192 -*- -->
 
+# Chrysalis 0.0.3
+UNRELEASED
+
+## Notable changes
+
+* The `Shortcut` is now far better supported: it has an icon, and a layout image, and the layout editor is usable with it too (well, somewhat, anyway).
+* Chrysalis gained a few key bindings:
+  - The various pages can be accessed with `Alt+N`.
+  - On the device selector page, the devices can be selected with `Ctrl+N`.
+* Comes with ClojureScript DevTools pre-installed, for ease of development.
+* The whole application has been re-based on top of [re-frame][re-frame], to provide a more reliable, proven foundation. The net result is fewer bugs, and a more responsive interface.
+
+ [re-frame]: https://github.com/Day8/re-frame
+
+## LED Theme Editor
+
+* The color picker has been redone, and we are using the [react-color][react-color] library. It doesn't only look better, it is more usable too.
+* The editor can now "live update", meaning that whenever any key color is changed, it will apply the theme automatically, without having to press the `Apply` button. This is turned off by default, however.
+
+ [react-color]: http://casesandberg.github.io/react-color/
+
+## REPL, Wire Traffic Spy
+
+* The REPL and Wire Traffic history is now limited to 50 items, to put a limit on resource use, and scrolling.
+* Minor polishing was done on the look of the history item boxes:
+  - The device used for the command are now shown in the `Wire Traffic Spy` view, too.
+  - The device used is placed further down from the command response.
+
+## Known issues
+
+* Settings are not properly saved at the moment.
+
 # Chrysalis 0.0.2
 Released on 2017-05-12
 
