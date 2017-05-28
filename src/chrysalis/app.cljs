@@ -16,7 +16,6 @@
 
 (ns chrysalis.app
   (:require [re-frame.core :as re-frame]
-            [re-frisk.core :refer [enable-re-frisk!]]
 
             ;;; ---- Chrysalis ---- ;;;
 
@@ -45,10 +44,6 @@
             [chrysalis.plugin.Kaleidoscope.HostOS.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]
             [chrysalis.plugin.Kaleidoscope.OneShot.core]))
-
-(enable-console-print!)
-(enable-re-frisk! {:width "600px"
-                   :height "400px"})
 
 (re-frame/reg-event-fx
  :db
