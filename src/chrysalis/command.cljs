@@ -55,7 +55,9 @@
          index (.indexOf buffer ".\r\n")]
     (if (>= index 0)
       (let [remain (.substring buffer (+ index 3))]
-        (recur (conj responses (s/trim (.substring buffer 0 index)))
+        (recur (conj responses (-> buffer
+                                   (.substring 0 index)
+                                   s/trim))
                remain
                (.indexOf remain ".\r\n")))
       [responses buffer])))

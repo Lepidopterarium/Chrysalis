@@ -126,9 +126,9 @@
  :device/select-by-serial
  (fn [db [_ serial]]
    (assoc db
-          :device/current (first (filter (fn [device]
-                                           (= (:serialNumber device) serial))
-                                         (:device/list db))))))
+          :device/current (->> (:device/list db)
+                               (filter #(= (:serialNumber %) serial))
+                               first))))
 
 ;;; ---- API ---- ;;;
 

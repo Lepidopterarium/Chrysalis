@@ -43,7 +43,8 @@
        vec))
 
 (defmethod format [:layer.getState] [_ text]
-  (->> (map (fn [state idx] [idx (= state "1")]) text (range))
+  (->> (map (fn [state idx] [idx (= state "1")])
+            text (range))
        (filter second)
        (map first)
        vec))

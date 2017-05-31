@@ -26,7 +26,9 @@
  (fn [cofx _]
    (let [fs (js/require "fs")]
      (when (.existsSync fs config-file)
-       (let [contents (js->clj (.parse js/JSON (.readFileSync fs config-file #js {"encoding" "utf-8"}))
+       (let [contents (js->clj (as-> fs $
+                                 (.readFileSync $ config-file #js {"encoding" "utf-8"})
+                                 (.parse js/JSON $))
                                :keywordize-keys true)]
          (assoc cofx :settings contents))))))
 
@@ -34,7 +36,10 @@
  :settings/save
  (fn [settings]
    (let [fs (js/require "fs")]
-     (.writeFileSync fs config-file (.stringify js/JSON (clj->js settings))
+     (.writeFileSync fs config-file
+                     (->> settings
+                          clj->js
+                          (.stringify js/JSON))
                      #js {"mode" 0644}))))
 
 (defmulti apply!

@@ -44,16 +44,19 @@
  :page/select
  [settings/interceptor]
  (fn [cofx [_ page]]
-   (let [resp {:db (assoc (:db cofx)
-                          :page/current page)
-               :key-bindings/reset true
-               :settings/save (get-in cofx [:db :settings])}
-         new-page (get-in (:db cofx) [:pages page])]
-     (merge
-      (if (:device/need? new-page)
-        (assoc resp :device/open (:device/current (:db cofx)))
-        (assoc resp :device/close (:device/current (:db cofx))))
-      (:events new-page)))))
+   (let [new-page (get-in (:db cofx) [:pages page])
+         current-device (:device/current (:db cofx))]
+     (->
+      {:db (assoc (:db cofx)
+                  :page/current page)
+       :key-bindings/reset true
+       :settings/save (get-in cofx [:db :settings])}
+
+      (cond->
+          (:device/need? new-page) (assoc :device/open current-device)
+          (not (:device/need? new-page) (assoc :device/close current-device)))
+
+      (merge (:events new-page))))))
 
 ;;; ---- helpers ---- ;;;
 

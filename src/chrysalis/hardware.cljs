@@ -31,7 +31,9 @@
 
 (defn- jsx->clj
   [x]
-  (into {} (for [k (.keys js/Object x)] [(keyword k) (aget x k)])))
+  (into {}
+        (for [k (.keys js/Object x)]
+          [(keyword k) (aget x k)])))
 
 (defmulti scan*
   (fn [scanner-type out]

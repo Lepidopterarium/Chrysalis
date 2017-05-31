@@ -20,7 +20,9 @@
             [chrysalis.plugin.page.repl.core :refer [display repl-wrap]]))
 
 (defmethod post-process/format [:led.theme] [_ text]
-  (let [theme (map (fn [spec] (map js/parseInt (.split spec #" ")) ) (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
+  (let [theme (map (fn [spec]
+                     (map js/parseInt (.split spec #" ")))
+                   (remove #{""} (.split text #" *(\d+ \d+ \d+) *")))]
     (vec theme)))
 
 (defmethod display :led.theme [_ req result device index]
