@@ -76,8 +76,7 @@
        (let [[_ cmd args _] (nth (history) current-index)]
          {:db (assoc (:db cofx)
                      :repl/history.index (max (dec current-index) -1))
-          :dispatch [:repl/input.change (s/join " " [(name cmd) args])]}
-         )
+          :dispatch [:repl/input.change (s/join " " [(name cmd) args])]})
        {:dispatch [:repl/input.change nil]}))))
 
 (defn history:previous! []

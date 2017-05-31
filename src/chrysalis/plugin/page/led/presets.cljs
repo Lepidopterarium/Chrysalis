@@ -67,8 +67,7 @@
                                           (.preventDefault e)
                                           (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
                                           (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
-                                                              @(re-frame/subscribe [:led/theme])])
-                                          )}
+                                                              @(re-frame/subscribe [:led/theme])]))}
           [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
           [:input.form-control {:type :text
                                 :value @(re-frame/subscribe [:led/presets.name])
