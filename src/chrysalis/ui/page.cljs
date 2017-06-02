@@ -54,7 +54,7 @@
 
       (cond->
           (:device/need? new-page) (assoc :device/open current-device)
-          (not (:device/need? new-page) (assoc :device/close current-device)))
+          (not (:device/need? new-page)) (assoc :device/close current-device))
 
       (merge (:events new-page))))))
 
