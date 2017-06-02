@@ -23,6 +23,7 @@
             [chrysalis.key-bindings]
             [chrysalis.hardware :as hardware]
             [chrysalis.ui :as ui]
+            [chrysalis.ui.page :as page]
             [chrysalis.device :as device]
             [chrysalis.settings :as settings]
 
@@ -55,8 +56,7 @@
 (re-frame/reg-event-fx
  :settings/window
  (fn [cofx _]
-   {:settings/window (get-in cofx [:db :settings])
-    :key-bindings/reset true}))
+   {:settings/window (get-in cofx [:db :settings])}))
 
 (re-frame/reg-fx
  :settings/window
@@ -108,6 +108,7 @@
   (re-frame/dispatch-sync [:db])
   (device/detect!)
   (re-frame/dispatch-sync [:settings/window])
+  (page/switch-to! :devices)
   (let [usb (js/require "usb")]
     (.on usb "attach" (fn [device]
                         (device/detect!)))
