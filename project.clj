@@ -1,4 +1,4 @@
-(defproject Chrysalis "0.0.3-SNAPSHOT"
+(defproject Chrysalis "0.0.3"
   :source-paths ["src"]
   :description "Kaleidoscope Command Center"
   :dependencies [[binaryage/devtools "0.8.2"]
