@@ -28,13 +28,16 @@
                        [tether "^1.3.7"]
                        [usb "^1.2.0"]]
         :devDependencies [[electron "1.6.9"]
+                          [electron-packager "^8.7.0"]
                           [electron-rebuild "^1.5.7"]
                           [foreman "^2.0.0"]]
         :root "resources/public"
-        :package {:scripts {:start-ui "electron .."
+        :package {:main "main.js"
+                  :scripts {:start-ui "electron .."
                             :build "electron-rebuild -w usb,serialport && lein cljsbuild once electron-dev && lein cljsbuild once frontend-dev"
                             :build:release "electron-rebuild -w usb,serialport && lein cljsbuild once electron-release && lein cljsbuild once frontend-release"
-                            :start "nf -j ../../Procfile start"}}}
+                            :start "nf -j ../../Procfile start"
+                            :package "electron-packager . Chrysalis --arch x64 --platform linux --overwrite --out ../../packages/ --icon images/kaleidoscope-logo-ph.png"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
             [lein-resource "16.9.1"]
