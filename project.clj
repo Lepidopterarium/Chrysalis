@@ -33,7 +33,7 @@
                           [foreman "^2.0.0"]]
         :root "resources/public"
         :package {:main "main.js"
-                  :scripts {:start-ui "electron .."
+                  :scripts {:start-ui "electron ."
                             :build "electron-rebuild -w usb,serialport && lein cljsbuild once electron-dev && lein cljsbuild once frontend-dev"
                             :build:release "electron-rebuild -w usb,serialport && lein cljsbuild once electron-release && lein cljsbuild once frontend-release"
                             :start "nf -j ../../Procfile start"
