@@ -112,10 +112,13 @@
                         (device/detect!)))
     (.on usb "detach" (fn [device]
                         (device/detect!))))
-  (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
-    (doall (map (fn [event]
-                  (.on browser-window (name event) #(re-frame/dispatch [:settings/window.update])))
-                [:maximize :unmaximize :resize :move])))
+  (.setTimeout js/window (fn []
+                 (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+                   (doall (map (fn [event]
+                                 (.on browser-window (name event) #(re-frame/dispatch [:settings/window.update])))
+                               [:maximize :unmaximize :resize :move]))))
+               1000)
+
   (ui/mount-root))
 
 (defn ^:export reload! []
