@@ -26,6 +26,7 @@
    (.reset mousetrap)
 
    ;; Apply global key bindings...
+   (.bind mousetrap "ctrl+q" #(.close js/window))
    (let [pages (map-indexed vector (sort-by (fn [[key meta]]
                                               (:index meta))
                                             (page/list)))]
