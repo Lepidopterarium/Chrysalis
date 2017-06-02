@@ -55,7 +55,8 @@
 (re-frame/reg-event-fx
  :settings/window
  (fn [cofx _]
-   {:settings/window (get-in cofx [:db :settings])}))
+   {:settings/window (get-in cofx [:db :settings])
+    :key-bindings/reset true}))
 
 (re-frame/reg-fx
  :settings/window
@@ -106,7 +107,6 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:db])
   (device/detect!)
-  (re-frame/dispatch-sync [:key-bindings/reset])
   (re-frame/dispatch-sync [:settings/window])
   (let [usb (js/require "usb")]
     (.on usb "attach" (fn [device]
