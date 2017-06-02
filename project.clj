@@ -33,6 +33,7 @@
         :root "resources/public"
         :package {:scripts {:start-ui "electron .."
                             :build "electron-rebuild -w usb,serialport && lein cljsbuild once electron-dev && lein cljsbuild once frontend-dev"
+                            :build:release "electron-rebuild -w usb,serialport && lein cljsbuild once electron-release && lein cljsbuild once frontend-release"
                             :start "nf -j ../../Procfile start"}}}
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-figwheel "0.5.8"]
@@ -91,5 +92,6 @@
              :skip-stencil [#".*"]}
 
   :aliases {"build" ["do" ["npm" "run" "build"] "resource"]
+            "build:release" ["do" ["npm" "run" "build:release"] "resource"]
             "start-ui" ["do" ["npm" "run" "start-ui"]]
             "start" ["do" ["npm" "run" "start"]]})
