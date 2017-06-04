@@ -1,7 +1,7 @@
 <!-- -*- mode: markdown; fill-column: 8192 -*- -->
 
 # Chrysalis 0.0.3
-Released on 2017-06-03
+Released on 2017-06-04
 
 ## Notable changes
 
