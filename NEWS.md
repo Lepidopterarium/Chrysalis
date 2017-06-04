@@ -5,7 +5,7 @@ Released on 2017-06-04
 
 ## Notable changes
 
-* The `Shortcut` is now far better supported: it has an icon, and a layout image, and the layout editor is usable with it too (well, somewhat, anyway).
+* The `Shortcut` is now far better supported: it has an icon, and a layout image, and the LED theme editor is usable with it too (well, somewhat, anyway).
 * Chrysalis gained a few key bindings:
   - The various pages can be accessed with `Alt+N`.
   - On the device selector page, the devices can be selected with `Ctrl+N`.
