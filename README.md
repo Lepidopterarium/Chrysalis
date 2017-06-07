@@ -18,10 +18,8 @@
 First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nodejs.org/en/), then follow these steps:
 
 * **Install dependencies**: `lein deps`
-* **Compile & prepare assets**: `lein build`
-* **Start the user-interface**: `lein start-ui`
-
-To start Chrysalis in development mode, with live-reload and everything, use `lein start` instead of the last two steps.
+* **Compile & prepare assets**: `lein build`, or `lein build:release`
+* **Start the user-interface**: `lein start`
 
 ## License
 
