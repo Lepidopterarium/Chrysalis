@@ -52,7 +52,8 @@
                                               (page/list)))]
        (doall
         (for [[index menu-item] pages]
-          (<menu-item> menu-item index))))
+          ^{:key index}
+          [<menu-item> menu-item index])))
      [:hr]
      [:a.dropdown-item {:href "#about"
                         :data-toggle :modal} "About"]
