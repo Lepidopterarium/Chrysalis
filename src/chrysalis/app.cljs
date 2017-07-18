@@ -49,9 +49,10 @@
 (re-frame/reg-event-fx
  :db
  [(re-frame/inject-cofx :settings/load)]
- (fn [{:keys [settings]} _]
-   {:db {:page/current :devices
-         :settings settings}}))
+ (fn [{:keys [settings db]} _]
+   {:db (assoc db
+               :page/current :devices
+               :settings settings)}))
 
 (re-frame/reg-event-fx
  :settings/window
