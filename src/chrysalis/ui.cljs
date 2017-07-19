@@ -50,9 +50,9 @@
 ;;; ---- Main application ---- ;;;
 (defn chrysalis []
   [:div
-   (style)
+   [style]
    [<about>]
-   (<main-menu>)
+   [<main-menu>]
 
    [:div {:id :page}
     (when-let [page (page/current)]
