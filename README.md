@@ -21,6 +21,10 @@ First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nod
 * **Compile & prepare assets**: `lein build`, or `lein build:release`
 * **Start the user-interface**: `lein start`
 
+## Documentation
+
+[API funtions](/docs/api.md)
+
 ## License
 
 The code is released under the terms of the GNU GPL, version 3 or later. See the [COPYING](COPYING) file for details.
