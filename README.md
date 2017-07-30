@@ -23,7 +23,7 @@ First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nod
 
 ## Documentation
 
-[API funtions](/docs/api.md)
+[API](/docs/api.md)
 
 ## License
 
