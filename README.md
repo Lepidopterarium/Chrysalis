@@ -10,7 +10,7 @@
  [kaleidoscope]: https://github.com/keyboardio/Kaleidoscope
  [chrysalis:project:1.0]: https://github.com/algernon/Chrysalis/projects/1
  [blog:algernon:chrysalis]: https://asylum.madhouse-project.org/blog/tags/chrysalis/
- 
+
 ![Chrysalis](docs/screenshots/led-theme-editor.png)
 
 ## Quick start
@@ -25,9 +25,11 @@ First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nod
 
 ### Linux
 
-Build libraries that [usb@1.2.0]:https://www.npmjs.com/package/usb depends on
+To build the [node-usb](https://www.npmjs.com/package/usb) dependency, the following packages are also required (Debian and Ubuntu systems, others may need a similar package installed):
 
-    sudo apt-get install build-essentials libudev-dev
+```
+sudo apt-get install build-essentials libudev-dev
+```
 
 ## Documentation
 
