@@ -21,6 +21,14 @@ First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nod
 * **Compile & prepare assets**: `lein build`, or `lein build:release`
 * **Start the user-interface**: `lein start`
 
+## Dependencies
+
+### Linux
+
+Build libraries that [usb@1.2.0]:https://www.npmjs.com/package/usb depends on
+
+    sudo apt-get install build-essentials libudev-dev
+
 ## Documentation
 
 [API](/docs/api.md)
