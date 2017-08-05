@@ -102,9 +102,6 @@
 (defn run [command args event]
    (re-frame/dispatch [:command/send command args event]))
 
-(defn on-data [data]
-  (re-frame/dispatch [:command/input.data data]))
-
 (defn history
   ([] (history nil))
   ([processor] (let [items @(re-frame/subscribe [:command/history])]
@@ -113,3 +110,11 @@
                                 (partial processor command)
                                 identity)]
                      [device command args (proc response)])))))
+
+;;; `on-data` was initially defined as an API function.
+;;; However, given that it's only called when data comes in through
+;;; a device port following a command sent via `run` maybe it should
+;;; be considered a helper function.
+
+(defn on-data [data]
+  (re-frame/dispatch [:command/input.data data]))
