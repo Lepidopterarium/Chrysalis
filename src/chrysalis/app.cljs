@@ -39,6 +39,7 @@
             [chrysalis.plugin.page.firmware.core]
             [chrysalis.plugin.page.repl.core]
             [chrysalis.plugin.page.spy.core]
+            [chrysalis.plugin.page.keymap.core]
 
             ;; Kaleidoscope plugins
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
