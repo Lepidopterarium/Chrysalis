@@ -72,7 +72,7 @@
                     (node-update device node theme (:interactive? props))
                     node))
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 2048 1280")))))
+                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
 
 (defn <led-theme> [device svg theme props]
   (if theme
