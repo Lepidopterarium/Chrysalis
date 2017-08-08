@@ -20,21 +20,39 @@
             [chrysalis.ui.page :as page]
             [chrysalis.key-bindings :as key-bindings]
 
+            [chrysalis.plugin.page.keymap.events :as events]
+            [chrysalis.plugin.page.keymap.layout :as map]
+
             [garden.units :as gu]))
 
 
 
 (defn render []
   [:div.container-fluid {:id :keymap}
-   [ui/style [:#page [:#keymap]]]
+   [ui/style [:#page [:#keymap
+                      [:.key:hover {:cursor :pointer
+                                    :stroke-width (gu/px 3)
+                                    :stroke "#000000"}]]]]
 
-   [:div.text-center
-    [:h1 "Hello, world."]
-    [:p1 "This is where you'll find the Keymap Editor."]
-    [:div.cog [:i.fa.fa-cog.fa-5x.fa-spin]]
-    ]])
+   [:div.row
+    [:div.col-sm-9.text-center
+
+     [:h2 "Keymap"]
+     [map/<keymap-layout>
+      (device/current)
+      @(get-in (device/current) [:meta :layout])
+      (events/layout)
+      {:width 1024 :height 640 :interactive? true}]
+     ]
+    [:div.col-sm-3.text-center
+
+     [:h2 "Inspector"]]]
+   ])
 
 
 (page/add! :keymap {:name "Keymap Editor"
-                     :index 6
-                     :render render})
+                    :index 6
+                    :disable? (fn [] (nil? (device/current)))
+                    :device/need? true
+                    :render render
+                    :events {:keymap/map :update}})
