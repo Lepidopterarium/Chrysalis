@@ -94,26 +94,6 @@
               (doall (map (partial <help-command-group> index)
                           (group-commands result)))]))
 
-(defn- <key> [history-index layer key idx]
-  (key/display (str "repl-keymap-layer-" history-index "-" layer "-" idx) key))
-
-(defn- <layer> [index keymap layer]
-  [:div.col-sm-12 {:key (str "repl-keymap-layer-" index "-" layer)}
-   [:div.card
-    [:div.card-block
-     [:div.card-title
-      [:b "Layer #" layer]]
-     [:div.card-text
-      (doall (map (partial <key> index layer) keymap (range)))]]]])
-
-(defmethod display :keymap.map [_ req result device index]
-  (let [layer-size (apply * (get-in device [:meta :matrix]))]
-    (repl-wrap req index device result
-               [:div.row
-                (doall (map (partial <layer> index)
-                            (partition layer-size result)
-                            (range)))])))
-
 (defn style [page]
   [:#page
    [page

@@ -17,7 +17,7 @@
 (ns chrysalis.plugin.Kaleidoscope.OneShot.core
   (:require [clojure.string :as s]
 
-            [chrysalis.key :as key :refer [processors key-button]]))
+            [chrysalis.key :as key :refer [processors]]))
 
 (defn- oneshot-processor [key code]
   (cond
@@ -25,7 +25,7 @@
          (<= code 0xc008)) (assoc key
                                   :plugin :oneshot
                                   :type :modifier
-                                  :modifier (:usage (nth key/HID-Codes (+ (- code 0xc001) 224))))
+                                  :modifier (:key (nth key/HID-Codes (+ (- code 0xc001) 224))))
     (and (>= code 0xc009)
          (<= code (+ 0xc009 7))) (assoc key
                                           :plugin :oneshot
@@ -33,10 +33,10 @@
                                           :layer (- code 0xc009))
     :default key))
 
-(defmethod key/display [:oneshot] [react-key key]
-  (key-button react-key :info
-              (condp = (:type key)
-                :modifier (str "OSM(" (name (:modifier key)) ")")
-                :layer (str "OSL(" (:layer key) ")"))))
+(defmethod key/format [:oneshot] [key]
+  {:primary-text (if (= (:type key) :modifier)
+                   (:modifier key)
+                   (:layer key))
+   :extra-text "OneShot"})
 
 (swap! processors concat [oneshot-processor])

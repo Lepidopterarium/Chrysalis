@@ -16,174 +16,176 @@
 
 (ns chrysalis.key
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+
+            [chrysalis.command.post-process :as post-process]))
 
 (def HID-Codes
-  [{:type :no-key}
-   {:type :error, :error :rollover}
-   {:type :error, :error :post-fail}
-   {:type :error, :error :undefined}
-   {:type :keyboard, :usage :a}
-   {:type :keyboard, :usage :b}
-   {:type :keyboard, :usage :c}
-   {:type :keyboard, :usage :d}
-   {:type :keyboard, :usage :e}
-   {:type :keyboard, :usage :f}
-   {:type :keyboard, :usage :g}
-   {:type :keyboard, :usage :h}
-   {:type :keyboard, :usage :i}
-   {:type :keyboard, :usage :j}
-   {:type :keyboard, :usage :k}
-   {:type :keyboard, :usage :l}
-   {:type :keyboard, :usage :m}
-   {:type :keyboard, :usage :n}
-   {:type :keyboard, :usage :o}
-   {:type :keyboard, :usage :p}
-   {:type :keyboard, :usage :q}
-   {:type :keyboard, :usage :r}
-   {:type :keyboard, :usage :s}
-   {:type :keyboard, :usage :t}
-   {:type :keyboard, :usage :u}
-   {:type :keyboard, :usage :v}
-   {:type :keyboard, :usage :w}
-   {:type :keyboard, :usage :x}
-   {:type :keyboard, :usage :y}
-   {:type :keyboard, :usage :z}
-   {:type :keyboard, :usage :1}
-   {:type :keyboard, :usage :2}
-   {:type :keyboard, :usage :3}
-   {:type :keyboard, :usage :4}
-   {:type :keyboard, :usage :5}
-   {:type :keyboard, :usage :6}
-   {:type :keyboard, :usage :7}
-   {:type :keyboard, :usage :8}
-   {:type :keyboard, :usage :9}
-   {:type :keyboard, :usage :0}
-   {:type :keyboard, :usage :enter}
-   {:type :keyboard, :usage :escape}
-   {:type :keyboard, :usage :backspace}
-   {:type :keyboard, :usage :tab}
-   {:type :keyboard, :usage :space}
-   {:type :keyboard, :usage :minus}
-   {:type :keyboard, :usage :equals}
-   {:type :keyboard, :usage :left-square-bracket}
-   {:type :keyboard, :usage :right-square-bracket}
-   {:type :keyboard, :usage :backslash}
-   {:type :keyboard, :usage :non-US-pound}
-   {:type :keyboard, :usage :semicolon}
-   {:type :keyboard, :usage :quote}
-   {:type :keyboard, :usage :backtick}
-   {:type :keyboard, :usage :comma}
-   {:type :keyboard, :usage :dot}
-   {:type :keyboard, :usage :slash}
-   {:type :keyboard, :usage :caps-lock}
-   {:type :keyboard, :usage :F1}
-   {:type :keyboard, :usage :F2}
-   {:type :keyboard, :usage :F3}
-   {:type :keyboard, :usage :F4}
-   {:type :keyboard, :usage :F5}
-   {:type :keyboard, :usage :F6}
-   {:type :keyboard, :usage :F7}
-   {:type :keyboard, :usage :F8}
-   {:type :keyboard, :usage :F9}
-   {:type :keyboard, :usage :F10}
-   {:type :keyboard, :usage :F11}
-   {:type :keyboard, :usage :F12}
-   {:type :keyboard, :usage :print-screen}
-   {:type :keyboard, :usage :scroll-lock}
-   {:type :keyboard, :usage :pause}
-   {:type :keyboard, :usage :insert}
-   {:type :keyboard, :usage :home}
-   {:type :keyboard, :usage :page-up}
-   {:type :keyboard, :usage :delete}
-   {:type :keyboard, :usage :end}
-   {:type :keyboard, :usage :page-down}
-   {:type :keyboard, :usage :right-arrow}
-   {:type :keyboard, :usage :left-arrow}
-   {:type :keyboard, :usage :down-arrow}
-   {:type :keyboard, :usage :up-arrow}
-   {:type :keyboard, :usage :num-lock}
-   {:type :keypad, :usage :divide}
-   {:type :keypad, :usage :multiply}
-   {:type :keypad, :usage :minus}
-   {:type :keypad, :usage :plus}
-   {:type :keypad, :usage :enter}
-   {:type :keypad, :usage :1}
-   {:type :keypad, :usage :2}
-   {:type :keypad, :usage :3}
-   {:type :keypad, :usage :4}
-   {:type :keypad, :usage :5}
-   {:type :keypad, :usage :6}
-   {:type :keypad, :usage :7}
-   {:type :keypad, :usage :8}
-   {:type :keypad, :usage :9}
-   {:type :keypad, :usage :0}
-   {:type :keypad, :usage :dot}
-   {:type :keyboard, :usage :non-US-slash}
-   {:type :keyboard, :usage :application}
-   {:type :keyboard, :usage :power}
-   {:type :keypad, :usage :equals}
-   {:type :keyboard, :usage :F13}
-   {:type :keyboard, :usage :F14}
-   {:type :keyboard, :usage :F15}
-   {:type :keyboard, :usage :F16}
-   {:type :keyboard, :usage :F17}
-   {:type :keyboard, :usage :F18}
-   {:type :keyboard, :usage :F19}
-   {:type :keyboard, :usage :F20}
-   {:type :keyboard, :usage :F21}
-   {:type :keyboard, :usage :F22}
-   {:type :keyboard, :usage :F23}
-   {:type :keyboard, :usage :F24}
-   {:type :keyboard, :usage :execute}
-   {:type :keyboard, :usage :help}
-   {:type :keyboard, :usage :menu}
-   {:type :keyboard, :usage :select}
-   {:type :keyboard, :usage :stop}
-   {:type :keyboard, :usage :again}
-   {:type :keyboard, :usage :undo}
-   {:type :keyboard, :usage :cut}
-   {:type :keyboard, :usage :copy}
-   {:type :keyboard, :usage :paste}
-   {:type :keyboard, :usage :find}
-   {:type :keyboard, :usage :mute}
-   {:type :keyboard, :usage :volume-up}
-   {:type :keyboard, :usage :volume-down}
-   {:type :keyboard, :usage :locking-caps-lock}
-   {:type :keyboard, :usage :locking-num-lock}
-   {:type :keyboard, :usage :locking-scroll-lock}
-   {:type :keypad, :usage :comma}
-   {:type :keypad, :usage :equal-sign}
-   {:type :keyboard, :usage :international-1}
-   {:type :keyboard, :usage :international-2}
-   {:type :keyboard, :usage :international-3}
-   {:type :keyboard, :usage :international-4}
-   {:type :keyboard, :usage :international-5}
-   {:type :keyboard, :usage :international-6}
-   {:type :keyboard, :usage :international-7}
-   {:type :keyboard, :usage :international-8}
-   {:type :keyboard, :usage :international-9}
-   {:type :keyboard, :usage :lang-1}
-   {:type :keyboard, :usage :lang-2}
-   {:type :keyboard, :usage :lang-3}
-   {:type :keyboard, :usage :lang-4}
-   {:type :keyboard, :usage :lang-5}
-   {:type :keyboard, :usage :lang-6}
-   {:type :keyboard, :usage :lang-7}
-   {:type :keyboard, :usage :lang-8}
-   {:type :keyboard, :usage :lang-9}
-   {:type :keyboard, :usage :alternate-erase}
-   {:type :keyboard, :usage :sysrq}
-   {:type :keyboard, :usage :cancel}
-   {:type :keyboard, :usage :clear}
-   {:type :keyboard, :usage :prior}
-   {:type :keyboard, :usage :return}
-   {:type :keyboard, :usage :separator}
-   {:type :keyboard, :usage :out}
-   {:type :keyboard, :usage :oper}
-   {:type :keyboard, :usage :clear-or-again}
-   {:type :keyboard, :usage :crsel-or-props}
-   {:type :keyboard, :usage :exsel}
+  [{:plugin :core, :key nil}
+   nil
+   nil
+   nil
+   {:plugin :core, :key :a}
+   {:plugin :core, :key :b}
+   {:plugin :core, :key :c}
+   {:plugin :core, :key :d}
+   {:plugin :core, :key :e}
+   {:plugin :core, :key :f}
+   {:plugin :core, :key :g}
+   {:plugin :core, :key :h}
+   {:plugin :core, :key :i}
+   {:plugin :core, :key :j}
+   {:plugin :core, :key :k}
+   {:plugin :core, :key :l}
+   {:plugin :core, :key :m}
+   {:plugin :core, :key :n}
+   {:plugin :core, :key :o}
+   {:plugin :core, :key :p}
+   {:plugin :core, :key :q}
+   {:plugin :core, :key :r}
+   {:plugin :core, :key :s}
+   {:plugin :core, :key :t}
+   {:plugin :core, :key :u}
+   {:plugin :core, :key :v}
+   {:plugin :core, :key :w}
+   {:plugin :core, :key :x}
+   {:plugin :core, :key :y}
+   {:plugin :core, :key :z}
+   {:plugin :core, :key :1}
+   {:plugin :core, :key :2}
+   {:plugin :core, :key :3}
+   {:plugin :core, :key :4}
+   {:plugin :core, :key :5}
+   {:plugin :core, :key :6}
+   {:plugin :core, :key :7}
+   {:plugin :core, :key :8}
+   {:plugin :core, :key :9}
+   {:plugin :core, :key :0}
+   {:plugin :core, :key :enter}
+   {:plugin :core, :key :escape}
+   {:plugin :core, :key :backspace}
+   {:plugin :core, :key :tab}
+   {:plugin :core, :key :space}
+   {:plugin :core, :key :minus}
+   {:plugin :core, :key :equals}
+   {:plugin :core, :key :left-square-bracket}
+   {:plugin :core, :key :right-square-bracket}
+   {:plugin :core, :key :backslash}
+   {:plugin :core, :key :non-US-pound}
+   {:plugin :core, :key :semicolon}
+   {:plugin :core, :key :quote}
+   {:plugin :core, :key :backtick}
+   {:plugin :core, :key :comma}
+   {:plugin :core, :key :dot}
+   {:plugin :core, :key :slash}
+   {:plugin :core, :key :caps-lock}
+   {:plugin :core, :key :F1}
+   {:plugin :core, :key :F2}
+   {:plugin :core, :key :F3}
+   {:plugin :core, :key :F4}
+   {:plugin :core, :key :F5}
+   {:plugin :core, :key :F6}
+   {:plugin :core, :key :F7}
+   {:plugin :core, :key :F8}
+   {:plugin :core, :key :F9}
+   {:plugin :core, :key :F10}
+   {:plugin :core, :key :F11}
+   {:plugin :core, :key :F12}
+   {:plugin :core, :key :print-screen}
+   {:plugin :core, :key :scroll-lock}
+   {:plugin :core, :key :pause}
+   {:plugin :core, :key :insert}
+   {:plugin :core, :key :home}
+   {:plugin :core, :key :page-up}
+   {:plugin :core, :key :delete}
+   {:plugin :core, :key :end}
+   {:plugin :core, :key :page-down}
+   {:plugin :core, :key :right-arrow}
+   {:plugin :core, :key :left-arrow}
+   {:plugin :core, :key :down-arrow}
+   {:plugin :core, :key :up-arrow}
+   {:plugin :core, :key :num-lock}
+   {:plugin :core, :key :keypad_divide}
+   {:plugin :core, :key :keypad_multiply}
+   {:plugin :core, :key :keypad_minus}
+   {:plugin :core, :key :keypad_plus}
+   {:plugin :core, :key :keypad_enter}
+   {:plugin :core, :key :keypad_1}
+   {:plugin :core, :key :keypad_2}
+   {:plugin :core, :key :keypad_3}
+   {:plugin :core, :key :keypad_4}
+   {:plugin :core, :key :keypad_5}
+   {:plugin :core, :key :keypad_6}
+   {:plugin :core, :key :keypad_7}
+   {:plugin :core, :key :keypad_8}
+   {:plugin :core, :key :keypad_9}
+   {:plugin :core, :key :keypad_0}
+   {:plugin :core, :key :keypad_dot}
+   {:plugin :core, :key :non-US-slash}
+   {:plugin :core, :key :application}
+   {:plugin :core, :key :power}
+   {:plugin :core, :key :keypad_equals}
+   {:plugin :core, :key :F13}
+   {:plugin :core, :key :F14}
+   {:plugin :core, :key :F15}
+   {:plugin :core, :key :F16}
+   {:plugin :core, :key :F17}
+   {:plugin :core, :key :F18}
+   {:plugin :core, :key :F19}
+   {:plugin :core, :key :F20}
+   {:plugin :core, :key :F21}
+   {:plugin :core, :key :F22}
+   {:plugin :core, :key :F23}
+   {:plugin :core, :key :F24}
+   {:plugin :core, :key :execute}
+   {:plugin :core, :key :help}
+   {:plugin :core, :key :menu}
+   {:plugin :core, :key :select}
+   {:plugin :core, :key :stop}
+   {:plugin :core, :key :again}
+   {:plugin :core, :key :undo}
+   {:plugin :core, :key :cut}
+   {:plugin :core, :key :copy}
+   {:plugin :core, :key :paste}
+   {:plugin :core, :key :find}
+   {:plugin :core, :key :mute}
+   {:plugin :core, :key :volume-up}
+   {:plugin :core, :key :volume-down}
+   {:plugin :core, :key :locking-caps-lock}
+   {:plugin :core, :key :locking-num-lock}
+   {:plugin :core, :key :locking-scroll-lock}
+   {:plugin :core, :key :keypad_comma}
+   {:plugin :core, :key :keypad_equal-sign}
+   {:plugin :core, :key :international-1}
+   {:plugin :core, :key :international-2}
+   {:plugin :core, :key :international-3}
+   {:plugin :core, :key :international-4}
+   {:plugin :core, :key :international-5}
+   {:plugin :core, :key :international-6}
+   {:plugin :core, :key :international-7}
+   {:plugin :core, :key :international-8}
+   {:plugin :core, :key :international-9}
+   {:plugin :core, :key :lang-1}
+   {:plugin :core, :key :lang-2}
+   {:plugin :core, :key :lang-3}
+   {:plugin :core, :key :lang-4}
+   {:plugin :core, :key :lang-5}
+   {:plugin :core, :key :lang-6}
+   {:plugin :core, :key :lang-7}
+   {:plugin :core, :key :lang-8}
+   {:plugin :core, :key :lang-9}
+   {:plugin :core, :key :alternate-erase}
+   {:plugin :core, :key :sysrq}
+   {:plugin :core, :key :cancel}
+   {:plugin :core, :key :clear}
+   {:plugin :core, :key :prior}
+   {:plugin :core, :key :return}
+   {:plugin :core, :key :separator}
+   {:plugin :core, :key :out}
+   {:plugin :core, :key :oper}
+   {:plugin :core, :key :clear-or-again}
+   {:plugin :core, :key :crsel-or-props}
+   {:plugin :core, :key :exsel}
    nil ;; Reserved
    nil
    nil
@@ -195,62 +197,62 @@
    nil
    nil
    nil ;; Reserved
-   {:type :keypad, :usage :00}
-   {:type :keypad, :usage :000}
-   {:type :keypad, :usage :thousands-separator}
-   {:type :keypad, :usage :decimal-separator}
-   {:type :keypad, :usage :currency-unit}
-   {:type :keypad, :usage :currency-sub-unit}
-   {:type :keypad, :usage :opening-parens}
-   {:type :keypad, :usage :closing-parens}
-   {:type :keypad, :usage :opening-curly-braces}
-   {:type :keypad, :usage :closing-curly-brackes}
-   {:type :keypad, :usage :tab}
-   {:type :keypad, :usage :backspace}
-   {:type :keypad, :usage :a}
-   {:type :keypad, :usage :b}
-   {:type :keypad, :usage :c}
-   {:type :keypad, :usage :d}
-   {:type :keypad, :usage :e}
-   {:type :keypad, :usage :f}
-   {:type :keypad, :usage :xor}
-   {:type :keypad, :usage :caret}
-   {:type :keypad, :usage :percent}
-   {:type :keypad, :usage :<}
-   {:type :keypad, :usage :>}
-   {:type :keypad, :usage :&}
-   {:type :keypad, :usage :&&}
-   {:type :keypad, :usage :|}
-   {:type :keypad, :usage :||}
-   {:type :keypad, :usage :colon}
-   {:type :keypad, :usage :#}
-   {:type :keypad, :usage :space}
-   {:type :keypad, :usage :at}
-   {:type :keypad, :usage :!}
-   {:type :keypad, :usage :memory-store}
-   {:type :keypad, :usage :memory-recall}
-   {:type :keypad, :usage :memory-clear}
-   {:type :keypad, :usage :memory-add}
-   {:type :keypad, :usage :memory-substract}
-   {:type :keypad, :usage :memory-multiply}
-   {:type :keypad, :usage :memory-divide}
-   {:type :keypad, :usage :sign-invert}
-   {:type :keypad, :usage :clear}
-   {:type :keypad, :usage :clear-entry}
-   {:type :keypad, :usage :binary}
-   {:type :keypad, :usage :octal}
-   {:type :keypad, :usage :decimal}
-   {:type :keypad, :usage :hexadecimal}
+   {:plugin :core, :key :keypad_00}
+   {:plugin :core, :key :keypad_000}
+   {:plugin :core, :key :keypad_thousands-separator}
+   {:plugin :core, :key :keypad_decimal-separator}
+   {:plugin :core, :key :keypad_currency-unit}
+   {:plugin :core, :key :keypad_currency-sub-unit}
+   {:plugin :core, :key :keypad_opening-parens}
+   {:plugin :core, :key :keypad_closing-parens}
+   {:plugin :core, :key :keypad_opening-curly-braces}
+   {:plugin :core, :key :keypad_closing-curly-brackes}
+   {:plugin :core, :key :keypad_tab}
+   {:plugin :core, :key :keypad_backspace}
+   {:plugin :core, :key :keypad_a}
+   {:plugin :core, :key :keypad_b}
+   {:plugin :core, :key :keypad_c}
+   {:plugin :core, :key :keypad_d}
+   {:plugin :core, :key :keypad_e}
+   {:plugin :core, :key :keypad_f}
+   {:plugin :core, :key :keypad_xor}
+   {:plugin :core, :key :keypad_caret}
+   {:plugin :core, :key :keypad_percent}
+   {:plugin :core, :key :keypad_<}
+   {:plugin :core, :key :keypad_>}
+   {:plugin :core, :key :keypad_&}
+   {:plugin :core, :key :keypad_&&}
+   {:plugin :core, :key :keypad_|}
+   {:plugin :core, :key :keypad_||}
+   {:plugin :core, :key :keypad_colon}
+   {:plugin :core, :key :keypad_#}
+   {:plugin :core, :key :keypad_space}
+   {:plugin :core, :key :keypad_at}
+   {:plugin :core, :key :keypad_!}
+   {:plugin :core, :key :keypad_memory-store}
+   {:plugin :core, :key :keypad_memory-recall}
+   {:plugin :core, :key :keypad_memory-clear}
+   {:plugin :core, :key :keypad_memory-add}
+   {:plugin :core, :key :keypad_memory-substract}
+   {:plugin :core, :key :keypad_memory-multiply}
+   {:plugin :core, :key :keypad_memory-divide}
+   {:plugin :core, :key :keypad_sign-invert}
+   {:plugin :core, :key :keypad_clear}
+   {:plugin :core, :key :keypad_clear-entry}
+   {:plugin :core, :key :keypad_binary}
+   {:plugin :core, :key :keypad_octal}
+   {:plugin :core, :key :keypad_decimal}
+   {:plugin :core, :key :keypad_hexadecimal}
    nil
    nil
-   {:type :keyboard, :usage :left-control}
-   {:type :keyboard, :usage :left-shift}
-   {:type :keyboard, :usage :left-alt}
-   {:type :keyboard, :usage :left-gui}
-   {:type :keyboard, :usage :right-control}
-   {:type :keyboard, :usage :right-shift}
-   {:type :keyboard, :usage :right-alt}
-   {:type :keyboard, :usage :right-gui}])
+   {:plugin :core, :key :left-control}
+   {:plugin :core, :key :left-shift}
+   {:plugin :core, :key :left-alt}
+   {:plugin :core, :key :left-gui}
+   {:plugin :core, :key :right-control}
+   {:plugin :core, :key :right-shift}
+   {:plugin :core, :key :right-alt}
+   {:plugin :core, :key :right-gui}])
 
 (defn- fallback-processor [_ code]
   {:plugin :unknown
@@ -287,18 +289,18 @@
     (cond
       ;; Transparent keys
       (= code 0xffff) {:plugin :core
-                       :type :transparent}
+                       :key :transparent}
       ;; Reserved bit set
       (bit-test flags 7) key
       ;; Normal keys (with optional modifiers)
       (and (>= flags 0)
-           (<= flags (bit-shift-left 1 4))) (assoc (nth HID-Codes key-code {:type :unknown :code key-code})
+           (<= flags (bit-shift-left 1 4))) (assoc (nth HID-Codes key-code {:plugin :unknown :code key-code})
                                                    :plugin :core
                                                    :modifiers (reduce #(%2 %1 flags) []
                                                                       [control-held left-alt-held right-alt-held shift-held gui-held]))
       ;; Synthetic
       (bit-test flags 6) key
-      :default key)))
+      :default (keyword key))))
 
 (defn- key-cleanup [key]
   (if (= :unknown (:plugin key))
@@ -310,45 +312,23 @@
 (defn from-code [code]
   (key-cleanup (reduce #(%2 %1 code) {} @processors)))
 
-(defmulti display
-  (fn [react-key key]
+(defmulti format
+  (fn [key]
     [(:plugin key)]))
 
-(defn key-button [react-key color content]
-  [:button.btn {:type :button
-                :class (str "btn-" (name color))
-                :key react-key}
-   content])
+(defmethod format :default [key]
+  {:primary-text "<???>"})
 
-(defmulti with-modifier
-  (fn [mod key-name]
-    mod))
+(defmethod format [:core] [key]
+  (condp = (:key key)
+    nil {:primary-text "NoKey"
+         :foreground "red"}
+    :transparent {:primary-text "Trns"
+                  :foreground "red"}
+    {:primary-text (s/capitalize (name (:key key)))}))
 
-(defmethod with-modifier :left-control [_ key-name]
-  (str "LCTRL(" key-name ")"))
-(defmethod with-modifier :left-alt [_ key-name]
-  (str "LALT(" key-name ")"))
-(defmethod with-modifier :right-alt [_ key-name]
-  (str "RALT(" key-name ")"))
-(defmethod with-modifier :left-shift [_ key-name]
-  (str "LSHIFT(" key-name ")"))
-(defmethod with-modifier :left-gui [_ key-name]
-  (str "LGUI(" key-name ")"))
-
-(defn with-modifiers [key-name mods]
-  (reduce #(with-modifier %2 %1) key-name mods))
-
-(defmethod display :default [react-key key]
-  (key-button react-key :secondary key))
-
-(defmethod display [:core] [react-key key]
-  (condp = (:type key)
-    :transparent (key-button react-key :secondary "<Transparent>")
-    :no-key (key-button react-key :danger "<NoKey>")
-    (key-button react-key :secondary (with-modifiers (s/capitalize (name (:usage key)))
-                                       (:modifiers key)))))
-
-(defmethod display [:unknown] [react-key key]
-  (key-button react-key :warning
-              [:em {:title (str "code: " (:key-code key))}
-               "<???>"]))
+(defmethod post-process/format [:keymap.map] [_ text]
+  (->> (.split text " ")
+       (map int)
+       (map from-code)
+       vec))
