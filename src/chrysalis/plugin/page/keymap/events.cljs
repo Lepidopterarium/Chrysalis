@@ -63,7 +63,7 @@
 (re-frame/reg-fx
  :keymap/layout
  (fn []
-   (command/run :keymap.layout nil :keymap/layout.process)))
+   (command/run :keymap.map nil :keymap/layout.process)))
 
 (re-frame/reg-event-fx
  :keymap/layout.update

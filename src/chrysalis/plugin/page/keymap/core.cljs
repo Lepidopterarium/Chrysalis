@@ -55,4 +55,4 @@
                     :disable? (fn [] (nil? (device/current)))
                     :device/need? true
                     :render render
-                    :events {:keymap/map :update}})
+                    :events {:keymap/layout :update}})
