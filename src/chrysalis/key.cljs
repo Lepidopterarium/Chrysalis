@@ -18,7 +18,8 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [clojure.string :as s]
 
-            [chrysalis.command.post-process :as post-process]))
+            [chrysalis.command.post-process :as post-process]
+            [chrysalis.device :as device]))
 
 (def HID-Codes
   [{:plugin :core, :key nil}
@@ -328,7 +329,10 @@
     {:primary-text (s/capitalize (name (:key key)))}))
 
 (defmethod post-process/format [:keymap.map] [_ text]
-  (->> (.split text " ")
-       (map int)
-       (map from-code)
-       vec))
+  (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
+    (->> (.split text " ")
+        (map int)
+        (map from-code)
+        (partition keymap-size)
+        (map vec)
+        vec)))
