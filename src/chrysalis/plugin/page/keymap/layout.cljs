@@ -35,7 +35,7 @@
     false))
 
 (defn- node-update [device node layout interactive?]
-  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_F$" (:id node))))]
+  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)]
@@ -46,11 +46,11 @@
                  :data-column c
                  :data-index index
                  :stroke-width (if (current-node? r c)
-                                 3
-                                 1)
+                                 2
+                                 2)
                  :stroke (if (current-node? r c)
                            "#ff0000"
-                           "#000000")
+                           "#b4b4b4")
                  :on-click (fn [e]
                              (let [target (.-target e)]
                                (events/current-target! target))))))

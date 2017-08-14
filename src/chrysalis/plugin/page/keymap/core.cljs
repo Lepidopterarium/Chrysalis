@@ -31,7 +31,7 @@
   [:div.container-fluid {:id :keymap}
    [ui/style [:#page [:#keymap
                       [:.key:hover {:cursor :pointer
-                                    :stroke-width (gu/px 3)
+                                    :stroke-width (gu/px 2)
                                     :stroke "#000000"}]]]]
 
    [:div.row
