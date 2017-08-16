@@ -43,7 +43,7 @@
                [:.chrome-picker {:display :inline-block
                                  :margin-bottom (gu/em 1)}]
                [:.key:hover {:cursor :pointer
-                             :stroke-width (gu/px 3)
+                             :stroke-width (gu/px 2)
                              :stroke "#0000ff"}]]]]
    [presets/<save-theme>]
    [:div.row
