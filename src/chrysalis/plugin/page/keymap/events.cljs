@@ -50,7 +50,7 @@
 (re-frame/reg-event-db
  :keymap/layout.process
  (fn [db [_ [_ _ _ response]]]
-   (assoc db :keymap/layout (post-process/format :keymap.layout response))))
+   (assoc db :keymap/layout (post-process/format :keymap.map response))))
 
 (re-frame/reg-event-fx
  :keymap/layout!
