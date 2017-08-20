@@ -65,6 +65,6 @@
                     (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
 
 (defn <keymap-layout> [device svg layout props]
-  (if map
+  (if layout
     (prepare device svg layout props)
     [:i.fa.fa-refresh.fa-spin.fa-5x]))
