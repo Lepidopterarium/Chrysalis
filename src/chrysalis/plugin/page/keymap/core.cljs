@@ -21,7 +21,7 @@
             [chrysalis.key-bindings :as key-bindings]
 
             [chrysalis.plugin.page.keymap.events :as events]
-            [chrysalis.plugin.page.keymap.layout :as map]
+            [chrysalis.plugin.page.keymap.layout :as layout]
 
             [garden.units :as gu]))
 
@@ -38,7 +38,7 @@
     [:div.col-sm-9.text-center
 
      [:h2 "Keymap"]
-     [map/<keymap-layout>
+     [layout/<keymap-layout>
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/layout)
