@@ -16,6 +16,7 @@
 
 (ns chrysalis.plugin.page.keymap.layout
   (:require [chrysalis.ui :as ui :refer [color->hex]]
+            [chrysalis.key :as key]
 
             [chrysalis.plugin.page.keymap.events :as events]
 
@@ -34,11 +35,12 @@
       (and (= r cr) (= c cc)))
     false))
 
-(defn- node-update [device node layout interactive?]
+(defn- node-update [device node theme interactive?]
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
-            index (key-index device r c cols)]
+            index (key-index device r c cols)
+            ]
         (if interactive?
           (assoc node
                  :class :key
@@ -56,13 +58,68 @@
                                (events/current-target! target))))))
       node)))
 
+
+
+
+
+(defn- print-labels
+  "Print key labels on the SVG"
+  [device node]
+
+
+  ;; (println ((((events/layout) 0) 0)))
+
+  (let [id (:id (get node 1))
+        label (last (re-find #"_t_(.*)" id))
+        [r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)" id)))]
+
+
+    (if (and r c)
+      (let [[cols rows] (get-in device [:meta :matrix])
+            index (key-index device r c cols)]
+
+        (println index)
+
+        ;; (println (key/format(((events/layout) 1) 55)))
+
+        ;; Why are the indices so high?
+
+
+
+        (condp = label
+          "primary"  (assoc node 2 "PRIM")
+          "secondary" (assoc node 2 "SEC")
+          "extra" (assoc node 2 "EXTRA"))
+        )
+      node))
+
+
+
+
+  )
+
+
+
+
+
+
+
 (defn prepare [device svg layout props]
   (walk/prewalk (fn [node]
-                  (if (and (map? node) (get node :id))
-                    (node-update device node layout (:interactive? props))
-                    node))
+
+                  (if (and (vector? node) (= (first node) :text))
+                    (print-labels device node)
+                    (if (and (map? node) (get node :id))
+                      (node-update device node layout (:interactive? props))
+                      node))
+
+                  )
+
+                
                 (-> svg
                     (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
+
+
 
 (defn <keymap-layout> [device svg layout props]
   (if layout
