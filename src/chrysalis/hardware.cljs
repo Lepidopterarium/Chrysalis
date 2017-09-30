@@ -24,7 +24,7 @@
 
 (defmulti known?
   (fn [device]
-    [(js/parseInt (:vendorId device)) (js/parseInt (:productId device))]))
+    [(js/parseInt (:vendorId device) 16) (js/parseInt (:productId device) 16)]))
 
 (defmethod known? :default [d]
   nil)
