@@ -32,7 +32,7 @@
   (let [latest? (= index (count (events/history)))]
     [:div.row.box {:key (str "repl-history-" index)}
      [:div.col-sm-12
-      [:div.card {:class (when latest? "card-outline-success")}
+      [:div.card {:class (when latest? "border-success")}
        [:div.card-block
         [:div.card-title.row
          [:div.col-sm-6.text-left

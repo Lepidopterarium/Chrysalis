@@ -80,9 +80,9 @@
                   [:a.btn {:margin-top (gu/em 0.5)}]]]]]
      [:div.row.justify-content-center
       [:div.card {:class (condp = firmware-state
-                           :uploading "card-outline-info"
-                           :success "card-outline-success"
-                           :error "card-outline-danger"
+                           :uploading "border-info"
+                           :success "border-success"
+                           :error "border-danger"
                            nil)}
        [:img.card-img-top {:alt "Kaleidoscope Logo"
                            :class (when (:uploading #{firmware-state})

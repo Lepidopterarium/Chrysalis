@@ -33,7 +33,7 @@
       [:a.card.device {:key (:comName device)
                        :href "#"
                        :disabled current?
-                       :class (when current? "card-outline-success")
+                       :class (when current? "border-success")
                        :on-click (fn [e]
                                    (if current?
                                      (device/select! nil)

@@ -36,7 +36,7 @@
      [:div.text-right.text-mute {:style {:float :right}} "Alt+" index]]))
 
 (defn <main-menu> []
-  [:nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse.fixed-top
+  [:nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
    [:button.navbar-toggler.navbar-toggler-right {:type :button
                                                  :data-toggle :collapse
                                                  :data-target "#navbarSupportedContent"}
