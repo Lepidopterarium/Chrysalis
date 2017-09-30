@@ -25,6 +25,7 @@
                        [react-color "^2.11.7"]
                        [react-dom "15.4.2"]
                        [serialport "git+https://github.com/EmergingTechnologyAdvisors/node-serialport.git#master"]
+                       [popper.js "^1.11.0"]
                        [tether "^1.3.7"]
                        [usb "^1.2.0"]]
         :devDependencies [[electron "1.6.9"]
