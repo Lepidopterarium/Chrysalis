@@ -35,8 +35,8 @@
 
 (defmethod key/format [:oneshot] [key]
   {:primary-text (if (= (:type key) :modifier)
-                   (:modifier key)
-                   (:layer key))
-   :extra-text "OneShot"})
+                   (:primary-text (key/format {:plugin :core :key (:modifier key)}))
+                   (str "L" (:layer key)))
+   :extra-text "OS"})
 
 (swap! processors concat [oneshot-processor])
