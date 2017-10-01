@@ -383,6 +383,29 @@
     :keypad_comma {:primary-text ","}
     :keypad_equal-sign {:primary-text "="}
     :return {:primary-text "Ret"}
+    :keypad_opening-parens {:primary-text "("}
+    :keypad_closing-parens {:primary-text ")"}
+    :keypad_opening-curly-braces {:primary-text "{"}
+    :keypad_closing-curly-brackes {:primary-text "}"}
+    :keypad_tab {:primary-text "Tab"}
+    :keypad_backspace {:primary-text "BSPC"}
+    :keypad_a {:primary-text "a"}
+    :keypad_b {:primary-text "b"}
+    :keypad_c {:primary-text "c"}
+    :keypad_d {:primary-text "d"}
+    :keypad_e {:primary-text "e"}
+    :keypad_f {:primary-text "f"}
+    :keypad_caret {:primary-text "^"}
+    :keypad_percent {:primary-text "%"}
+    :keypad_< {:primary-text "<"}
+    :keypad_> {:primary-text ">"}
+    :keypad_& {:primary-text "&"}
+    :keypad_| {:primary-text "|"}
+    :keypad_colon {:primary-text ":"}
+    :keypad_# {:primary-text "#"}
+    :keypad_space {:primary-text "SPC"}
+    :keypad_at {:primary-text "@"}
+    :keypad_! {:primary-text "!"}
 
     {:primary-text (s/capitalize (name (:key key)))}))
 
