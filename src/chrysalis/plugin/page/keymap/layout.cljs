@@ -78,18 +78,18 @@
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)]
 
-        (println index)
+        ;; (println label)
 
-        ;; (println (key/format(((events/layout) 1) 55)))
+        ;; (println (:primary-text (key/format(((events/layout) 1) index))))
 
         ;; Why are the indices so high?
 
 
 
         (condp = label
-          "primary"  (assoc node 2 "PRIM")
-          "secondary" (assoc node 2 "SEC")
-          "extra" (assoc node 2 "EXTRA"))
+          "primary"  (assoc node 2 (:primary-text (key/format(((events/layout) 0) index))))
+          "secondary" (assoc node 2 "")
+          "extra" (assoc node 2 ""))
         )
       node))
 
