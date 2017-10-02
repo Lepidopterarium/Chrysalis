@@ -90,3 +90,30 @@
 
 (defn layout:upload! []
   (re-frame/dispatch [:keymap/layout.upload]))
+
+
+(defn switch-layer [layer]
+  (re-frame/dispatch [:keymap/switch-layer layer])
+  )
+
+(re-frame/reg-event-fx
+ :keymap/switch-layer
+ (fn [cofx event]
+   (let [layer (js/parseInt (second event))
+
+
+         db (:db cofx)]
+     {:db (assoc db :keymap/layer layer)})))
+
+
+(defn layer []
+  @(re-frame/subscribe [:keymap/layer]))
+
+
+(re-frame/reg-sub
+ :keymap/layer
+ (fn [db _]
+   (let [layer (:keymap/layer db)]
+     (if layer
+       layer
+       1))))

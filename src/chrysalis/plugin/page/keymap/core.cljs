@@ -37,7 +37,6 @@
    [:div.row
     [:div.col-sm-9.text-center
 
-     [:h2 "Keymap"]
      [layout/<keymap-layout>
       (device/current)
       @(get-in (device/current) [:meta :layout])
@@ -46,8 +45,20 @@
      ]
     [:div.col-sm-3.text-center
 
-     [:h2 "Inspector"]]]
-   ])
+
+     [:label.mr-sm-2 "Layer"]
+     [:select.custom-select {:on-change (fn [e]
+                                          (events/switch-layer (-> e .-target .-value)))}
+      [:option "1"]
+      [:option "2"]
+      [:option "3"]
+      [:option "4"]
+      [:option "5"]
+      ]
+     ]
+    ]
+   ]
+  )
 
 
 (page/add! :keymap {:name "Keymap Editor"

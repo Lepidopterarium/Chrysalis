@@ -60,14 +60,9 @@
 
 
 
-
-
 (defn- print-labels
   "Print key labels on the SVG"
   [device node]
-
-
-  ;; (println ((((events/layout) 0) 0)))
 
   (let [id (:id (get node 1))
         label (last (re-find #"_t_(.*)" id))
@@ -78,29 +73,13 @@
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)]
 
-        ;; (println label)
-
-        ;; (println (:primary-text (key/format(((events/layout) 1) index))))
-
-        ;; Why are the indices so high?
-
-
-
         (condp = label
-          "primary"  (assoc node 2 (:primary-text (key/format(((events/layout) 0) index))))
-          "secondary" (assoc node 2 "")
-          "extra" (assoc node 2 ""))
+          "primary"  (assoc node 2 (:primary-text (key/format(((events/layout) (events/layer)) index))))
+          "secondary" (assoc node 2 (:secondary-text (key/format(((events/layout) (events/layer)) index))))
+          "extra" (assoc node 2 (:extra-text (key/format(((events/layout) (events/layer)) index)))))
         )
       node))
-
-
-
-
   )
-
-
-
-
 
 
 
@@ -112,10 +91,8 @@
                     (if (and (map? node) (get node :id))
                       (node-update device node layout (:interactive? props))
                       node))
-
                   )
 
-                
                 (-> svg
                     (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
 
