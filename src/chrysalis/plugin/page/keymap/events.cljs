@@ -98,13 +98,8 @@
 
 (re-frame/reg-event-fx
  :keymap/switch-layer
- (fn [cofx event]
-   (let [layer (js/parseInt (second event))
-
-
-         db (:db cofx)]
-     {:db (assoc db :keymap/layer layer)})))
-
+ (fn [{db :db :as cofx} [_ layer]]
+   {:db (assoc db :keymap/layer layer)}))
 
 (defn layer []
   @(re-frame/subscribe [:keymap/layer]))

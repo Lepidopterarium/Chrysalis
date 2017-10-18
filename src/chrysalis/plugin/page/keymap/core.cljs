@@ -41,24 +41,18 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/layout)
-      {:width 1024 :height 640 :interactive? true}]
-     ]
+      {:width 1024 :height 640 :interactive? true}]]
     [:div.col-sm-3.text-center
 
 
      [:label.mr-sm-2 "Layer"]
      [:select.custom-select {:on-change (fn [e]
                                           (events/switch-layer (-> e .-target .-value)))}
-      [:option "1"]
-      [:option "2"]
-      [:option "3"]
-      [:option "4"]
-      [:option "5"]
-      ]
-     ]
-    ]
-   ]
-  )
+      [:option {:value 1} "1"]
+      [:option {:value 2} "2"]
+      [:option {:value 3} "3"]
+      [:option {:value 4} "4"]
+      [:option {:value 5} "5"]]]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
