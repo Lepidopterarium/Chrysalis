@@ -97,16 +97,20 @@
          [edit-key-view {:key key :index index :layer (events/layer)}]))]
     [:div.col-sm-3.text-center
      [<live-update>]
-     [:label.mr-sm-2 "Layer"]
-     [:select.custom-select {:value (events/layer)
-                             :on-change (fn [e]
-                                          (events/switch-layer (-> e .-target .-value)))}
-      ;; TODO: is there a way to check how many layers there are?
-      [:option {:value 1} "1"]
-      [:option {:value 2} "2"]
-      [:option {:value 3} "3"]
-      [:option {:value 4} "4"]
-      [:option {:value 5} "5"]]]]])
+     [:button.btn.btn-success
+      {:on-click (fn [_] (events/layout:upload!))}
+      [:i.fa.fa-floppy-o] " Save"]
+     [:br]
+     [:label.mr-sm-2 "Layer"
+      [:select.custom-select {:value (events/layer)
+                              :on-change (fn [e]
+                                           (events/switch-layer (-> e .-target .-value)))}
+       ;; TODO: is there a way to check how many layers there are?
+       [:option {:value 1} "1"]
+       [:option {:value 2} "2"]
+       [:option {:value 3} "3"]
+       [:option {:value 4} "4"]
+       [:option {:value 5} "5"]]]]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"

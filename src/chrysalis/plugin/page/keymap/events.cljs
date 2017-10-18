@@ -55,10 +55,9 @@
 (re-frame/reg-event-fx
  :keymap/layout!
  (fn [{db :db :as cofx} [_ layout]]
-   (let [live? (db :keymap/live-update)]
-     (-> {:db (assoc db :keymap/layout layout)}
-         (cond->
-             live? (assoc :keymap/layout.upload layout))))))
+   (-> {:db (assoc db :keymap/layout layout)}
+       (cond->
+           (db :keymap/live-update) (assoc :keymap/layout.upload layout)))))
 
 (re-frame/reg-fx
  :keymap/layout
@@ -68,7 +67,11 @@
 (re-frame/reg-event-fx
   :keymap/change-key!
   (fn [{db :db} [_ layer index new-key]]
-    {:db (assoc-in db [:keymap/layout layer index] new-key)}))
+    (let [new-layout (assoc-in (:keymap/layout db) [layer index] new-key)]
+      (-> {:db (assoc db :keymap/layout new-layout)}
+          (cond->
+              (:keymap/live-update db)
+            (assoc :keymap/layout.upload new-layout))))))
 
 (re-frame/reg-event-fx
  :keymap/layout.update
