@@ -54,9 +54,9 @@
 
 (re-frame/reg-event-fx
  :keymap/layout!
- (fn [cofx [_ layout]]
-   (let [live? (get-in (:db cofx) [:keymap/live-update])]
-     (-> {:db (assoc (:db cofx) :keymap/layout layout)}
+ (fn [{db :db :as cofx} [_ layout]]
+   (let [live? (db :keymap/live-update)]
+     (-> {:db (assoc db :keymap/layout layout)}
          (cond->
              live? (assoc :keymap/layout.upload layout))))))
 
@@ -73,9 +73,9 @@
 (re-frame/reg-fx
  :keymap/layout.upload
  (fn [layout]
-   (command/run :keymap.layout (->> layout
-                                flatten
-                                (s/join " ")) :discard)))
+   (command/run :keymap.layout
+     (->> layout flatten (s/join " "))
+     :discard)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
@@ -93,8 +93,7 @@
 
 
 (defn switch-layer [layer]
-  (re-frame/dispatch [:keymap/switch-layer layer])
-  )
+  (re-frame/dispatch [:keymap/switch-layer layer]))
 
 (re-frame/reg-event-fx
  :keymap/switch-layer
@@ -104,11 +103,9 @@
 (defn layer []
   @(re-frame/subscribe [:keymap/layer]))
 
-
 (re-frame/reg-sub
  :keymap/layer
  (fn [db _]
-   (let [layer (:keymap/layer db)]
-     (if layer
-       layer
-       1))))
+   (if-let [layer (:keymap/layer db)]
+     layer
+     1)))

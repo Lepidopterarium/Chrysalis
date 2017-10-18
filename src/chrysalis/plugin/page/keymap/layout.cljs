@@ -39,8 +39,7 @@
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
-            index (key-index device r c cols)
-            ]
+            index (key-index device r c cols)]
         (if interactive?
           (assoc node
                  :class :key
@@ -58,17 +57,12 @@
                                (events/current-target! target))))))
       node)))
 
-
-
 (defn- print-labels
   "Print key labels on the SVG"
   [device node]
-
   (let [id (:id (get node 1))
         label (last (re-find #"_t_(.*)" id))
         [r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)" id)))]
-
-
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
@@ -85,7 +79,6 @@
                     (if (and (map? node) (get node :id))
                       (node-update device node layout (:interactive? props))
                       node)))
-
                 (-> svg
                     (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
 
