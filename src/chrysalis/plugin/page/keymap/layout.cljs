@@ -25,7 +25,7 @@
 
 (defn- key-index [device r c cols]
   (if-let [keymap-layout (get-in device [:keymap :map])]
-    (nth (nth keymap-layout r) c)
+    (get-in keymap-layout [r c])
     (+ (* r cols) c)))
 
 (defn- current-node? [r c]
@@ -66,13 +66,14 @@
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            ;; Note layers are 1-indexed, so we need `dec` to go to
+            ;; NB: layers are 1-indexed, so we need `dec` to go to
             ;; zero-indexed clojure vectors
             formatted-key (key/format (get-in (events/layout) [(dec (events/layer)) index]))]
         (assoc node 2 (get formatted-key (keyword (str label "-text")))))
       node)))
 
-(defn prepare [device svg layout props]
+(defn layout-svg
+  [device svg layout props]
   (walk/prewalk (fn [node]
                   (if (and (vector? node) (= (first node) :text))
                     (print-labels device node)
@@ -84,5 +85,5 @@
 
 (defn <keymap-layout> [device svg layout props]
   (if layout
-    (prepare device svg layout props)
+    [layout-svg device svg layout props]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))
