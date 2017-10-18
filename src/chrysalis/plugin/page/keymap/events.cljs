@@ -91,7 +91,6 @@
 (defn layout:upload! []
   (re-frame/dispatch [:keymap/layout.upload]))
 
-
 (defn switch-layer [layer]
   (re-frame/dispatch [:keymap/switch-layer layer]))
 
@@ -109,3 +108,21 @@
    (if-let [layer (:keymap/layer db)]
      layer
      1)))
+
+;;; ---- Live update ---- ;;;
+(re-frame/reg-event-db
+  :keymap/live-update
+  (fn [db [_ live?]]
+    (assoc db :keymap/live-update live?)))
+
+(re-frame/reg-sub
+  :keymap/live-update
+  (fn [db _]
+    (:keymap/live-update db)))
+
+(defn live-update? []
+  @(re-frame/subscribe [:keymap/live-update]))
+
+(defn live-update!
+  [live?]
+  (re-frame/dispatch [:keymap/live-update live?]))

@@ -25,7 +25,14 @@
 
             [garden.units :as gu]))
 
-
+(defn <live-update> []
+  [:form.form-group.form-check
+   [:label.form-check-label
+    [:input.form-check-input {:type :checkbox
+                              :value (events/live-update?)
+                              :on-change (fn [e]
+                                           (events/live-update! (-> e .-target .-checked)))}]
+    " Live update"]])
 
 (defn render []
   [:div.container-fluid {:id :keymap}
@@ -43,8 +50,7 @@
       (events/layout)
       {:width 1024 :height 640 :interactive? true}]]
     [:div.col-sm-3.text-center
-
-
+     [<live-update>]
      [:label.mr-sm-2 "Layer"]
      [:select.custom-select {:on-change (fn [e]
                                           (events/switch-layer (-> e .-target .-value)))}
@@ -52,7 +58,8 @@
       [:option {:value 2} "2"]
       [:option {:value 3} "3"]
       [:option {:value 4} "4"]
-      [:option {:value 5} "5"]]]]])
+      [:option {:value 5} "5"]]
+     ]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
