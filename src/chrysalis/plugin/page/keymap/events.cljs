@@ -66,6 +66,11 @@
    (command/run :keymap.map nil :keymap/layout.process)))
 
 (re-frame/reg-event-fx
+  :keymap/change-key!
+  (fn [{db :db} [_ layer index new-key]]
+    {:db (assoc-in db [:keymap/layout layer index] new-key)}))
+
+(re-frame/reg-event-fx
  :keymap/layout.update
  (fn [cofx _]
    {:keymap/layout :update}))
@@ -81,6 +86,10 @@
  :keymap/layout.upload
  (fn [cofx _]
    {:keymap/layout.upload (get-in cofx [:db :keymap/layout])}))
+
+(defn change-key!
+  [row col new-key]
+  (re-frame/dispatch [:keymap/change-key! row col new-key]))
 
 (defn layout []
   @(re-frame/subscribe [:keymap/layout]))

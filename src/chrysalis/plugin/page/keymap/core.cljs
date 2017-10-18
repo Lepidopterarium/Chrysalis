@@ -15,7 +15,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.plugin.page.keymap.core
-  (:require [chrysalis.device :as device]
+  (:require [clojure.string :as s]
+            [reagent.core :as r]
+            [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
             [chrysalis.key-bindings :as key-bindings]
@@ -23,7 +25,9 @@
             [chrysalis.plugin.page.keymap.events :as events]
             [chrysalis.plugin.page.keymap.layout :as layout]
 
-            [garden.units :as gu]))
+            [garden.units :as gu]
+            [chrysalis.key :as key]
+            [re-frame.core :as re-frame]))
 
 (defn <live-update> []
   [:form.form-group.form-check
@@ -31,8 +35,36 @@
     [:input.form-check-input {:type :checkbox
                               :value (events/live-update?)
                               :on-change (fn [e]
-                                           (events/live-update! (-> e .-target .-checked)))}]
+                                           (events/live-update! (.. e -target -checked)))}]
     " Live update"]])
+
+(defn- key-name
+  [key]
+  (str (when (and (:key key) (s/starts-with? (name (:key key)) "keypad_"))
+         "Keypad ")
+       (:primary-text (key/format key))))
+
+(defn edit-key-view
+  [{:keys [index key layer]}]
+  [:div.edit-key
+   [:dl
+    [:dt "Key Code"]
+    [:dd
+     [:select.custom-select
+      {:value (:key key "")
+       :on-change (fn [e] (let [new-key (keyword (.. e -target -value))]
+                           (events/change-key! (dec layer) index
+                                               {:plugin :core
+                                                :key new-key
+                                                :modifiers []})))}
+      (doall
+        (for [k (remove nil? key/HID-Codes)]
+          ^{:key k}
+          [:option {:value (:key k)} (key-name k)]))]]
+    [:dt "Modifiers"]
+    [:dd (if-let [mods (seq (:modifiers key))]
+           (s/join mods ", ")
+           "None")]]])
 
 (defn render []
   [:div.container-fluid {:id :keymap}
@@ -42,7 +74,14 @@
                                     :stroke "#000000"}]]]]
 
    [:div.row
-    [:div.col-sm-9.text-center
+    [:div.col-sm-6.text-center
+     ;; TODO: only show this once, or in a more unobtrusive way
+     ;; TODO: can we check if they have the eeprom plugin enabled &
+     ;; only show if they haven't?
+     [:p.warning
+      "To change the keymap from here, you'll need to have installed the "
+      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
+       "Keymap-EEPROM plugin"] "."]
 
      [layout/<keymap-layout>
       (device/current)
@@ -50,16 +89,24 @@
       (events/layout)
       {:width 1024 :height 640 :interactive? true}]]
     [:div.col-sm-3.text-center
+     (when-let [cur-key (events/current-target)]
+       (let [[r c] (->> ["data-row" "data-column"]
+                       (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
+             index (js/parseInt (.getAttribute cur-key "data-index") 10)
+             key (get-in (events/layout) [(dec (events/layer)) index])]
+         [edit-key-view {:key key :index index :layer (events/layer)}]))]
+    [:div.col-sm-3.text-center
      [<live-update>]
      [:label.mr-sm-2 "Layer"]
-     [:select.custom-select {:on-change (fn [e]
+     [:select.custom-select {:value (events/layer)
+                             :on-change (fn [e]
                                           (events/switch-layer (-> e .-target .-value)))}
+      ;; TODO: is there a way to check how many layers there are?
       [:option {:value 1} "1"]
       [:option {:value 2} "2"]
       [:option {:value 3} "3"]
       [:option {:value 4} "4"]
-      [:option {:value 5} "5"]]
-     ]]])
+      [:option {:value 5} "5"]]]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
