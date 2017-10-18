@@ -12,6 +12,6 @@
 /resources/public/npm-debug.log
 /resources/public/package.json
 /packages/
-
+/.cljs_rhino_repl
 *~
 .#*
