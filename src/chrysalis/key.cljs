@@ -405,8 +405,16 @@
    :keypad_at {:primary-text "@"}
    :keypad_! {:primary-text "!"}})
 
-(defmethod format [:core] [{key :key}]
-  (key->description key {:primary-text (s/capitalize ((fnil name "???") key))}))
+(def mod->short-name
+  {:control "C"
+   :left-alt "M"
+   :gui "s"
+   :shift "S"
+   :right-alt "AltGr"})
+
+(defmethod format [:core] [{key :key mods :modifiers}]
+  (key->description key {:primary-text (s/capitalize ((fnil name "???") key))
+                         :secondary-text (s/join "-" (map mod->short-name mods))}))
 
 (defmethod post-process/format [:keymap.map] [_ text]
   (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
