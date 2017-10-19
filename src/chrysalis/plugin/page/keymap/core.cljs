@@ -66,7 +66,7 @@
     [:dt "Modifiers"]
     [:dd
      (doall
-       (for [modifier [:left-shift :left-control :left-alt :left-gui :right-control :right-alt]]
+       (for [modifier [:shift :control :gui :left-alt :right-alt]]
          ^{:key modifier}
          [:label.form-check-label
           [:input.form-check-input

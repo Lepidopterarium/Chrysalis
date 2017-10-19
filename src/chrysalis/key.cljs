@@ -259,30 +259,23 @@
   {:plugin :unknown
    :key-code code})
 
-(defn- control-held [mods flags]
-  (if (bit-test flags 0)
-    (conj mods :left-control)
-    mods))
+(def modifier-bits
+  {:control 0
+   :left-alt 1
+   :right-alt 2
+   :shift 3
+   :gui 4})
 
-(defn- left-alt-held [mods flags]
-  (if (bit-test flags 1)
-    (conj mods :left-alt)
-    mods))
-
-(defn- right-alt-held [mods flags]
-  (if (bit-test flags 2)
-    (conj mods :right-alt)
-    mods))
-
-(defn- shift-held [mods flags]
-  (if (bit-test flags 3)
-    (conj mods :left-shift)
-    mods))
-
-(defn- gui-held [mods flags]
-  (if (bit-test flags 4)
-    (conj mods :left-gui)
-    mods))
+(defn- modifiers-set
+  "Given the flags bits, return a set of keywords indicating which
+  modifiers have been set."
+  [flags]
+  (reduce (fn [mods [mod bit]]
+            (if (bit-test flags bit)
+              (conj mods mod)
+              mods))
+          #{}
+          modifier-bits))
 
 (defn- hid-processor [key code]
   (let [flags (bit-shift-right code 8)
@@ -298,8 +291,7 @@
            (<= flags (bit-shift-left 1 4)))
       (assoc (nth HID-Codes key-code {:plugin :unknown :code key-code})
              :plugin :core
-             :modifiers (reduce #(%2 %1 flags) #{}
-                                [control-held left-alt-held right-alt-held shift-held gui-held]))
+             :modifiers (modifiers-set flags))
       ;; Synthetic
       (bit-test flags 6) key
       :default (keyword key))))
