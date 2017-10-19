@@ -223,6 +223,9 @@
 
 (add-edit-tab!
   {:title "Modifier Keys"
+   ;; Should modifier keys be able to have additional modifiers on
+   ;; them? Does this make sense? Do they need to have their own
+   ;; modifier added?
    :modifiers? false
    :keys
    (into
