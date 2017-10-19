@@ -152,20 +152,20 @@
 
    [:div.row
     [:div.col-sm-9.text-center
-     [:p.bg-warning
-      "To change the keymap from here, you'll need to have installed the "
-      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
-       "Keymap-EEPROM plugin"] "."]
+
      (when-let [cur-key (events/current-target)]
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
              index (js/parseInt (.getAttribute cur-key "data-index") 10)]
-         [edit-key-view {:index index :layer (dec (events/layer))}]))]
-
+         [edit-key-view {:index index :layer (dec (events/layer))}]))]]
+   [:div.row
     ;; TODO: only show this once, or in a more unobtrusive way
     ;; TODO: can we check if they have the eeprom plugin enabled &
     ;; only show if they haven't?
-    ]])
+    [:p.bg-warning
+     "To change the keymap from here, you'll need to have installed the "
+     [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
+      "Keymap-EEPROM plugin"] "."]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
