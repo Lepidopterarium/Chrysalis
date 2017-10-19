@@ -111,13 +111,14 @@
          [edit-key-view {:key key :index index :layer (events/layer)}]))]
     [:div.col-sm-3.text-center
      [<live-update>]
-     [:div.form-group.form-check
-      [:button.btn.btn-success
-       {:on-click (fn [_] (events/layout:upload!))}
-       [:i.fa.fa-floppy-o] " Update"]
-      [:button.btn.btn-secondary
-       {:on-click (fn [_] (events/layout:update!))}
-       "Cancel"]]
+     (when-not (events/live-update?)
+       [:div.form-group.form-check
+        [:button.btn.btn-success
+         {:on-click (fn [_] (events/layout:upload!))}
+         [:i.fa.fa-floppy-o] " Update"]
+        [:button.btn.btn-secondary
+         {:on-click (fn [_] (events/layout:update!))}
+         "Cancel"]])
      [:label.mr-sm-2 "Layer"
       [:select.custom-select {:value (events/layer)
                               :on-change (fn [e]
