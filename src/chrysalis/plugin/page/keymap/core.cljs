@@ -54,7 +54,7 @@
     [:dt "Key Code"]
     [:dd
      [:select.custom-select
-      {:value (:key key "")
+      {:value (or (:key key) "")
        :on-change (fn [e] (let [val (.. e -target -value)
                                new-key (if (s/blank? val) nil (keyword val))]
                            (events/change-key! (dec layer) index
@@ -62,7 +62,7 @@
       (doall
         (for [k (remove nil? key/HID-Codes)]
           ^{:key k}
-          [:option {:value (:key k "")} (key-name k)]))]]
+          [:option {:value (or (:key k) "")} (key-name k)]))]]
     [:dt "Modifiers"]
     [:dd
      (doall
