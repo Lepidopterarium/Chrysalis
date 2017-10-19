@@ -46,38 +46,70 @@
            "Keypad ")
          label)))
 
+(defn display-key
+  "Display the key + mods in a nice way"
+  [key]
+  (reduce
+    (fn [s mod]
+      (case mod
+        :control (str "CTRL(" s ")")
+        :shift (str "SHIFT(" s ")")
+        :gui (str "GUI(" s ")")
+        :left-alt (str "ALT(" s ")")
+        :right-alt (str "RALT(" s ")")))
+    (key-name key)
+    (:modifiers key)))
+
+(defn edit-tab-view
+  [args]
+  (let [current-tab-idx (r/atom 0)
+        tabs (events/edit-tabs)]
+    (fn [{:keys [index layer] :as args}]
+      (let [key (events/layout-key layer index)]
+        [:div.edit-controls
+         [:ul.tabs
+          (doall
+            (for [[idx tab] (map-indexed vector tabs)]
+              ^{:key [idx (:title tab)]}
+              [:li
+               [:a.tab {:href "#"
+                        :on-click (fn [_] (reset! current-tab-idx idx))}
+                (:title tab)]]))]
+         [:div
+          [:select.custom-select
+           {:value (or (:key key) "")
+            :on-change (fn [e] (let [val (.. e -target -value)
+                                    new-key (if (s/blank? val) nil (keyword val))]
+                                (events/change-key! layer index
+                                                    (assoc key :key new-key))))}
+           (doall
+             (for [k (get-in tabs [@current-tab-idx :keys])]
+               ^{:key k}
+               [:option {:value (or (:key k) "")} (key-name k)]))]
+          (when (get-in tabs [@current-tab-idx :modifiers?])
+            (doall
+              (for [modifier [:shift :control :gui :left-alt :right-alt]]
+                ^{:key modifier}
+                [:label.form-check-label
+                 [:input.form-check-input
+                  {:type :checkbox
+                   :checked (contains? (:modifiers key) modifier)
+                   :on-change (fn [e]
+                                (let [f (if (.. e -target -checked) conj disj)]
+                                  (events/change-key!
+                                    layer index
+                                    (update key :modifiers (fnil f #{}) modifier))))}]
+
+                 (name modifier)])))]]))))
+
 (defn edit-key-view
-  [{:keys [index key layer]}]
+  [{:keys [index key layer] :as args}]
   [:div.edit-key
    [:dl
-    [:dt "Key Code"]
-    [:dd
-     [:select.custom-select
-      {:value (or (:key key) "")
-       :on-change (fn [e] (let [val (.. e -target -value)
-                               new-key (if (s/blank? val) nil (keyword val))]
-                           (events/change-key! (dec layer) index
-                                               (assoc key :key new-key))))}
-      (doall
-        (for [k (remove nil? key/HID-Codes)]
-          ^{:key k}
-          [:option {:value (or (:key k) "")} (key-name k)]))]]
-    [:dt "Modifiers"]
-    [:dd
-     (doall
-       (for [modifier [:shift :control :gui :left-alt :right-alt]]
-         ^{:key modifier}
-         [:label.form-check-label
-          [:input.form-check-input
-           {:type :checkbox
-            :checked (contains? (:modifiers key) modifier)
-            :on-change (fn [e]
-                         (let [f (if (.. e -target -checked) conj disj)]
-                           (events/change-key!
-                             (dec layer) index
-                             (update key :modifiers (fnil f #{}) modifier))))}]
-
-          (name modifier)]))]]])
+    [:dt "Current Key"]
+    [:dd (display-key (events/saved-layout-key layer index))]
+    [:dt "Edit Key"]
+    [:dd [edit-tab-view args]]]])
 
 (defn render []
   [:div.container-fluid {:id :keymap}
@@ -121,9 +153,8 @@
      (when-let [cur-key (events/current-target)]
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
-             index (js/parseInt (.getAttribute cur-key "data-index") 10)
-             key (get-in (events/layout) [(dec (events/layer)) index])]
-         [edit-key-view {:key key :index index :layer (events/layer)}]))]
+             index (js/parseInt (.getAttribute cur-key "data-index") 10)]
+         [edit-key-view {:index index :layer (dec (events/layer))}]))]
 
     ;; TODO: only show this once, or in a more unobtrusive way
     ;; TODO: can we check if they have the eeprom plugin enabled &

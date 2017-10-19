@@ -20,7 +20,8 @@
 
             [re-frame.core :as re-frame]
             [clojure.walk :as walk]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [chrysalis.key :as key]))
 
 ;;; ---- Current target ------ ;;;
 
@@ -53,6 +54,19 @@
  :keymap/layout
  (fn [db _]
    (merge-edits db)))
+
+(re-frame/reg-sub
+  :keymap/layout.key
+  ;; Get the current committed binding for the given key
+  (fn [db [_ layer index]]
+    (get-in db [:keymap/layout.edits [layer index]]
+            (get-in db [:keymap/layout layer index]))))
+
+(re-frame/reg-sub
+  :keymap/layout.key.current
+  ;; Get the current committed binding for the given key
+  (fn [db [_ layer index]]
+    (get-in db [:keymap/layout layer index])))
 
 (re-frame/reg-sub
   :keymap/layout.edits
@@ -116,6 +130,16 @@
 (defn layout-edits []
   @(re-frame/subscribe [:keymap/layout.edits]))
 
+(defn saved-layout-key
+  "Get the current binding for the key on layer `layer` at index
+  `index`, ignoring pending edits."
+  [layer index]
+  @(re-frame/subscribe [:keymap/layout.key.current layer index]))
+
+(defn layout-key
+  [layer index]
+  @(re-frame/subscribe [:keymap/layout.key layer index]))
+
 (defn layout:update! []
   (re-frame/dispatch [:keymap/layout.update]))
 
@@ -143,7 +167,7 @@
 ;;; ---- Live update ---- ;;;
 (re-frame/reg-event-fx
   :keymap/live-update
-  (fn [{db :db}[_ live?]]
+  (fn [{db :db} [_ live?]]
     (-> {:db (assoc db :keymap/live-update live?)}
         (cond->
             (and live? (seq (:keymap/layout.edits db)))
@@ -161,3 +185,48 @@
 (defn live-update!
   [live?]
   (re-frame/dispatch [:keymap/live-update live?]))
+
+;;; --- Key editing tabs --- ;;;
+
+(re-frame/reg-event-fx
+  :keymap/add-edit-tab
+  (fn [{db :db} [_ tab]]
+    (when-not (some #(= (:title tab) (:title %)) (:keymap/edit-tabs db))
+      {:db (update db :keymap/edit-tabs (fnil conj []) tab)})))
+
+(re-frame/reg-sub
+  :keymap/edit-tabs
+  (fn [db _]
+    (:keymap/edit-tabs db)))
+
+(defn add-edit-tab!
+  [tab]
+  (re-frame/dispatch [:keymap/add-edit-tab tab]))
+
+(defn edit-tabs
+  []
+  @(re-frame/subscribe [:keymap/edit-tabs]))
+
+;; add default tabs
+
+;; TODO: is this the best place to do this?
+(add-edit-tab!
+  {:title "Alphanumeric"
+   :keys (into []
+               (comp (remove nil?)
+                     (filter (fn [{k :key}]
+                               (and k (re-matches #"\d|\w" (name k))))))
+               key/HID-Codes)
+   :modifiers? true})
+
+(add-edit-tab!
+  {:title "Modifier Keys"
+   :modifiers? false
+   :keys
+   (into
+     []
+     (comp (remove nil?)
+           (filter (fn [{k :key}]
+                     (and k (re-matches #"(left|right)-(control|shift|alt|gui)"
+                                        (name k))))))
+     key/HID-Codes)})
