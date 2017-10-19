@@ -255,6 +255,12 @@
    {:plugin :core, :key :right-alt}
    {:plugin :core, :key :right-gui}])
 
+(def key->hid
+  "Given a key name, like :right-arrow, get the corresponding numeric
+  HID code"
+  (-> (into {} (map-indexed (fn [i {k :key}] [k i])) HID-Codes)
+      (assoc nil 0)))
+
 (defn- fallback-processor [_ code]
   {:plugin :unknown
    :key-code code})
@@ -410,3 +416,18 @@
         (partition keymap-size)
         (map vec)
         vec)))
+
+(defmulti unformat :plugin)
+
+(defn mods->flags
+  [mods]
+  (reduce (fn [flags mod]
+            (bit-set flags (modifier-bits mod)))
+          0
+          mods))
+
+(defmethod unformat :core
+  [key]
+  (let [key-code (key->hid (:key key))
+        modifiers (mods->flags (:modifiers key))]
+    (bit-or (bit-shift-left modifiers 8) key-code)))
