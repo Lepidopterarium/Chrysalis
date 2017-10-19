@@ -190,14 +190,16 @@
 
 (re-frame/reg-event-fx
   :keymap/add-edit-tab
-  (fn [{db :db} [_ tab]]
-    (when-not (some #(= (:title tab) (:title %)) (:keymap/edit-tabs db))
-      {:db (update db :keymap/edit-tabs (fnil conj []) tab)})))
+  (fn [{db :db} [_ {title :title :as tab}]]
+    {:db (-> (assoc-in db [:keymap/edit-tabs title] tab)
+             (cond->
+                 (nil? (get-in db [:keymap/edit-tabs title]))
+               (update :keymap/edit-tabs-order (fnil conj []) title)))}))
 
 (re-frame/reg-sub
   :keymap/edit-tabs
   (fn [db _]
-    (:keymap/edit-tabs db)))
+    (mapv (:keymap/edit-tabs db) (:keymap/edit-tabs-order db))))
 
 (defn add-edit-tab!
   [tab]
@@ -212,7 +214,7 @@
 ;; TODO: is this the best place to do this?
 (add-edit-tab!
   {:title "Alphanumeric"
-   :keys (into []
+   :keys (into [(first key/HID-Codes)]
                (comp (remove nil?)
                      (filter (fn [{k :key}]
                                (and k (re-matches #"\d|\w" (name k))))))
@@ -224,7 +226,7 @@
    :modifiers? false
    :keys
    (into
-     []
+     [(first key/HID-Codes)]
      (comp (remove nil?)
            (filter (fn [{k :key}]
                      (and k (re-matches #"(left|right)-(control|shift|alt|gui)"
