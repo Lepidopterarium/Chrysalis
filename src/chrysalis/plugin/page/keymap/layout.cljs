@@ -39,7 +39,9 @@
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
-            index (key-index device r c cols)]
+            index (key-index device r c cols)
+            layer (dec (events/layer))
+            edited? (contains? (events/layout-edits) [layer index])]
         (if interactive?
           (assoc node
                  :class :key
@@ -52,6 +54,9 @@
                  :stroke (if (current-node? r c)
                            "#ff0000"
                            "#b4b4b4")
+                 :fill (if edited?
+                         "rgba(255,0,0,0.5)"
+                         "rgba(255,255,255,0)")
                  :on-click (fn [e]
                              (let [target (.-target e)]
                                (events/current-target! target))))))

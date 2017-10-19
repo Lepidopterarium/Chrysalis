@@ -42,10 +42,22 @@
 
 ;;; ---- Layout ---- ;;;
 
+(defn merge-edits
+  [{edits :keymap/layout.edits layout :keymap/layout :as db}]
+  (reduce (fn [layout [[layer index :as path] key]]
+            (assoc-in layout path key))
+          layout
+          edits))
+
 (re-frame/reg-sub
  :keymap/layout
  (fn [db _]
-   (:keymap/layout db)))
+   (merge-edits db)))
+
+(re-frame/reg-sub
+  :keymap/layout.edits
+  (fn [db]
+    (:keymap/layout.edits db)))
 
 (re-frame/reg-event-db
  :keymap/layout.process
@@ -67,11 +79,10 @@
 (re-frame/reg-event-fx
   :keymap/change-key!
   (fn [{db :db} [_ layer index new-key]]
-    (let [new-layout (assoc-in (:keymap/layout db) [layer index] new-key)]
-      (-> {:db (assoc db :keymap/layout new-layout)}
-          (cond->
-              (:keymap/live-update db)
-            (assoc :keymap/layout.upload new-layout))))))
+    (-> {:db (assoc-in db [:keymap/layout.edits [layer index]] new-key)}
+        (cond->
+            (:keymap/live-update db)
+          (assoc :dispatch [:keymap/layout.upload])))))
 
 (re-frame/reg-event-fx
  :keymap/layout.update
@@ -88,8 +99,12 @@
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
- (fn [cofx _]
-   {:keymap/layout.upload (get-in cofx [:db :keymap/layout])}))
+ (fn [{db :db} _]
+   (let [new-layout (merge-edits db)]
+     {:keymap/layout.upload new-layout
+      :db (assoc db
+                 :keymap/layout new-layout
+                 :keymap/layout.edits {})})))
 
 (defn change-key!
   [row col new-key]
@@ -97,6 +112,9 @@
 
 (defn layout []
   @(re-frame/subscribe [:keymap/layout]))
+
+(defn layout-edits []
+  @(re-frame/subscribe [:keymap/layout.edits]))
 
 (defn layout:update! []
   (re-frame/dispatch [:keymap/layout.update]))
@@ -123,10 +141,14 @@
      1)))
 
 ;;; ---- Live update ---- ;;;
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
   :keymap/live-update
-  (fn [db [_ live?]]
-    (assoc db :keymap/live-update live?)))
+  (fn [{db :db}[_ live?]]
+    (-> {:db (assoc db :keymap/live-update live?)}
+        (cond->
+            (and live? (seq (:keymap/layout.edits db)))
+          ;; if switching to live, commit existing edits
+          (assoc :dispatch [:keymap/layout.upload])))))
 
 (re-frame/reg-sub
   :keymap/live-update
