@@ -88,7 +88,7 @@
                                     :stroke "#000000"}]]]]
 
    [:div.row
-    [:div.col-sm-6.text-center
+    [:div.col-sm-9.text-center
      ;; TODO: only show this once, or in a more unobtrusive way
      ;; TODO: can we check if they have the eeprom plugin enabled &
      ;; only show if they haven't?
@@ -101,14 +101,8 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/layout)
-      {:width 1024 :height 640 :interactive? true}]]
-    [:div.col-sm-3.text-center
-     (when-let [cur-key (events/current-target)]
-       (let [[r c] (->> ["data-row" "data-column"]
-                       (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
-             index (js/parseInt (.getAttribute cur-key "data-index") 10)
-             key (get-in (events/layout) [(dec (events/layer)) index])]
-         [edit-key-view {:key key :index index :layer (events/layer)}]))]
+      {:interactive? true}]]
+
     [:div.col-sm-3.text-center
      [<live-update>]
      (when-not (events/live-update?)
@@ -128,7 +122,16 @@
        [:option {:value 2} "2"]
        [:option {:value 3} "3"]
        [:option {:value 4} "4"]
-       [:option {:value 5} "5"]]]]]])
+       [:option {:value 5} "5"]]]]]
+
+   [:div.row
+    [:div.col-sm-9.text-center
+     (when-let [cur-key (events/current-target)]
+       (let [[r c] (->> ["data-row" "data-column"]
+                       (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
+             index (js/parseInt (.getAttribute cur-key "data-index") 10)
+             key (get-in (events/layout) [(dec (events/layer)) index])]
+         [edit-key-view {:key key :index index :layer (events/layer)}]))]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
