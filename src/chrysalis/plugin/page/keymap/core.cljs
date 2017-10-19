@@ -67,13 +67,13 @@
     (fn [{:keys [index layer] :as args}]
       (let [key (events/layout-key layer index)]
         [:div.edit-controls
-         [:ul.tabs
+         [:ul.nav.nav-tabs
           (doall
             (for [[idx tab] (map-indexed vector tabs)]
               ^{:key [idx (:title tab)]}
-              [:li
-               [:a.tab {:href "#"
-                        :on-click (fn [_] (reset! current-tab-idx idx))}
+              [:li {:class (when (= idx @current-tab-idx) "active")}
+               [:a {:href "#"
+                    :on-click (fn [_] (reset! current-tab-idx idx))}
                 (:title tab)]]))]
          [:div
           [:select.custom-select
@@ -159,7 +159,7 @@
     ;; TODO: only show this once, or in a more unobtrusive way
     ;; TODO: can we check if they have the eeprom plugin enabled &
     ;; only show if they haven't?
-    [:p.warning
+    [:p.bg-warning
      "To change the keymap from here, you'll need to have installed the "
      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
       "Keymap-EEPROM plugin"] "."]]])
