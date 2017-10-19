@@ -17,6 +17,7 @@
 (ns chrysalis.plugin.page.keymap.core
   (:require [clojure.string :as s]
             [reagent.core :as r]
+            [re-frame.core :as re-frame]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
@@ -26,8 +27,7 @@
             [chrysalis.plugin.page.keymap.layout :as layout]
 
             [garden.units :as gu]
-            [chrysalis.key :as key]
-            [re-frame.core :as re-frame]))
+            [chrysalis.key :as key]))
 
 (defn <live-update> []
   [:form.form-group.form-check
@@ -40,9 +40,12 @@
 
 (defn- key-name
   [key]
-  (str (when (and (:key key) (s/starts-with? (name (:key key)) "keypad_"))
-         "Keypad ")
-       (:primary-text (key/format key))))
+  (let [label (:primary-text (key/format key))]
+    (str (when (and (:key key)
+                    (s/starts-with? (name (:key key)) "keypad_")
+                    (not (s/starts-with? label "Keypad")))
+           "Keypad ")
+         label)))
 
 (defn edit-key-view
   [{:keys [index key layer]}]
@@ -52,19 +55,30 @@
     [:dd
      [:select.custom-select
       {:value (:key key "")
-       :on-change (fn [e] (let [new-key (keyword (.. e -target -value))]
+       :on-change (fn [e] (let [val (.. e -target -value)
+                               new-key (if (s/blank? val) nil (keyword val))]
                            (events/change-key! (dec layer) index
-                                               {:plugin :core
-                                                :key new-key
-                                                :modifiers []})))}
+                                               (assoc key :key new-key))))}
       (doall
         (for [k (remove nil? key/HID-Codes)]
           ^{:key k}
-          [:option {:value (:key k)} (key-name k)]))]]
+          [:option {:value (:key k "")} (key-name k)]))]]
     [:dt "Modifiers"]
-    [:dd (if-let [mods (seq (:modifiers key))]
-           (s/join mods ", ")
-           "None")]]])
+    [:dd
+     (doall
+       (for [modifier [:left-shift :left-control :left-alt :left-gui :right-control :right-alt]]
+         ^{:key modifier}
+         [:label.form-check-label
+          [:input.form-check-input
+           {:type :checkbox
+            :checked (contains? (:modifiers key) modifier)
+            :on-change (fn [e]
+                         (let [f (if (.. e -target -checked) conj disj)]
+                           (events/change-key!
+                             (dec layer) index
+                             (update key :modifiers (fnil f #{}) modifier))))}]
+
+          (name modifier)]))]]])
 
 (defn render []
   [:div.container-fluid {:id :keymap}

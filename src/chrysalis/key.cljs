@@ -298,7 +298,7 @@
            (<= flags (bit-shift-left 1 4)))
       (assoc (nth HID-Codes key-code {:plugin :unknown :code key-code})
              :plugin :core
-             :modifiers (reduce #(%2 %1 flags) []
+             :modifiers (reduce #(%2 %1 flags) #{}
                                 [control-held left-alt-held right-alt-held shift-held gui-held]))
       ;; Synthetic
       (bit-test flags 6) key
