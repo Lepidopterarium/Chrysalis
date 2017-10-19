@@ -71,9 +71,11 @@
           (doall
             (for [[idx tab] (map-indexed vector tabs)]
               ^{:key [idx (:title tab)]}
-              [:li {:class (when (= idx @current-tab-idx) "active")}
-               [:a {:href "#"
-                    :on-click (fn [_] (reset! current-tab-idx idx))}
+              [:li
+               [:a.nav-link
+                {:href "#"
+                 :class (when (= idx @current-tab-idx) "active")
+                 :on-click (fn [_] (reset! current-tab-idx idx))}
                 (:title tab)]]))]
          [:div
           [:select.custom-select
@@ -150,6 +152,10 @@
 
    [:div.row
     [:div.col-sm-9.text-center
+     [:p.bg-warning
+      "To change the keymap from here, you'll need to have installed the "
+      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
+       "Keymap-EEPROM plugin"] "."]
      (when-let [cur-key (events/current-target)]
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
@@ -159,10 +165,7 @@
     ;; TODO: only show this once, or in a more unobtrusive way
     ;; TODO: can we check if they have the eeprom plugin enabled &
     ;; only show if they haven't?
-    [:p.bg-warning
-     "To change the keymap from here, you'll need to have installed the "
-     [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
-      "Keymap-EEPROM plugin"] "."]]])
+    ]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
