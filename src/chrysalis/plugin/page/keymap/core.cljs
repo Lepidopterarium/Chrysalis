@@ -17,7 +17,6 @@
 (ns chrysalis.plugin.page.keymap.core
   (:require [clojure.string :as s]
             [reagent.core :as r]
-            [re-frame.core :as re-frame]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
@@ -89,13 +88,6 @@
 
    [:div.row
     [:div.col-sm-9.text-center
-     ;; TODO: only show this once, or in a more unobtrusive way
-     ;; TODO: can we check if they have the eeprom plugin enabled &
-     ;; only show if they haven't?
-     [:p.warning
-      "To change the keymap from here, you'll need to have installed the "
-      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
-       "Keymap-EEPROM plugin"] "."]
 
      [layout/<keymap-layout>
       (device/current)
@@ -131,7 +123,15 @@
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
              index (js/parseInt (.getAttribute cur-key "data-index") 10)
              key (get-in (events/layout) [(dec (events/layer)) index])]
-         [edit-key-view {:key key :index index :layer (events/layer)}]))]]])
+         [edit-key-view {:key key :index index :layer (events/layer)}]))]
+
+    ;; TODO: only show this once, or in a more unobtrusive way
+    ;; TODO: can we check if they have the eeprom plugin enabled &
+    ;; only show if they haven't?
+    [:p.warning
+     "To change the keymap from here, you'll need to have installed the "
+     [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
+      "Keymap-EEPROM plugin"] "."]]])
 
 
 (page/add! :keymap {:name "Keymap Editor"
