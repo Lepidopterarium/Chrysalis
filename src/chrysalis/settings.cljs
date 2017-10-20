@@ -20,7 +20,7 @@
 
 (defonce config-file (str (.getPath (.-app (.-remote (js/require "electron")))
                                     "userData")
-                          "/settings.json"))
+                          "/settings.tjson"))
 
 (re-frame/reg-cofx
  :settings/load
