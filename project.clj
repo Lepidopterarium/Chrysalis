@@ -13,8 +13,7 @@
                  [re-frame "0.9.2"]
                  [re-frisk "0.3.2"]
                  [reagent "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [ring/ring-core "1.5.0"]
-                 [com.cognitect/transit-cljs "0.8.243"]]
+                 [ring/ring-core "1.5.0"]]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :npm {:dependencies [[avrgirl-arduino "^2.1.0"]
                        [bootstrap "^4.0.0-alpha.4"]
