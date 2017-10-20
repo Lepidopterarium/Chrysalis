@@ -25,9 +25,11 @@
 
             [chrysalis.plugin.page.keymap.events :as events]
             [chrysalis.plugin.page.keymap.layout :as layout]
+            [chrysalis.plugin.page.keymap.presets :as presets]
 
             [garden.units :as gu]
-            [chrysalis.key :as key]))
+            [chrysalis.key :as key]
+            [chrysalis.settings :as settings]))
 
 (defn <live-update> []
   [:form.form-group.form-check
@@ -144,6 +146,13 @@
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
          "Cancel"]])
+     [presets/<save-layout>]
+     [:div.btn-group.mr-2
+      [:a.btn.btn-success {:href "#chrysalis-plugin-page-keymap-save-layout"
+                           :data-toggle :modal
+                           :on-click (fn [e]
+                                       (presets/name! nil))}
+       [:i.fa.fa-floppy-o] " Save"]]
      [:label.mr-sm-2 "Layer"
       [:select.custom-select
        {:value (events/layer)
@@ -154,7 +163,9 @@
        [:option {:value 2} "2"]
        [:option {:value 3} "3"]
        [:option {:value 4} "4"]
-       [:option {:value 5} "5"]]]]]
+       [:option {:value 5} "5"]]]
+
+     [presets/<presets>]]]
 
    [:div.row
     [:div.col-sm-9.text-center
@@ -171,6 +182,19 @@
              index (js/parseInt (.getAttribute cur-key "data-index") 10)]
          [edit-key-view {:index index :layer (dec (events/layer))}]))]]])
 
+(defmethod settings/apply! [:keymap] [db _]
+  (settings/copy-> db
+                   [:devices
+                    (keyword (get-in (device/current) [:meta :name]))
+                    :keymap :presets]
+                   [:keymap/presets]))
+
+(defmethod settings/save! [:keymap] [db _]
+  (settings/<-copy db
+                   [:devices
+                    (keyword (get-in (device/current) [:meta :name]))
+                    :keymap :presets]
+                   [:keymap/presets]))
 
 (page/add! :keymap {:name "Keymap Editor"
                     :index 6
