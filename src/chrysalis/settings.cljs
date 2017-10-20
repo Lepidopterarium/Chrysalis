@@ -15,31 +15,32 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.settings
-  (:require [re-frame.core :as re-frame]))
+  (:require [re-frame.core :as re-frame]
+            [cognitect.transit :as t]))
 
 (defonce config-file (str (.getPath (.-app (.-remote (js/require "electron")))
                                     "userData")
-                          "/settings.json"))
+                          "/settings.tjson"))
 
 (re-frame/reg-cofx
  :settings/load
  (fn [cofx _]
    (let [fs (js/require "fs")]
      (when (.existsSync fs config-file)
-       (let [contents (js->clj (as-> fs $
+       (let [reader (t/reader :json)
+             contents (js->clj (as-> fs $
                                  (.readFileSync $ config-file #js {"encoding" "utf-8"})
-                                 (.parse js/JSON $))
+                                 (t/read reader $))
                                :keywordize-keys true)]
          (assoc cofx :settings contents))))))
 
 (re-frame/reg-fx
  :settings/save
  (fn [settings]
-   (let [fs (js/require "fs")]
+   (let [fs (js/require "fs")
+         writer (t/writer :json)]
      (.writeFileSync fs config-file
-                     (->> settings
-                          clj->js
-                          (.stringify js/JSON))
+                     (->> settings (t/write writer))
                      #js {"mode" 0644}))))
 
 (defmulti apply!

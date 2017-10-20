@@ -17,6 +17,7 @@
 (ns chrysalis.plugin.page.keymap.core
   (:require [clojure.string :as s]
             [reagent.core :as r]
+            [reagent.ratom :refer-macros [reaction]]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
@@ -24,17 +25,20 @@
 
             [chrysalis.plugin.page.keymap.events :as events]
             [chrysalis.plugin.page.keymap.layout :as layout]
+            [chrysalis.plugin.page.keymap.presets :as presets]
 
             [garden.units :as gu]
-            [chrysalis.key :as key]))
+            [chrysalis.key :as key]
+            [chrysalis.settings :as settings]))
 
 (defn <live-update> []
   [:form.form-group.form-check
    [:label.form-check-label
-    [:input.form-check-input {:type :checkbox
-                              :value (events/live-update?)
-                              :on-change (fn [e]
-                                           (events/live-update! (.. e -target -checked)))}]
+    [:input.form-check-input
+     {:type :checkbox
+      :value (events/live-update?)
+      :on-change (fn [e]
+                   (events/live-update! (.. e -target -checked)))}]
     " Live update"]])
 
 (defn- key-name
@@ -63,7 +67,8 @@
 (defn edit-tab-view
   [args]
   (let [current-tab-idx (r/atom 0)
-        tabs (events/edit-tabs)]
+        tabs (events/edit-tabs)
+        cur-tab (reaction (get tabs @current-tab-idx))]
     (fn [{:keys [index layer] :as args}]
       (let [key (events/layout-key layer index)]
         [:div.edit-controls
@@ -85,10 +90,10 @@
                                 (events/change-key! layer index
                                                     (assoc key :key new-key))))}
            (doall
-             (for [k (get-in tabs [@current-tab-idx :keys])]
+             (for [k (:keys @cur-tab)]
                ^{:key k}
                [:option {:value (or (:key k) "")} (key-name k)]))]
-          (when (get-in tabs [@current-tab-idx :modifiers?])
+          (when (:modifiers? @cur-tab)
             (doall
               (for [modifier [:shift :control :gui :left-alt :right-alt]]
                 ^{:key modifier}
@@ -96,11 +101,12 @@
                  [:input.form-check-input
                   {:type :checkbox
                    :checked (contains? (:modifiers key) modifier)
-                   :on-change (fn [e]
-                                (let [f (if (.. e -target -checked) conj disj)]
-                                  (events/change-key!
-                                    layer index
-                                    (update key :modifiers (fnil f #{}) modifier))))}]
+                   :on-change
+                   (fn [e]
+                     (let [f (if (.. e -target -checked) conj disj)]
+                       (events/change-key!
+                         layer index
+                         (update key :modifiers (fnil f #{}) modifier))))}]
 
                  (name modifier)])))]]))))
 
@@ -127,7 +133,8 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/layout)
-      {:interactive? true}]]
+      {:interactive? true
+       :style {:max-height "50vh"}}]]
 
     [:div.col-sm-3.text-center
      [<live-update>]
@@ -139,34 +146,57 @@
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
          "Cancel"]])
+     [presets/<save-layout>]
+     [:div.btn-group.mr-2
+      [:a.btn.btn-success {:href "#chrysalis-plugin-page-keymap-save-layout"
+                           :data-toggle :modal
+                           :on-click (fn [e]
+                                       (presets/name! nil))}
+       [:i.fa.fa-floppy-o] " Save"]]
      [:label.mr-sm-2 "Layer"
-      [:select.custom-select {:value (events/layer)
-                              :on-change (fn [e]
-                                           (events/switch-layer (-> e .-target .-value)))}
+      [:select.custom-select
+       {:value (events/layer)
+        :on-change (fn [e]
+                     (events/switch-layer (-> e .-target .-value)))}
        ;; TODO: is there a way to check how many layers there are?
        [:option {:value 1} "1"]
        [:option {:value 2} "2"]
        [:option {:value 3} "3"]
        [:option {:value 4} "4"]
-       [:option {:value 5} "5"]]]]]
+       [:option {:value 5} "5"]]]
+
+     [presets/<presets>]]]
 
    [:div.row
     [:div.col-sm-12.text-center
 
+    [:div.col-sm-9.text-center
+     [:p.bg-warning
+      ;; TODO: only show this once, or in a more unobtrusive way
+      ;; TODO: can we check if they have the eeprom plugin enabled &
+      ;; only show if they haven't?
+      "To change the keymap from here, you'll need to have installed the "
+      [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
+       "Keymap-EEPROM plugin"] "."]
      (when-let [cur-key (events/current-target)]
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
              index (js/parseInt (.getAttribute cur-key "data-index") 10)]
-         [edit-key-view {:index index :layer (dec (events/layer))}]))]]
-   [:div.row
-    ;; TODO: only show this once, or in a more unobtrusive way
-    ;; TODO: can we check if they have the eeprom plugin enabled &
-    ;; only show if they haven't?
-    [:p.bg-warning
-     "To change the keymap from here, you'll need to have installed the "
-     [:a {:href "https://github.com/keyboardio/Kaleidoscope-EEPROM-Keymap"}
-      "Keymap-EEPROM plugin"] "."]]])
+         [edit-key-view {:index index :layer (dec (events/layer))}]))]]]])
 
+(defmethod settings/apply! [:keymap] [db _]
+  (settings/copy-> db
+                   [:devices
+                    (keyword (get-in (device/current) [:meta :name]))
+                    :keymap :presets]
+                   [:keymap/presets]))
+
+(defmethod settings/save! [:keymap] [db _]
+  (settings/<-copy db
+                   [:devices
+                    (keyword (get-in (device/current) [:meta :name]))
+                    :keymap :presets]
+                   [:keymap/presets]))
 
 (page/add! :keymap {:name "Keymap Editor"
                     :index 6

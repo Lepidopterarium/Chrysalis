@@ -63,7 +63,8 @@
 (re-frame/reg-fx
  :settings/window
  (fn [settings]
-   (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
+   (let [browser-window (.. (js/require "electron") -remote getCurrentWebContents
+                            getOwnerBrowserWindow)]
      (when (and (get-in settings [:window :x])
                 (get-in settings [:window :y]))
        (.setPosition browser-window
@@ -79,7 +80,8 @@
 (re-frame/reg-fx
  :settings/window.update
  (fn [settings]
-   (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)
+   (let [browser-window (.. (js/require "electron") -remote getCurrentWebContents
+                            getOwnerBrowserWindow)
          bounds (js->clj (.getBounds browser-window))]
      (re-frame/dispatch [:settings/window.save
                          (update settings :window merge
@@ -112,15 +114,16 @@
   (re-frame/dispatch-sync [:settings/window])
   (page/switch-to! :devices)
   (let [usb (js/require "usb")]
-    (.on usb "attach" (fn [device]
-                        (device/detect!)))
-    (.on usb "detach" (fn [device]
-                        (device/detect!))))
-  (.setTimeout js/window (fn []
-                 (let [browser-window (-> (js/require "electron") .-remote .getCurrentWebContents .getOwnerBrowserWindow)]
-                   (doall (map (fn [event]
-                                 (.on browser-window (name event) #(re-frame/dispatch [:settings/window.update])))
-                               [:maximize :unmaximize :resize :move]))))
+    (.on usb "attach" (fn [device] (device/detect!)))
+    (.on usb "detach" (fn [device] (device/detect!))))
+  (.setTimeout js/window
+               (fn []
+                 (let [browser-window (.. (js/require "electron") -remote
+                                          getCurrentWebContents
+                                          getOwnerBrowserWindow)]
+                   (doseq [event [:maximize :unmaximize :resize :move]]
+                     (.on browser-window (name event)
+                          #(re-frame/dispatch [:settings/window.update])))))
                1000)
 
   (ui/mount-root))
@@ -128,3 +131,4 @@
 (defn ^:export reload! []
   (re-frame/clear-subscription-cache!)
   (ui/mount-root))
+;; TODO: fix bug where nothing shows up on initial load if no settings file
