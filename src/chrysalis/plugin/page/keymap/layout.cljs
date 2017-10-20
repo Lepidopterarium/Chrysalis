@@ -69,8 +69,10 @@
   "Print key labels on the SVG"
   [device node]
   (let [id (:id (get node 1))
-        label (last (re-find #"_t_(.*)" id))
-        [r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)" id)))]
+        [_ label] (re-find #"_t_(.*)" id)
+        [r c] (->> id
+                  (re-find #"R(\d+)C(\d+)") rest
+                  (map #(js/parseInt % 10)))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
