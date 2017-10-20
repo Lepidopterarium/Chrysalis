@@ -131,3 +131,4 @@
 (defn ^:export reload! []
   (re-frame/clear-subscription-cache!)
   (ui/mount-root))
+;; TODO: fix bug where nothing shows up on initial load if no settings file

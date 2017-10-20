@@ -108,3 +108,4 @@
 (defn <presets> []
   [:div.card-group
    (doall (map <preset> @(re-frame/subscribe [:keymap/presets])))])
+;; TODO: selecting preset be like applying edits
