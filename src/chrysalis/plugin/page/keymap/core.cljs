@@ -151,7 +151,7 @@
        [:option {:value 5} "5"]]]]]
 
    [:div.row
-    [:div.col-sm-9.text-center
+    [:div.col-sm-12.text-center
 
      (when-let [cur-key (events/current-target)]
        (let [[r c] (->> ["data-row" "data-column"]
