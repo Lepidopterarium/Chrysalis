@@ -17,6 +17,7 @@
 (ns chrysalis.plugin.page.keymap.core
   (:require [clojure.string :as s]
             [reagent.core :as r]
+            [reagent.ratom :refer-macros [reaction]]
             [chrysalis.device :as device]
             [chrysalis.ui :as ui]
             [chrysalis.ui.page :as page]
@@ -64,7 +65,8 @@
 (defn edit-tab-view
   [args]
   (let [current-tab-idx (r/atom 0)
-        tabs (events/edit-tabs)]
+        tabs (events/edit-tabs)
+        cur-tab (reaction (get tabs @current-tab-idx))]
     (fn [{:keys [index layer] :as args}]
       (let [key (events/layout-key layer index)]
         [:div.edit-controls
@@ -86,10 +88,10 @@
                                 (events/change-key! layer index
                                                     (assoc key :key new-key))))}
            (doall
-             (for [k (get-in tabs [@current-tab-idx :keys])]
+             (for [k (:keys @cur-tab)]
                ^{:key k}
                [:option {:value (or (:key k) "")} (key-name k)]))]
-          (when (get-in tabs [@current-tab-idx :modifiers?])
+          (when (:modifiers? @cur-tab)
             (doall
               (for [modifier [:shift :control :gui :left-alt :right-alt]]
                 ^{:key modifier}
