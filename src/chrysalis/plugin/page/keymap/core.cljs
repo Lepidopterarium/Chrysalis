@@ -99,11 +99,12 @@
                  [:input.form-check-input
                   {:type :checkbox
                    :checked (contains? (:modifiers key) modifier)
-                   :on-change (fn [e]
-                                (let [f (if (.. e -target -checked) conj disj)]
-                                  (events/change-key!
-                                    layer index
-                                    (update key :modifiers (fnil f #{}) modifier))))}]
+                   :on-change
+                   (fn [e]
+                     (let [f (if (.. e -target -checked) conj disj)]
+                       (events/change-key!
+                         layer index
+                         (update key :modifiers (fnil f #{}) modifier))))}]
 
                  (name modifier)])))]]))))
 
