@@ -100,6 +100,7 @@
                 [:label.form-check-label
                  [:input.form-check-input
                   {:type :checkbox
+                   :disabled (nil? (:key key))
                    :checked (contains? (:modifiers key) modifier)
                    :on-change
                    (fn [e]
