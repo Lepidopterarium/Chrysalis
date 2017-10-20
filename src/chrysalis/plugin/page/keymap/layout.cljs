@@ -21,7 +21,8 @@
             [chrysalis.plugin.page.keymap.events :as events]
 
             [re-frame.core :as re-frame]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.set :as set]))
 
 (defn- key-index [device r c cols]
   (if-let [keymap-layout (get-in device [:keymap :map])]
@@ -93,8 +94,8 @@
                       (node-update device node layout (:interactive? props))
                       node)))
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?)
-                                    :view-box "0 0 1024 640")))))
+                    (update 1 merge (dissoc props :interactive?))
+                    (update 1 set/rename-keys {:viewbox :view-box}))))
 
 (defn <keymap-layout> [device svg layout props]
   (if layout
