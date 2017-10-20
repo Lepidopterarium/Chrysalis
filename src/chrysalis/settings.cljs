@@ -16,31 +16,28 @@
 
 (ns chrysalis.settings
   (:require [re-frame.core :as re-frame]
-            [cognitect.transit :as t]))
+            [cljs.reader :as edn]))
 
 (defonce config-file (str (.getPath (.-app (.-remote (js/require "electron")))
                                     "userData")
-                          "/settings.tjson"))
+                          "/settings.edn"))
 
 (re-frame/reg-cofx
  :settings/load
  (fn [cofx _]
    (let [fs (js/require "fs")]
      (when (.existsSync fs config-file)
-       (let [reader (t/reader :json)
-             contents (js->clj (as-> fs $
-                                 (.readFileSync $ config-file #js {"encoding" "utf-8"})
-                                 (t/read reader $))
-                               :keywordize-keys true)]
+       (let [contents (-> fs
+                        (.readFileSync config-file #js {"encoding" "utf-8"})
+                        edn/read-string)]
          (assoc cofx :settings contents))))))
 
 (re-frame/reg-fx
  :settings/save
  (fn [settings]
-   (let [fs (js/require "fs")
-         writer (t/writer :json)]
+   (let [fs (js/require "fs")]
      (.writeFileSync fs config-file
-                     (->> settings (t/write writer))
+                     (pr-str settings)
                      #js {"mode" 0644}))))
 
 (defmulti apply!
