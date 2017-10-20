@@ -61,7 +61,7 @@
 ;;; ---- helpers ---- ;;;
 
 (defn add! [key page-data]
-  (re-frame/dispatch [:page/add! key page-data]))
+  (js/setTimeout (fn [] (re-frame/dispatch [:page/add! key page-data])) 0))
 
 (defn current []
   @(re-frame/subscribe [:page/current]))
