@@ -80,7 +80,9 @@
                [:a.nav-link
                 {:href "#"
                  :class (when (= idx @current-tab-idx) "active")
-                 :on-click (fn [_] (reset! current-tab-idx idx))}
+                 :on-click (fn [e]
+                             (.preventDefault e)
+                             (reset! current-tab-idx idx))}
                 (:title tab)]]))]
          [:div
           [:select.custom-select
