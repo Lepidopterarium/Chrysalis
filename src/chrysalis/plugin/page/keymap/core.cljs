@@ -31,10 +31,11 @@
 (defn <live-update> []
   [:form.form-group.form-check
    [:label.form-check-label
-    [:input.form-check-input {:type :checkbox
-                              :value (events/live-update?)
-                              :on-change (fn [e]
-                                           (events/live-update! (.. e -target -checked)))}]
+    [:input.form-check-input
+     {:type :checkbox
+      :value (events/live-update?)
+      :on-change (fn [e]
+                   (events/live-update! (.. e -target -checked)))}]
     " Live update"]])
 
 (defn- key-name
@@ -140,9 +141,10 @@
          {:on-click (fn [_] (events/layout:update!))}
          "Cancel"]])
      [:label.mr-sm-2 "Layer"
-      [:select.custom-select {:value (events/layer)
-                              :on-change (fn [e]
-                                           (events/switch-layer (-> e .-target .-value)))}
+      [:select.custom-select
+       {:value (events/layer)
+        :on-change (fn [e]
+                     (events/switch-layer (-> e .-target .-value)))}
        ;; TODO: is there a way to check how many layers there are?
        [:option {:value 1} "1"]
        [:option {:value 2} "2"]
