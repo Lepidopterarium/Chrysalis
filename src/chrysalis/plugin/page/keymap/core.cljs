@@ -146,13 +146,7 @@
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
          "Cancel"]])
-     [presets/<save-layout>]
-     [:div.btn-group.mr-2
-      [:a.btn.btn-success {:href "#chrysalis-plugin-page-keymap-save-layout"
-                           :data-toggle :modal
-                           :on-click (fn [e]
-                                       (presets/name! nil))}
-       [:i.fa.fa-floppy-o] " Save"]]
+
      [:label.mr-sm-2 "Layer"
       [:select.custom-select
        {:value (events/layer)
@@ -163,9 +157,7 @@
        [:option {:value 2} "2"]
        [:option {:value 3} "3"]
        [:option {:value 4} "4"]
-       [:option {:value 5} "5"]]]
-
-     [presets/<presets>]]]
+       [:option {:value 5} "5"]]]]]
 
    [:div.row
     [:div.col-sm-12.text-center
@@ -182,19 +174,31 @@
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
              index (js/parseInt (.getAttribute cur-key "data-index") 10)]
-         [edit-key-view {:index index :layer (dec (events/layer))}]))]]]])
+         [edit-key-view {:index index :layer (dec (events/layer))}]))]]]
+
+   [:div.row
+    [:div.col-sm-12.text-center
+     [:h2 "Presets"]
+     [presets/<save-layout>]
+     [:div.btn-group.mr-2
+      [:a.btn.btn-success {:href "#chrysalis-plugin-page-keymap-save-layout"
+                           :data-toggle :modal
+                           :on-click (fn [e]
+                                       (presets/name! nil))}
+       [:i.fa.fa-floppy-o] " Save"]]
+     [presets/<presets>]]]])
 
 (defmethod settings/apply! [:keymap] [db _]
   (settings/copy-> db
                    [:devices
-                    (keyword (get-in (device/current) [:meta :name]))
+                    (get-in (device/current) [:meta :name])
                     :keymap :presets]
                    [:keymap/presets]))
 
 (defmethod settings/save! [:keymap] [db _]
   (settings/<-copy db
                    [:devices
-                    (keyword (get-in (device/current) [:meta :name]))
+                    (get-in (device/current) [:meta :name])
                     :keymap :presets]
                    [:keymap/presets]))
 
