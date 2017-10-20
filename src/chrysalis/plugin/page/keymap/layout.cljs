@@ -36,7 +36,10 @@
     false))
 
 (defn- node-update [device node theme interactive?]
-  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
+  (let [[r c] (->> node :id
+                  (re-find #"R(\d+)C(\d+)_keyshape$")
+                  rest
+                  (map #(js/parseInt % 10)))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
@@ -73,7 +76,9 @@
             index (key-index device r c cols)
             ;; NB: layers are 1-indexed, so we need `dec` to go to
             ;; zero-indexed clojure vectors
-            formatted-key (key/format (get-in (events/layout) [(dec (events/layer)) index]))]
+            formatted-key (-> (events/layout)
+                              (get-in [(dec (events/layer)) index])
+                              key/format)]
         (assoc node 2 (get formatted-key (keyword (str label "-text")))))
       node)))
 
@@ -86,7 +91,8 @@
                       (node-update device node layout (:interactive? props))
                       node)))
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
+                    (assoc 1 (assoc (dissoc props :interactive?)
+                                    :view-box "0 0 1024 640")))))
 
 (defn <keymap-layout> [device svg layout props]
   (if layout
