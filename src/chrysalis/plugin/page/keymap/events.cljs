@@ -196,6 +196,14 @@
                  (nil? (get-in db [:keymap/edit-tabs title]))
                (update :keymap/edit-tabs-order (fnil conj []) title)))}))
 
+(re-frame/reg-event-fx
+  :keymap/remove-edit-tab
+  (fn [{db :db} [_ title]]
+    {:db (-> db
+             (update :keymap/edit-tabs dissoc title)
+             (update :keymap/edit-tabs-order
+                     (partial filterv #(not= title %))))}))
+
 (re-frame/reg-sub
   :keymap/edit-tabs
   (fn [db _]
@@ -205,33 +213,53 @@
   [tab]
   (re-frame/dispatch [:keymap/add-edit-tab tab]))
 
+(defn remove-edit-tab!
+  [title]
+  (re-frame/dispatch [:keymap/remove-edit-tab title]))
+
 (defn edit-tabs
   []
   @(re-frame/subscribe [:keymap/edit-tabs]))
 
 ;; add default tabs
 
+(defn- keys-like
+  [re]
+  (into [(first key/HID-Codes)]
+        (comp (remove nil?)
+              (filter (fn [{k :key}]
+                        (and k (re-matches re (name k))))))
+        key/HID-Codes))
+
 ;; TODO: is this the best place to do this?
 (add-edit-tab!
   {:title "Alphanumeric"
-   :keys (into [(first key/HID-Codes)]
-               (comp (remove nil?)
-                     (filter (fn [{k :key}]
-                               (and k (re-matches #"\d|\w" (name k))))))
-               key/HID-Codes)
+   :keys (keys-like #"\d|\w")
    :modifiers? true})
 
 (add-edit-tab!
-  {:title "Modifier Keys"
+  {:title "Punctuation & Spaces"
+   :modifiers? true
+   :keys
+   (into [(first key/HID-Codes)]
+         (comp (drop-while #(not= :enter (:key %)))
+               (take-while #(not= :F1 (:key %))))
+         key/HID-Codes)})
+
+(add-edit-tab!
+  {:title "Modifiers"
    ;; Should modifier keys be able to have additional modifiers on
    ;; them? Does this make sense? Do they need to have their own
    ;; modifier added?
    :modifiers? false
-   :keys
-   (into
-     [(first key/HID-Codes)]
-     (comp (remove nil?)
-           (filter (fn [{k :key}]
-                     (and k (re-matches #"(left|right)-(control|shift|alt|gui)"
-                                        (name k))))))
-     key/HID-Codes)})
+   :keys (keys-like #"(left|right)-(control|shift|alt|gui)")})
+
+(add-edit-tab!
+  {:title "Function"
+   :modifiers? true
+   :keys (keys-like #"F\d+")})
+
+(add-edit-tab!
+  {:title "Keypad"
+   :modifiers? true
+   :keys (keys-like #"keypad_.*")})
