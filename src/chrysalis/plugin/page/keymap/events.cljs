@@ -136,7 +136,7 @@
  (fn [layout]
    ;; TODO: do we need to process the layout here?
    (command/run :keymap.layout
-     (->> layout flatten (s/join " "))
+     (->> layout flatten (map key/unformat) (s/join " "))
      :discard)))
 
 (re-frame/reg-event-fx
