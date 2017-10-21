@@ -254,7 +254,7 @@
 (defn- keys-like
   "Helper function for selecting groups of keys by regex of their name"
   [re]
-  (into [(first key/HID-Codes)]
+  (into []
         (comp (remove nil?)
               (filter (fn [{k :key}]
                         (and k (re-matches re (name k))))))
@@ -270,7 +270,7 @@
   {:title "Punctuation & Spaces"
    :modifiers? true
    :keys
-   (into [(first key/HID-Codes)]
+   (into []
          (comp (drop-while #(not= :enter (:key %)))
                (take-while #(not= :F1 (:key %))))
          key/HID-Codes)})

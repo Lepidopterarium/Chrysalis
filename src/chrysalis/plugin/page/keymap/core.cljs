@@ -72,18 +72,22 @@
 
 (defn- edit-tab-view
   [tab {:keys [layer index]}]
-  (let [key (events/layout-key layer index)]
+  (let [key (events/layout-key layer index)
+        ;; Always have NoKey & Trans as options
+        tab-keys (into [{:plugin :core :key nil}
+                        {:plugin :core :key :transparent}]
+                       (:keys tab))
+        key-idx (or (vindex-of tab-keys (dissoc key :modifiers))
+                    0)]
     [:div
      [:select.custom-select
-      {:value (or (vindex-of (:keys tab)
-                             (dissoc key :modifiers))
-                  0)
+      {:value key-idx
        :on-change (fn [e] (let [idx (js/parseInt (.. e -target -value) 10)
-                               new-key (get-in tab [:keys idx])]
+                               new-key (get tab-keys idx)]
                            ;; Should changing the key preserve the existing modifiers?
                            (events/change-key! layer index new-key)))}
       (doall
-        (for [[i k] (map-indexed vector (:keys tab))]
+        (for [[i k] (map-indexed vector tab-keys)]
           ^{:key k}
           [:option {:value i} (key-name k)]))]
      (when (:modifiers? tab)
@@ -93,7 +97,8 @@
            [:label.form-check-label
             [:input.form-check-input
              {:type :checkbox
-              :disabled (nil? (:key key))
+              :disabled (or (nil? (:key key))
+                            (= :transparent (:key key)))
               :checked (contains? (:modifiers key) modifier)
               :on-change
               (fn [e]
