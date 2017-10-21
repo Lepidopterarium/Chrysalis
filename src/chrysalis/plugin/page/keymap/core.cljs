@@ -97,6 +97,7 @@
                        0)
             :on-change (fn [e] (let [idx (js/parseInt (.. e -target -value) 10)
                                     new-key (get-in @cur-tab [:keys idx])]
+                                ;; Should changing the key preserve the existing modifiers?
                                 (events/change-key! layer index new-key)))}
            (doall
              (for [[i k] (map-indexed vector (:keys @cur-tab))]
