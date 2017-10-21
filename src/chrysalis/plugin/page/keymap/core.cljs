@@ -70,7 +70,7 @@
   (some (fn [[idx item]] (when (= item x) idx))
         (map-indexed vector v)))
 
-(defn edit-tab-view
+(defn edit-tabs-view
   [args]
   (let [current-tab-idx (r/atom 0)
         tabs (events/edit-tabs)
@@ -121,14 +121,14 @@
 
                  (name modifier)])))]]))))
 
-(defn edit-key-view
+(defn selected-key-view
   [{:keys [index key layer] :as args}]
   [:div.edit-key
    [:dl
     [:dt "Current Key"]
     [:dd (display-key (events/saved-layout-key layer index))]
     [:dt "Edit Key"]
-    [:dd [edit-tab-view args]]]])
+    [:dd [edit-tabs-view args]]]])
 
 (defn render []
   [:div.container-fluid {:id :keymap}
@@ -187,7 +187,7 @@
        (let [[r c] (->> ["data-row" "data-column"]
                        (map (comp #(js/parseInt % 10) #(.getAttribute cur-key %))))
              index (js/parseInt (.getAttribute cur-key "data-index") 10)]
-         [edit-key-view {:index index :layer (dec (events/layer))}]))]]
+         [selected-key-view {:index index :layer (dec (events/layer))}]))]]
 
    [:div.row
     [:div.col-sm-12.text-center
