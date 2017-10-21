@@ -251,6 +251,7 @@
 ;; add default tabs
 
 (defn- keys-like
+  "Helper function for selecting groups of keys by regex of their name"
   [re]
   (into [(first key/HID-Codes)]
         (comp (remove nil?)
