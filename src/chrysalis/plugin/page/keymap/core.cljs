@@ -64,6 +64,12 @@
     (key-name key)
     (:modifiers key)))
 
+(defn vindex-of
+  "Index-of for cljs vector"
+  [v x]
+  (some (fn [[idx item]] (when (= item x) idx))
+        (map-indexed vector v)))
+
 (defn edit-tab-view
   [args]
   (let [current-tab-idx (r/atom 0)
@@ -86,15 +92,16 @@
                 (:title tab)]]))]
          [:div
           [:select.custom-select
-           {:value (or (:key key) "")
-            :on-change (fn [e] (let [val (.. e -target -value)
-                                    new-key (if (s/blank? val) nil (keyword val))]
-                                (events/change-key! layer index
-                                                    (assoc key :key new-key))))}
+           {:value (or (vindex-of (:keys @cur-tab)
+                                  (dissoc key :modifiers))
+                       0)
+            :on-change (fn [e] (let [idx (js/parseInt (.. e -target -value) 10)
+                                    new-key (get-in @cur-tab [:keys idx])]
+                                (events/change-key! layer index new-key)))}
            (doall
-             (for [k (:keys @cur-tab)]
+             (for [[i k] (map-indexed vector (:keys @cur-tab))]
                ^{:key k}
-               [:option {:value (or (:key k) "")} (key-name k)]))]
+               [:option {:value i} (key-name k)]))]
           (when (:modifiers? @cur-tab)
             (doall
               (for [modifier [:shift :control :gui :left-alt :right-alt]]

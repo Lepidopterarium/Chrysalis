@@ -21,7 +21,8 @@
             [re-frame.core :as re-frame]
             [clojure.walk :as walk]
             [clojure.string :as s]
-            [chrysalis.key :as key]))
+            [chrysalis.key :as key]
+            [chrysalis.device :as device]))
 
 ;;; ---- Current target ------ ;;;
 
@@ -90,13 +91,26 @@
  (fn []
    (command/run :keymap.map nil :keymap/layout.process)))
 
+(defn- empty-layer
+  []
+  (let [device (device/current)
+        keys-per-layer (if-let [keymap-layout (get-in device [:keymap :map])]
+                         (reduce + 0 (mapcat count keymap-layout))
+                         (->> (get-in device [:meta :matrix])
+                             (apply *)))]
+    (->> key/HID-Codes
+        first
+        (repeat keys-per-layer)
+        vec)))
+
 (re-frame/reg-event-fx
   :keymap/change-key!
   (fn [{db :db} [_ layer index new-key]]
     (-> {:db (assoc-in db [:keymap/layout.edits [layer index]] new-key)}
         (cond->
-            (:keymap/live-update db)
-          (assoc :dispatch [:keymap/layout.upload])))))
+            (:keymap/live-update db) (assoc :dispatch [:keymap/layout.upload])
+            (nil? (get-in db [:keymap/layout layer]))
+            (assoc-in [:db :keymap/layout layer] (empty-layer))))))
 
 (re-frame/reg-event-fx
  :keymap/layout.update
