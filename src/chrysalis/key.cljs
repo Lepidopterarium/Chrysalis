@@ -307,7 +307,7 @@
     key
     (dissoc key :key-code)))
 
-(def processors (atom [fallback-processor hid-processor]))
+(defonce processors (atom [fallback-processor hid-processor]))
 
 (defn from-code [code]
   (key-cleanup (reduce #(%2 %1 code) {} @processors)))

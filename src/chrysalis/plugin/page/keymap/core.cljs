@@ -29,7 +29,8 @@
 
             [garden.units :as gu]
             [chrysalis.key :as key]
-            [chrysalis.settings :as settings]))
+            [chrysalis.settings :as settings]
+            [chrysalis.plugin.Kaleidoscope.OneShot.keymap]))
 
 (defn <live-update> []
   [:form.form-group.form-check

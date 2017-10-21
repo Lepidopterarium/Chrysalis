@@ -17,26 +17,46 @@
 (ns chrysalis.plugin.Kaleidoscope.OneShot.core
   (:require [clojure.string :as s]
 
-            [chrysalis.key :as key :refer [processors]]))
+            [chrysalis.key :as key]))
+
+(def osm-start 0xc001)
+(def osm-end (+ osm-start 7))
+(def osm-offset 224) ; Code for first modifier (control_l)
+(def osl-start 0xc009)
+;; Docs
+(def osl-end (+ osl-start 7))
 
 (defn- oneshot-processor [key code]
   (cond
-    (and (>= code 0xc001)
-         (<= code 0xc008)) (assoc key
-                                  :plugin :oneshot
-                                  :type :modifier
-                                  :modifier (:key (nth key/HID-Codes (+ (- code 0xc001) 224))))
-    (and (>= code 0xc009)
-         (<= code (+ 0xc009 7))) (assoc key
-                                          :plugin :oneshot
-                                          :type :layer
-                                          :layer (- code 0xc009))
-    :default key))
+    (<= osm-start code osm-end)
+    (assoc key
+           :plugin :oneshot
+           :type :modifier
+           :modifier (:key (nth key/HID-Codes (+ (- code osm-start) osm-offset))))
 
-(defmethod key/format [:oneshot] [key]
+    (<= osl-start code osl-end)
+    (assoc key
+           :plugin :oneshot
+           :type :layer
+           :layer (- code osl-start))
+
+    :else key))
+
+(swap! key/processors conj oneshot-processor)
+
+(defmethod key/format [:oneshot]
+  [key]
   {:primary-text (if (= (:type key) :modifier)
                    (:primary-text (key/format {:plugin :core :key (:modifier key)}))
                    (str "L" (:layer key)))
    :extra-text "OS"})
 
-(swap! processors concat [oneshot-processor])
+(defmethod key/unformat :oneshot
+  [key]
+  (case type
+    :modifier (let [modifier (:modifier key)
+                    code (->> key/HID-Codes
+                             (map-indexed vector)
+                             (some (fn [[i {k :key}]] (when (= k modifier) i))))]
+                (+ osm-start (- code osm-offset)))
+    :layer (+ (:layer key) osl-start)))

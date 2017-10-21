@@ -256,8 +256,7 @@
   [re]
   (into []
         (comp (remove nil?)
-              (filter (fn [{k :key}]
-                        (and k (re-matches re (name k))))))
+              (filter (fn [{k :key}] (some->> k name (re-matches re)))))
         key/HID-Codes))
 
 ;; TODO: is this the best place to do this?
