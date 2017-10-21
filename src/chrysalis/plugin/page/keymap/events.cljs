@@ -79,35 +79,51 @@
  (fn [db [_ [_ _ _ response]]]
    (assoc db :keymap/layout (post-process/format :keymap.map response))))
 
+(defn- empty-layer
+  [device]
+  (let [keys-per-layer (if-let [keymap-layout (get-in device [:keymap :map])]
+                         (reduce + 0 (mapcat count keymap-layout))
+                         (->> (get-in device [:meta :matrix])
+                             (apply *)))]
+    (vec (repeat keys-per-layer {:plugin :core, :key :transparent}))))
+
+(defn- pad-layouts
+  "Add transparent layers to layout up to layer n"
+  [layout n device]
+  (reduce
+    (fn [layout layer]
+      (if (nil? (get layout layer))
+        (assoc layout layer (empty-layer device))
+        layout))
+    layout
+    (range (inc n))))
+
 (re-frame/reg-event-fx
- :keymap/layout!
+ :keymap/load-preset
  (fn [{db :db :as cofx} [_ layout]]
-   (-> {:db (assoc db :keymap/layout layout)}
-       (cond->
-           (db :keymap/live-update) (assoc :keymap/layout.upload layout)))))
+   (let [cur-layer (or (dec (:keymap/layer db)) 0)
+         changes (into
+                   {}
+                   (map-indexed (fn [idx key] [[cur-layer idx] key]))
+                   layout)]
+     {:db (-> db
+              (update :keymap/layout.edits merge changes)
+              (update :keymap/layout pad-layouts cur-layer (:device/current db)))})))
 
 (re-frame/reg-fx
  :keymap/layout
  (fn []
    (command/run :keymap.map nil :keymap/layout.process)))
 
-(defn- empty-layer
-  []
-  (let [device (device/current)
-        keys-per-layer (if-let [keymap-layout (get-in device [:keymap :map])]
-                         (reduce + 0 (mapcat count keymap-layout))
-                         (->> (get-in device [:meta :matrix])
-                             (apply *)))]
-    (vec (repeat keys-per-layer {:plugin :core, :key :transparent}))))
-
 (re-frame/reg-event-fx
   :keymap/change-key!
   (fn [{db :db} [_ layer index new-key]]
-    (-> {:db (assoc-in db [:keymap/layout.edits [layer index]] new-key)}
+    (-> {:db (-> db
+                 (assoc-in [:keymap/layout.edits [layer index]] new-key)
+                 (update :keymap/layout pad-layouts layer (:device/current db)))}
         (cond->
-            (:keymap/live-update db) (assoc :dispatch [:keymap/layout.upload])
-            (nil? (get-in db [:keymap/layout layer]))
-            (assoc-in [:db :keymap/layout layer] (empty-layer))))))
+          (:keymap/live-update db)
+          (assoc :dispatch [:keymap/layout.upload])))))
 
 (re-frame/reg-event-fx
  :keymap/layout.update

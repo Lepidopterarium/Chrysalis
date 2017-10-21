@@ -12,15 +12,18 @@
  (fn [db _]
    (:keymap/presets db)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :keymap/presets.drop
- (fn [db [_ preset-name]]
-   (update db :keymap/presets dissoc preset-name)))
+ (fn [{db :db settings :settings} [_ preset-name]]
+   (let [db (update db :keymap/presets dissoc preset-name)
+         settings (settings/save! db :keymap)]
+     {:db (assoc db :settings settings)
+      :settings/save settings})))
 
 (re-frame/reg-event-fx
  :keymap/presets.add
  (fn [{db :db settings :settings} [_ preset-name layout]]
-   ;; TODO: do we really have to do this manually?
+   ;; TODO: do we really have to save settings manually?
    (let [db (update db :keymap/presets assoc preset-name layout)
          settings (settings/save! db :keymap)]
      {:db (assoc db :settings settings)
