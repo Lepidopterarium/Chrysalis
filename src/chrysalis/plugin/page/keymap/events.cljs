@@ -126,9 +126,10 @@
           (assoc :dispatch [:keymap/layout.upload])))))
 
 (re-frame/reg-event-fx
- :keymap/layout.update
- (fn [cofx _]
-   {:keymap/layout :update}))
+  :keymap/layout.update
+  (fn [cofx _]
+    {:keymap/layout :update
+     :db (assoc (:db cofx) :keymap/layout.edits {})}))
 
 (re-frame/reg-fx
  :keymap/layout.upload
