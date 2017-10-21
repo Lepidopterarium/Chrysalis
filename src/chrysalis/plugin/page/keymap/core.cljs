@@ -70,56 +70,60 @@
   (some (fn [[idx item]] (when (= item x) idx))
         (map-indexed vector v)))
 
+(defn- edit-tab-view
+  [tab {:keys [layer index]}]
+  (let [key (events/layout-key layer index)]
+    [:div
+     [:select.custom-select
+      {:value (or (vindex-of (:keys tab)
+                             (dissoc key :modifiers))
+                  0)
+       :on-change (fn [e] (let [idx (js/parseInt (.. e -target -value) 10)
+                               new-key (get-in tab [:keys idx])]
+                           ;; Should changing the key preserve the existing modifiers?
+                           (events/change-key! layer index new-key)))}
+      (doall
+        (for [[i k] (map-indexed vector (:keys tab))]
+          ^{:key k}
+          [:option {:value i} (key-name k)]))]
+     (when (:modifiers? tab)
+       (doall
+         (for [modifier [:shift :control :gui :left-alt :right-alt]]
+           ^{:key modifier}
+           [:label.form-check-label
+            [:input.form-check-input
+             {:type :checkbox
+              :disabled (nil? (:key key))
+              :checked (contains? (:modifiers key) modifier)
+              :on-change
+              (fn [e]
+                (let [f (if (.. e -target -checked) conj disj)]
+                  (events/change-key!
+                    layer index
+                    (update key :modifiers (fnil f #{}) modifier))))}]
+
+            (name modifier)])))]))
+
 (defn edit-tabs-view
   [args]
   (let [current-tab-idx (r/atom 0)
         tabs (events/edit-tabs)
         cur-tab (reaction (get tabs @current-tab-idx))]
     (fn [{:keys [index layer] :as args}]
-      (let [key (events/layout-key layer index)]
-        [:div.edit-controls
-         [:ul.nav.nav-tabs
-          (doall
-            (for [[idx tab] (map-indexed vector tabs)]
-              ^{:key [idx (:title tab)]}
-              [:li
-               [:a.nav-link
-                {:href "#"
-                 :class (when (= idx @current-tab-idx) "active")
-                 :on-click (fn [e]
-                             (.preventDefault e)
-                             (reset! current-tab-idx idx))}
-                (:title tab)]]))]
-         [:div
-          [:select.custom-select
-           {:value (or (vindex-of (:keys @cur-tab)
-                                  (dissoc key :modifiers))
-                       0)
-            :on-change (fn [e] (let [idx (js/parseInt (.. e -target -value) 10)
-                                    new-key (get-in @cur-tab [:keys idx])]
-                                ;; Should changing the key preserve the existing modifiers?
-                                (events/change-key! layer index new-key)))}
-           (doall
-             (for [[i k] (map-indexed vector (:keys @cur-tab))]
-               ^{:key k}
-               [:option {:value i} (key-name k)]))]
-          (when (:modifiers? @cur-tab)
-            (doall
-              (for [modifier [:shift :control :gui :left-alt :right-alt]]
-                ^{:key modifier}
-                [:label.form-check-label
-                 [:input.form-check-input
-                  {:type :checkbox
-                   :disabled (nil? (:key key))
-                   :checked (contains? (:modifiers key) modifier)
-                   :on-change
-                   (fn [e]
-                     (let [f (if (.. e -target -checked) conj disj)]
-                       (events/change-key!
-                         layer index
-                         (update key :modifiers (fnil f #{}) modifier))))}]
-
-                 (name modifier)])))]]))))
+      [:div.edit-controls
+       [:ul.nav.nav-tabs
+        (doall
+          (for [[idx tab] (map-indexed vector tabs)]
+            ^{:key [idx (:title tab)]}
+            [:li
+             [:a.nav-link
+              {:href "#"
+               :class (when (= idx @current-tab-idx) "active")
+               :on-click (fn [e]
+                           (.preventDefault e)
+                           (reset! current-tab-idx idx))}
+              (:title tab)]]))]
+       [edit-tab-view @cur-tab args]])))
 
 (defn selected-key-view
   [{:keys [index key layer] :as args}]
