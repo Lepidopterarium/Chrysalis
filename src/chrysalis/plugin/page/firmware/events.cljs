@@ -32,22 +32,23 @@
                                      "debug" true}))]
      (re-frame/dispatch [:firmware/state :uploading])
      (device/select! nil)
-     (.flash avrgirl hex-name (fn [error]
-                                (when error
-                                  (.error js/console error))
-                                (.setTimeout js/window
-                                             (fn []
-                                               (device/detect!)
-                                               (.setTimeout js/window
-                                                            (fn []
-                                                              (device/select-by-serial! (:serialNumber device))
-                                                              (re-frame/dispatch [:device/open.current])
-                                                              (re-frame/dispatch [:firmware/version.update])
-                                                              (if error
-                                                                (re-frame/dispatch [:firmware/state :error])
-                                                                (re-frame/dispatch [:firmware/state :success])))
-                                                            1000))
-                                             2000))))))
+     (.flash avrgirl hex-name
+             (fn [error]
+               (when error
+                 (.error js/console error))
+               (.setTimeout js/window
+                            (fn []
+                              (device/detect!)
+                              (.setTimeout js/window
+                                           (fn []
+                                             (device/select-by-serial! (:serialNumber device))
+                                             (re-frame/dispatch [:device/open.current])
+                                             (re-frame/dispatch [:firmware/version.update])
+                                             (if error
+                                               (re-frame/dispatch [:firmware/state :error])
+                                               (re-frame/dispatch [:firmware/state :success])))
+                                           1000))
+                            2000))))))
 
 (re-frame/reg-event-fx
  :firmware/upload

@@ -21,11 +21,12 @@
             [chrysalis.plugin.page.keymap.events :as events]
 
             [re-frame.core :as re-frame]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.set :as set]))
 
 (defn- key-index [device r c cols]
   (if-let [keymap-layout (get-in device [:keymap :map])]
-    (nth (nth keymap-layout r) c)
+    (get-in keymap-layout [r c])
     (+ (* r cols) c)))
 
 (defn- current-node? [r c]
@@ -35,12 +36,15 @@
       (and (= r cr) (= c cc)))
     false))
 
-(defn- node-update [device node theme interactive?]
-  (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
+(defn- node-update [device layer node theme interactive?]
+  (let [[r c] (->> node :id
+                  (re-find #"R(\d+)C(\d+)_keyshape$")
+                  rest
+                  (map #(js/parseInt % 10)))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            ]
+            edited? (contains? (events/layout-edits) [layer index])]
         (if interactive?
           (assoc node
                  :class :key
@@ -53,43 +57,42 @@
                  :stroke (if (current-node? r c)
                            "#ff0000"
                            "#b4b4b4")
+                 :fill (if edited?
+                         "rgba(255,0,0,0.5)"
+                         "rgba(255,255,255,0)")
                  :on-click (fn [e]
                              (let [target (.-target e)]
                                (events/current-target! target))))))
       node)))
 
-
-
 (defn- print-labels
   "Print key labels on the SVG"
-  [device node]
-
+  [device layout node layer]
   (let [id (:id (get node 1))
-        label (last (re-find #"_t_(.*)" id))
-        [r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)" id)))]
-
-
+        [_ label] (re-find #"_t_(.*)" id)
+        [r c] (->> id
+                  (re-find #"R(\d+)C(\d+)") rest
+                  (map #(js/parseInt % 10)))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            ;; Note layers are 1-indexed, so we need `dec` to go to
-            ;; zero-indexed clojure vectors
-            formatted-key (key/format (get-in (events/layout) [(dec (events/layer)) index]))]
+            formatted-key (-> layout (get-in [layer index]) key/format)]
         (assoc node 2 (get formatted-key (keyword (str label "-text")))))
       node)))
 
-(defn prepare [device svg layout props]
+(defn layout-svg
+  [{:keys [device svg layout props layer]}]
   (walk/prewalk (fn [node]
                   (if (and (vector? node) (= (first node) :text))
-                    (print-labels device node)
+                    (print-labels device layout node layer)
                     (if (and (map? node) (get node :id))
-                      (node-update device node layout (:interactive? props))
+                      (node-update device layer node layout (:interactive? props))
                       node)))
-
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
+                    (update 1 merge (dissoc props :interactive?))
+                    (update 1 set/rename-keys {:viewbox :view-box}))))
 
-(defn <keymap-layout> [device svg layout props]
+(defn <keymap-layout> [{:keys [device svg layout props layer] :as args}]
   (if layout
-    (prepare device svg layout props)
+    [layout-svg args]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))

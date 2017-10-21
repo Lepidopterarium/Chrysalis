@@ -25,15 +25,13 @@
 (re-frame/reg-event-fx
  :page/add!
  (fn [cofx [_ key page-data]]
-   {:db (assoc-in (:db cofx)
-                  [:pages key]
-                  page-data)}))
+   {:db (assoc-in (:db cofx) [:pages key] page-data)}))
 
 (re-frame/reg-sub
  :page/current
  (fn [db _]
-   (assoc (get-in db [:pages (:page/current db)])
-          :key (:page/current db))))
+   (-> (get-in db [:pages (:page/current db)])
+       (assoc :key (:page/current db)))))
 
 (re-frame/reg-sub
  :page/list
@@ -47,8 +45,7 @@
    (let [new-page (get-in (:db cofx) [:pages page])
          current-device (:device/current (:db cofx))]
      (->
-      {:db (assoc (:db cofx)
-                  :page/current page)
+      {:db (assoc (:db cofx) :page/current page)
        :key-bindings/reset true
        :settings/save (get-in cofx [:db :settings])}
 
@@ -61,7 +58,7 @@
 ;;; ---- helpers ---- ;;;
 
 (defn add! [key page-data]
-  (re-frame/dispatch [:page/add! key page-data]))
+  (js/setTimeout (fn [] (re-frame/dispatch [:page/add! key page-data])) 0))
 
 (defn current []
   @(re-frame/subscribe [:page/current]))

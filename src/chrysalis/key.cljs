@@ -255,34 +255,33 @@
    {:plugin :core, :key :right-alt}
    {:plugin :core, :key :right-gui}])
 
+(def key->hid
+  "Given a key name, like :right-arrow, get the corresponding numeric
+  HID code"
+  (-> (into {} (map-indexed (fn [i {k :key}] [k i])) HID-Codes)
+      (assoc nil 0)))
+
 (defn- fallback-processor [_ code]
   {:plugin :unknown
    :key-code code})
 
-(defn- control-held [mods flags]
-  (if (bit-test flags 0)
-    (conj mods :left-control)
-    mods))
+(def modifier-bits
+  {:control 0
+   :left-alt 1
+   :right-alt 2
+   :shift 3
+   :gui 4})
 
-(defn- left-alt-held [mods flags]
-  (if (bit-test flags 1)
-    (conj mods :left-alt)
-    mods))
-
-(defn- right-alt-held [mods flags]
-  (if (bit-test flags 2)
-    (conj mods :right-alt)
-    mods))
-
-(defn- shift-held [mods flags]
-  (if (bit-test flags 3)
-    (conj mods :left-shift)
-    mods))
-
-(defn- gui-held [mods flags]
-  (if (bit-test flags 4)
-    (conj mods :left-gui)
-    mods))
+(defn- modifiers-set
+  "Given the flags bits, return a set of keywords indicating which
+  modifiers have been set."
+  [flags]
+  (reduce (fn [mods [mod bit]]
+            (if (bit-test flags bit)
+              (conj mods mod)
+              mods))
+          #{}
+          modifier-bits))
 
 (defn- hid-processor [key code]
   (let [flags (bit-shift-right code 8)
@@ -295,10 +294,10 @@
       (bit-test flags 7) key
       ;; Normal keys (with optional modifiers)
       (and (>= flags 0)
-           (<= flags (bit-shift-left 1 4))) (assoc (nth HID-Codes key-code {:plugin :unknown :code key-code})
-                                                   :plugin :core
-                                                   :modifiers (reduce #(%2 %1 flags) []
-                                                                      [control-held left-alt-held right-alt-held shift-held gui-held]))
+           (<= flags (bit-shift-left 1 4)))
+      (assoc (nth HID-Codes key-code {:plugin :unknown :code key-code})
+             :plugin :core
+             :modifiers (modifiers-set flags))
       ;; Synthetic
       (bit-test flags 6) key
       :default (keyword key))))
@@ -320,94 +319,102 @@
 (defmethod format :default [key]
   {:primary-text "<???>"})
 
-(defmethod format [:core] [key]
-  (condp = (:key key)
-    nil {:primary-text "NoKey"
-         :foreground "red"}
-    :transparent {:primary-text "Trns"
-                  :foreground "red"}
-    :left-shift {:primary-text "Shift L"}
-    :right-shift {:primary-text "Shift R"}
-    :left-alt {:primary-text "Alt L"}
-    :right-alt {:primary-text "Alt R"}
-    :left-control {:primary-text "Ctrl L"}
-    :right-control {:primary-text "Ctrl R"}
-    :space {:primary-text "SPC"}
-    :backspace {:primary-text "BSPC"}
-    :escape {:primary-text "ESC"}
-    :minus {:primary-text "-"}
-    :equals {:primary-text "="}
-    :left-square-bracket {:primary-text "["}
-    :right-square-bracket {:primary-text "]"}
-    :backslash {:primary-text "\\"}
-    :non-US-pound {:primary-text "£"}
-    :semicolon {:primary-text ";"}
-    :quote {:primary-text "\""}
-    :backtick {:primary-text "`"}
-    :comma {:primary-text ","}
-    :dot {:primary-text "."}
-    :slash {:primary-text "/"}
-    :caps-lock {:primary-text "Caps"}
-    :print-screen {:primary-text "Pr Sc"}
-    :scroll-lock {:primary-text "⤓"}
-    :insert {:primary-text "Ins"}
-    :page-up {:primary-text "PgUp"}
-    :delete {:primary-text "Del"}
-    :page-down {:primary-text "PgDn"}
-    :right-arrow {:primary-text "→"}
-    :left-arrow {:primary-text "←"}
-    :down-arrow {:primary-text "↓"}
-    :up-arrow {:primary-text "↑"}
-    :num-lock {:primary-text "NumLck"}
-    :keypad_divide {:primary-text "/"}
-    :keypad_multiply {:primary-text "*"}
-    :keypad_minus {:primary-text "-"}
-    :keypad_plus {:primary-text "+"}
-    :keypad_enter {:primary-text "Enter"}
-    :keypad_1 {:primary-text "1"}
-    :keypad_2 {:primary-text "2"}
-    :keypad_3 {:primary-text "3"}
-    :keypad_4 {:primary-text "4"}
-    :keypad_5 {:primary-text "5"}
-    :keypad_6 {:primary-text "6"}
-    :keypad_7 {:primary-text "7"}
-    :keypad_8 {:primary-text "8"}
-    :keypad_9 {:primary-text "9"}
-    :keypad_0 {:primary-text "0"}
-    :keypad_dot {:primary-text "."}
-    :keypad_equals {:primary-text "="}
-    :execute {:primary-text ""}
-    :select {:primary-text "Sel"}
-    :volume-up {:primary-text "Vol +"}
-    :volume-down {:primary-text "Vol -"}
-    :keypad_comma {:primary-text ","}
-    :keypad_equal-sign {:primary-text "="}
-    :return {:primary-text "Ret"}
-    :keypad_opening-parens {:primary-text "("}
-    :keypad_closing-parens {:primary-text ")"}
-    :keypad_opening-curly-braces {:primary-text "{"}
-    :keypad_closing-curly-brackes {:primary-text "}"}
-    :keypad_tab {:primary-text "Tab"}
-    :keypad_backspace {:primary-text "BSPC"}
-    :keypad_a {:primary-text "a"}
-    :keypad_b {:primary-text "b"}
-    :keypad_c {:primary-text "c"}
-    :keypad_d {:primary-text "d"}
-    :keypad_e {:primary-text "e"}
-    :keypad_f {:primary-text "f"}
-    :keypad_caret {:primary-text "^"}
-    :keypad_percent {:primary-text "%"}
-    :keypad_< {:primary-text "<"}
-    :keypad_> {:primary-text ">"}
-    :keypad_& {:primary-text "&"}
-    :keypad_| {:primary-text "|"}
-    :keypad_colon {:primary-text ":"}
-    :keypad_# {:primary-text "#"}
-    :keypad_space {:primary-text "SPC"}
-    :keypad_at {:primary-text "@"}
-    :keypad_! {:primary-text "!"}
+(def key->description
+  {nil {:primary-text "NoKey"
+        :foreground "red"}
+   :transparent {:primary-text "Trns"
+                 :foreground "red"}
+   :left-shift {:primary-text "Shift L"}
+   :right-shift {:primary-text "Shift R"}
+   :left-alt {:primary-text "Alt L"}
+   :right-alt {:primary-text "Alt R"}
+   :left-control {:primary-text "Ctrl L"}
+   :right-control {:primary-text "Ctrl R"}
+   :space {:primary-text "SPC"}
+   :backspace {:primary-text "BSPC"}
+   :escape {:primary-text "ESC"}
+   :minus {:primary-text "-"}
+   :equals {:primary-text "="}
+   :left-square-bracket {:primary-text "["}
+   :right-square-bracket {:primary-text "]"}
+   :backslash {:primary-text "\\"}
+   :non-US-pound {:primary-text "£"}
+   :semicolon {:primary-text ";"}
+   :quote {:primary-text "\""}
+   :backtick {:primary-text "`"}
+   :comma {:primary-text ","}
+   :dot {:primary-text "."}
+   :slash {:primary-text "/"}
+   :caps-lock {:primary-text "Caps"}
+   :print-screen {:primary-text "Pr Sc"}
+   :scroll-lock {:primary-text "⤓"}
+   :insert {:primary-text "Ins"}
+   :page-up {:primary-text "PgUp"}
+   :delete {:primary-text "Del"}
+   :page-down {:primary-text "PgDn"}
+   :right-arrow {:primary-text "→"}
+   :left-arrow {:primary-text "←"}
+   :down-arrow {:primary-text "↓"}
+   :up-arrow {:primary-text "↑"}
+   :num-lock {:primary-text "NumLck"}
+   :keypad_divide {:primary-text "/"}
+   :keypad_multiply {:primary-text "*"}
+   :keypad_minus {:primary-text "-"}
+   :keypad_plus {:primary-text "+"}
+   :keypad_enter {:primary-text "Enter"}
+   :keypad_1 {:primary-text "1"}
+   :keypad_2 {:primary-text "2"}
+   :keypad_3 {:primary-text "3"}
+   :keypad_4 {:primary-text "4"}
+   :keypad_5 {:primary-text "5"}
+   :keypad_6 {:primary-text "6"}
+   :keypad_7 {:primary-text "7"}
+   :keypad_8 {:primary-text "8"}
+   :keypad_9 {:primary-text "9"}
+   :keypad_0 {:primary-text "0"}
+   :keypad_dot {:primary-text "."}
+   :keypad_equals {:primary-text "="}
+   :execute {:primary-text ""}
+   :select {:primary-text "Sel"}
+   :volume-up {:primary-text "Vol +"}
+   :volume-down {:primary-text "Vol -"}
+   :keypad_comma {:primary-text ","}
+   :keypad_equal-sign {:primary-text "="}
+   :return {:primary-text "Ret"}
+   :keypad_opening-parens {:primary-text "("}
+   :keypad_closing-parens {:primary-text ")"}
+   :keypad_opening-curly-braces {:primary-text "{"}
+   :keypad_closing-curly-brackes {:primary-text "}"}
+   :keypad_tab {:primary-text "Tab"}
+   :keypad_backspace {:primary-text "BSPC"}
+   :keypad_a {:primary-text "a"}
+   :keypad_b {:primary-text "b"}
+   :keypad_c {:primary-text "c"}
+   :keypad_d {:primary-text "d"}
+   :keypad_e {:primary-text "e"}
+   :keypad_f {:primary-text "f"}
+   :keypad_caret {:primary-text "^"}
+   :keypad_percent {:primary-text "%"}
+   :keypad_< {:primary-text "<"}
+   :keypad_> {:primary-text ">"}
+   :keypad_& {:primary-text "&"}
+   :keypad_| {:primary-text "|"}
+   :keypad_colon {:primary-text ":"}
+   :keypad_# {:primary-text "#"}
+   :keypad_space {:primary-text "SPC"}
+   :keypad_at {:primary-text "@"}
+   :keypad_! {:primary-text "!"}})
 
-    {:primary-text (s/capitalize (name (:key key)))}))
+(def mod->short-name
+  {:control "C"
+   :left-alt "M"
+   :gui "s"
+   :shift "S"
+   :right-alt "AltGr"})
+
+(defmethod format [:core] [{key :key mods :modifiers}]
+  (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
+         :secondary-text (s/join "-" (map mod->short-name mods))))
 
 (defmethod post-process/format [:keymap.map] [_ text]
   (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
@@ -417,3 +424,20 @@
         (partition keymap-size)
         (map vec)
         vec)))
+
+(defmulti unformat :plugin)
+
+(defn mods->flags
+  [mods]
+  (reduce (fn [flags mod]
+            (bit-set flags (modifier-bits mod)))
+          0
+          mods))
+
+(defmethod unformat :core
+  [key]
+  (let [key-code (if (= (:key key) :transparent)
+                   0xffff
+                   (key->hid (:key key)))
+        modifiers (mods->flags (:modifiers key))]
+    (bit-or (bit-shift-left modifiers 8) key-code)))

@@ -20,7 +20,9 @@
 
             [re-frame.core :as re-frame]
             [clojure.walk :as walk]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [chrysalis.key :as key]
+            [chrysalis.device :as device]))
 
 ;;; ---- Current target ------ ;;;
 
@@ -42,23 +44,71 @@
 
 ;;; ---- Layout ---- ;;;
 
+(defn merge-edits
+  [{edits :keymap/layout.edits layout :keymap/layout :as db}]
+  (reduce (fn [layout [[layer index :as path] key]]
+            (assoc-in layout path key))
+          layout
+          edits))
+
 (re-frame/reg-sub
  :keymap/layout
  (fn [db _]
-   (:keymap/layout db)))
+   (merge-edits db)))
+
+(re-frame/reg-sub
+  :keymap/layout.key
+  ;; Get the current committed binding for the given key
+  (fn [db [_ layer index]]
+    (get-in db [:keymap/layout.edits [layer index]]
+            (get-in db [:keymap/layout layer index]))))
+
+(re-frame/reg-sub
+  :keymap/layout.key.current
+  ;; Get the current committed binding for the given key
+  (fn [db [_ layer index]]
+    (get-in db [:keymap/layout layer index])))
+
+(re-frame/reg-sub
+  :keymap/layout.edits
+  (fn [db]
+    (:keymap/layout.edits db)))
 
 (re-frame/reg-event-db
  :keymap/layout.process
  (fn [db [_ [_ _ _ response]]]
    (assoc db :keymap/layout (post-process/format :keymap.map response))))
 
+(defn- empty-layer
+  [device]
+  (let [keys-per-layer (if-let [keymap-layout (get-in device [:keymap :map])]
+                         (reduce + 0 (mapcat count keymap-layout))
+                         (->> (get-in device [:meta :matrix])
+                             (apply *)))]
+    (vec (repeat keys-per-layer {:plugin :core, :key :transparent}))))
+
+(defn- pad-layouts
+  "Add transparent layers to layout up to layer n"
+  [layout n device]
+  (reduce
+    (fn [layout layer]
+      (if (nil? (get layout layer))
+        (assoc layout layer (empty-layer device))
+        layout))
+    layout
+    (range (inc n))))
+
 (re-frame/reg-event-fx
- :keymap/layout!
- (fn [cofx [_ layout]]
-   (let [live? (get-in (:db cofx) [:keymap/live-update])]
-     (-> {:db (assoc (:db cofx) :keymap/layout layout)}
-         (cond->
-             live? (assoc :keymap/layout.upload layout))))))
+ :keymap/load-preset
+ (fn [{db :db :as cofx} [_ layout]]
+   (let [cur-layer (dec (or (:keymap/layer db) 1))
+         changes (into
+                   {}
+                   (map-indexed (fn [idx key] [[cur-layer idx] key]))
+                   layout)]
+     {:db (-> db
+              (update :keymap/layout.edits merge changes)
+              (update :keymap/layout pad-layouts cur-layer (:device/current db)))})))
 
 (re-frame/reg-fx
  :keymap/layout
@@ -66,24 +116,57 @@
    (command/run :keymap.map nil :keymap/layout.process)))
 
 (re-frame/reg-event-fx
- :keymap/layout.update
- (fn [cofx _]
-   {:keymap/layout :update}))
+  :keymap/change-key!
+  (fn [{db :db} [_ layer index new-key]]
+    (-> {:db (-> db
+                 (assoc-in [:keymap/layout.edits [layer index]] new-key)
+                 (update :keymap/layout pad-layouts layer (:device/current db)))}
+        (cond->
+          (:keymap/live-update db)
+          (assoc :dispatch [:keymap/layout.upload])))))
+
+(re-frame/reg-event-fx
+  :keymap/layout.update
+  (fn [cofx _]
+    {:keymap/layout :update
+     :db (assoc (:db cofx) :keymap/layout.edits {})}))
 
 (re-frame/reg-fx
  :keymap/layout.upload
  (fn [layout]
-   (command/run :keymap.layout (->> layout
-                                flatten
-                                (s/join " ")) :discard)))
+   ;; TODO: do we need to process the layout here?
+   (command/run :keymap.layout
+     (->> layout flatten (s/join " "))
+     :discard)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
- (fn [cofx _]
-   {:keymap/layout.upload (get-in cofx [:db :keymap/layout])}))
+ (fn [{db :db} _]
+   (let [new-layout (merge-edits db)]
+     {:keymap/layout.upload new-layout
+      :db (assoc db
+                 :keymap/layout new-layout
+                 :keymap/layout.edits {})})))
+
+(defn change-key!
+  [row col new-key]
+  (re-frame/dispatch [:keymap/change-key! row col new-key]))
 
 (defn layout []
   @(re-frame/subscribe [:keymap/layout]))
+
+(defn layout-edits []
+  @(re-frame/subscribe [:keymap/layout.edits]))
+
+(defn saved-layout-key
+  "Get the current binding for the key on layer `layer` at index
+  `index`, ignoring pending edits."
+  [layer index]
+  @(re-frame/subscribe [:keymap/layout.key.current layer index]))
+
+(defn layout-key
+  [layer index]
+  @(re-frame/subscribe [:keymap/layout.key layer index]))
 
 (defn layout:update! []
   (re-frame/dispatch [:keymap/layout.update]))
@@ -91,29 +174,121 @@
 (defn layout:upload! []
   (re-frame/dispatch [:keymap/layout.upload]))
 
-
 (defn switch-layer [layer]
-  (re-frame/dispatch [:keymap/switch-layer layer])
-  )
+  (re-frame/dispatch [:keymap/switch-layer layer]))
 
 (re-frame/reg-event-fx
  :keymap/switch-layer
- (fn [cofx event]
-   (let [layer (js/parseInt (second event))
-
-
-         db (:db cofx)]
-     {:db (assoc db :keymap/layer layer)})))
-
+ (fn [{db :db :as cofx} [_ layer]]
+   {:db (assoc db :keymap/layer layer)}))
 
 (defn layer []
   @(re-frame/subscribe [:keymap/layer]))
 
-
 (re-frame/reg-sub
  :keymap/layer
  (fn [db _]
-   (let [layer (:keymap/layer db)]
-     (if layer
-       layer
-       1))))
+   (if-let [layer (:keymap/layer db)]
+     layer
+     1)))
+
+;;; ---- Live update ---- ;;;
+(re-frame/reg-event-fx
+  :keymap/live-update
+  (fn [{db :db} [_ live?]]
+    (-> {:db (assoc db :keymap/live-update live?)}
+        (cond->
+            (and live? (seq (:keymap/layout.edits db)))
+          ;; if switching to live, commit existing edits
+          (assoc :dispatch [:keymap/layout.upload])))))
+
+(re-frame/reg-sub
+  :keymap/live-update
+  (fn [db _]
+    (:keymap/live-update db)))
+
+(defn live-update? []
+  @(re-frame/subscribe [:keymap/live-update]))
+
+(defn live-update!
+  [live?]
+  (re-frame/dispatch [:keymap/live-update live?]))
+
+;;; --- Key editing tabs --- ;;;
+
+(re-frame/reg-event-fx
+  :keymap/add-edit-tab
+  (fn [{db :db} [_ {title :title :as tab}]]
+    {:db (-> (assoc-in db [:keymap/edit-tabs title] tab)
+             (cond->
+                 (nil? (get-in db [:keymap/edit-tabs title]))
+               (update :keymap/edit-tabs-order (fnil conj []) title)))}))
+
+(re-frame/reg-event-fx
+  :keymap/remove-edit-tab
+  (fn [{db :db} [_ title]]
+    {:db (-> db
+             (update :keymap/edit-tabs dissoc title)
+             (update :keymap/edit-tabs-order
+                     (partial filterv #(not= title %))))}))
+
+(re-frame/reg-sub
+  :keymap/edit-tabs
+  (fn [db _]
+    (mapv (:keymap/edit-tabs db) (:keymap/edit-tabs-order db))))
+
+(defn add-edit-tab!
+  [tab]
+  (re-frame/dispatch [:keymap/add-edit-tab tab]))
+
+(defn remove-edit-tab!
+  [title]
+  (re-frame/dispatch [:keymap/remove-edit-tab title]))
+
+(defn edit-tabs
+  []
+  @(re-frame/subscribe [:keymap/edit-tabs]))
+
+;; add default tabs
+
+(defn- keys-like
+  "Helper function for selecting groups of keys by regex of their name"
+  [re]
+  (into []
+        (comp (remove nil?)
+              (filter (fn [{k :key}]
+                        (and k (re-matches re (name k))))))
+        key/HID-Codes))
+
+;; TODO: is this the best place to do this?
+(add-edit-tab!
+  {:title "Alphanumeric"
+   :keys (keys-like #"\d|\w")
+   :modifiers? true})
+
+(add-edit-tab!
+  {:title "Punctuation & Spaces"
+   :modifiers? true
+   :keys
+   (into []
+         (comp (drop-while #(not= :enter (:key %)))
+               (take-while #(not= :F1 (:key %))))
+         key/HID-Codes)})
+
+(add-edit-tab!
+  {:title "Modifiers"
+   ;; Should modifier keys be able to have additional modifiers on
+   ;; them? Does this make sense? Do they need to have their own
+   ;; modifier added?
+   :modifiers? false
+   :keys (keys-like #"(left|right)-(control|shift|alt|gui)")})
+
+(add-edit-tab!
+  {:title "Function"
+   :modifiers? true
+   :keys (keys-like #"F\d+")})
+
+(add-edit-tab!
+  {:title "Keypad"
+   :modifiers? true
+   :keys (keys-like #"keypad_.*")})

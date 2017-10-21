@@ -94,8 +94,7 @@
 (re-frame/reg-event-fx
  :device/scan-finished
  (fn [cofx [_ devices]]
-   {:db (assoc (:db cofx)
-               :device/list devices)}))
+   {:db (assoc (:db cofx) :device/list devices)}))
 
 (re-frame/reg-event-fx
  :device/scan

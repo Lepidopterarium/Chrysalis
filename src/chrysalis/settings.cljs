@@ -15,21 +15,21 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns chrysalis.settings
-  (:require [re-frame.core :as re-frame]))
+  (:require [re-frame.core :as re-frame]
+            [cljs.reader :as edn]))
 
 (defonce config-file (str (.getPath (.-app (.-remote (js/require "electron")))
                                     "userData")
-                          "/settings.json"))
+                          "/settings.edn"))
 
 (re-frame/reg-cofx
  :settings/load
  (fn [cofx _]
    (let [fs (js/require "fs")]
      (when (.existsSync fs config-file)
-       (let [contents (js->clj (as-> fs $
-                                 (.readFileSync $ config-file #js {"encoding" "utf-8"})
-                                 (.parse js/JSON $))
-                               :keywordize-keys true)]
+       (let [contents (-> fs
+                        (.readFileSync config-file #js {"encoding" "utf-8"})
+                        edn/read-string)]
          (assoc cofx :settings contents))))))
 
 (re-frame/reg-fx
@@ -37,9 +37,7 @@
  (fn [settings]
    (let [fs (js/require "fs")]
      (.writeFileSync fs config-file
-                     (->> settings
-                          clj->js
-                          (.stringify js/JSON))
+                     (pr-str settings)
                      #js {"mode" 0644}))))
 
 (defmulti apply!
