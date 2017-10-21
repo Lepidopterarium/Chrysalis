@@ -171,7 +171,7 @@
       [:select.custom-select
        {:value (events/layer)
         :on-change (fn [e]
-                     (events/switch-layer (-> e .-target .-value)))}
+                     (events/switch-layer (js/parseInt (-> e .-target .-value) 10)))}
        ;; TODO: is there a way to check how many layers there are?
        [:option {:value 1} "1"]
        [:option {:value 2} "2"]
