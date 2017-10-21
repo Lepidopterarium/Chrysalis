@@ -36,7 +36,7 @@
       (and (= r cr) (= c cc)))
     false))
 
-(defn- node-update [device node theme interactive?]
+(defn- node-update [device layer node theme interactive?]
   (let [[r c] (->> node :id
                   (re-find #"R(\d+)C(\d+)_keyshape$")
                   rest
@@ -44,7 +44,6 @@
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            layer (dec (events/layer))
             edited? (contains? (events/layout-edits) [layer index])]
         (if interactive?
           (assoc node
@@ -68,7 +67,7 @@
 
 (defn- print-labels
   "Print key labels on the SVG"
-  [device node]
+  [device layout node layer]
   (let [id (:id (get node 1))
         [_ label] (re-find #"_t_(.*)" id)
         [r c] (->> id
@@ -77,27 +76,23 @@
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            ;; NB: layers are 1-indexed, so we need `dec` to go to
-            ;; zero-indexed clojure vectors
-            formatted-key (-> (events/layout)
-                              (get-in [(dec (events/layer)) index])
-                              key/format)]
+            formatted-key (-> layout (get-in [layer index]) key/format)]
         (assoc node 2 (get formatted-key (keyword (str label "-text")))))
       node)))
 
 (defn layout-svg
-  [device svg layout props]
+  [{:keys [device svg layout props layer]}]
   (walk/prewalk (fn [node]
                   (if (and (vector? node) (= (first node) :text))
-                    (print-labels device node)
+                    (print-labels device layout node layer)
                     (if (and (map? node) (get node :id))
-                      (node-update device node layout (:interactive? props))
+                      (node-update device layer node layout (:interactive? props))
                       node)))
                 (-> svg
                     (update 1 merge (dissoc props :interactive?))
                     (update 1 set/rename-keys {:viewbox :view-box}))))
 
-(defn <keymap-layout> [device svg layout props]
+(defn <keymap-layout> [{:keys [device svg layout props layer] :as args}]
   (if layout
-    [layout-svg device svg layout props]
+    [layout-svg args]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))

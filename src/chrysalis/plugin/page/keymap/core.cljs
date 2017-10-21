@@ -150,11 +150,12 @@
     [:div.col-sm-9.text-center
 
      [layout/<keymap-layout>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      (events/layout)
-      {:interactive? true
-       :style {:max-height "50vh"}}]]
+      {:device (device/current)
+       :svg @(get-in (device/current) [:meta :layout])
+       :layout (events/layout)
+       :layer (dec (events/layer))
+       :props {:interactive? true
+               :style {:max-height "50vh"}}}]]
 
     [:div.col-sm-3.text-center
      [<live-update>]

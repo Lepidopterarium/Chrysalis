@@ -41,60 +41,62 @@
 
 (defn <save-layout>
   []
-  [:div.modal.fade {:id "chrysalis-plugin-page-keymap-save-layout"}
-   [:div.modal-dialog.modal-lg
-    [:div.modal-content.bg-faded
-     [:div.modal-header
-      [:h5.modal-title "Save layout"]
-      [:button.close {:type :close
-                      :data-dismiss :modal}
-       [:span "×"]]]
-     [:div.modal-body
-      [:div.container-fluid
-       [:div.row
-        [:div.col-sm-12
-         [:form.input-group
-          {:on-submit
-           (fn [e]
-             (.preventDefault e)
-             (.modal (js/$ "#chrysalis-plugin-page-keymap-save-layout") "hide")
-             (re-frame/dispatch [:keymap/presets.add
-                                 @(re-frame/subscribe [:keymap/presets.name])
-                                 @(re-frame/subscribe [:keymap/layout])]))}
-          [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
-          [:input.form-control
-           {:type :text
-            :value @(re-frame/subscribe [:keymap/presets.name])
-            :placeholder "Name your layout..."
-            :on-change (fn [e]
-                         (re-frame/dispatch [:keymap/presets.name
-                                             (.. e -target -value)]))}]]]]]]
-     [:div.modal-footer
-      [:a.btn.btn-primary
-       {:href "#"
-        :data-dismiss :modal
-        :on-click (fn [e]
-                    (re-frame/dispatch [:keymap/presets.add
-                                        @(re-frame/subscribe [:keymap/presets.name])
-                                        @(re-frame/subscribe [:keymap/layout])]))}
-       "Save"]
-      [:a.btn.btn-secondary {:href "#"
-                             :data-dismiss :modal}
-       "Cancel"]]]]])
+  (let [save (fn []
+               (re-frame/dispatch [:keymap/presets.add
+                                   @(re-frame/subscribe [:keymap/presets.name])
+                                   (get @(re-frame/subscribe [:keymap/layout])
+                                        (dec (events/layer)))]))]
+    [:div.modal.fade {:id "chrysalis-plugin-page-keymap-save-layout"}
+     [:div.modal-dialog.modal-lg
+      [:div.modal-content.bg-faded
+       [:div.modal-header
+        [:h5.modal-title "Save layout"]
+        [:button.close {:type :close
+                        :data-dismiss :modal}
+         [:span "×"]]]
+       [:div.modal-body
+        [:div.container-fluid
+         [:div.row
+          [:div.col-sm-12
+           [:form.input-group
+            {:on-submit
+             (fn [e]
+               (.preventDefault e)
+               (.modal (js/$ "#chrysalis-plugin-page-keymap-save-layout") "hide")
+               (save))}
+            [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
+            [:input.form-control
+             {:type :text
+              :value @(re-frame/subscribe [:keymap/presets.name])
+              :placeholder "Name your layout..."
+              :on-change (fn [e]
+                           (re-frame/dispatch [:keymap/presets.name
+                                               (.. e -target -value)]))}]]]]]]
+       [:div.modal-footer
+        [:a.btn.btn-primary
+         {:href "#"
+          :data-dismiss :modal
+          :on-click (fn [e] (save))}
+         "Save"]
+        [:a.btn.btn-secondary {:href "#"
+                               :data-dismiss :modal}
+         "Cancel"]]]]]))
 
-(defn- <preset> [[preset-name layout]]
+(defn- <preset>
+  [[preset-name layout]]
   [:div.card {:href "#"
               :key (str "chrysalis-plugin-keymap-preset-" preset-name)}
    [:h5.card-header preset-name]
    [:div.card-block
     [:a.card-text {:href "#"
                    :on-click (fn [e]
-                               (re-frame/dispatch [:keymap/layout! layout]))}
+                               (re-frame/dispatch [:keymap/load-preset layout]))}
      [layout/<keymap-layout>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      layout
-      {:style {:width 102 :height 64}}]]]
+      {:device (device/current)
+       :svg @(get-in (device/current) [:meta :layout])
+       :layout [layout]
+       :layer 0
+       :props {:style {:width 102 :height 64}}}]]]
    [:div.card-footer.text-left
     [:span.card-text
      [:a {:style {:float :right}
