@@ -101,7 +101,7 @@
 (re-frame/reg-event-fx
  :keymap/load-preset
  (fn [{db :db :as cofx} [_ layout]]
-   (let [cur-layer (or (dec (:keymap/layer db)) 0)
+   (let [cur-layer (dec (or (:keymap/layer db) 1))
          changes (into
                    {}
                    (map-indexed (fn [idx key] [[cur-layer idx] key]))
