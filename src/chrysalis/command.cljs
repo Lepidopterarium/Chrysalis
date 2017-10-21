@@ -38,8 +38,8 @@
 
 (re-frame/reg-event-fx
  :command/send
- (fn [cofx [_ command args event]]
-   {:command/send [(:device/current (:db cofx)) command args event]}))
+ (fn [{db :db :as cofx} [_ command args event]]
+   {:command/send [(:device/current db) command args event]}))
 
 
 (re-frame/reg-event-fx
