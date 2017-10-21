@@ -413,8 +413,8 @@
    :right-alt "AltGr"})
 
 (defmethod format [:core] [{key :key mods :modifiers}]
-  (key->description key {:primary-text (s/capitalize ((fnil name "???") key))
-                         :secondary-text (s/join "-" (map mod->short-name mods))}))
+  (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
+         :secondary-text (s/join "-" (map mod->short-name mods))))
 
 (defmethod post-process/format [:keymap.map] [_ text]
   (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
