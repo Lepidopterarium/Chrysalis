@@ -98,10 +98,7 @@
                          (reduce + 0 (mapcat count keymap-layout))
                          (->> (get-in device [:meta :matrix])
                              (apply *)))]
-    (->> key/HID-Codes
-        first
-        (repeat keys-per-layer)
-        vec)))
+    (vec (repeat keys-per-layer {:plugin :core, :key :transparent}))))
 
 (re-frame/reg-event-fx
   :keymap/change-key!
