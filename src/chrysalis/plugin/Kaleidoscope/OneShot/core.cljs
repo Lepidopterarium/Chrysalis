@@ -52,11 +52,10 @@
    :extra-text "OS"})
 
 (defmethod key/unformat :oneshot
-  [key]
+  [{:keys [modifier layer type] :as key}]
   (case type
-    :modifier (let [modifier (:modifier key)
-                    code (->> key/HID-Codes
+    :modifier (let [code (->> key/HID-Codes
                              (map-indexed vector)
                              (some (fn [[i {k :key}]] (when (= k modifier) i))))]
                 (+ osm-start (- code osm-offset)))
-    :layer (+ (:layer key) osl-start)))
+    :layer (+ layer osl-start)))
