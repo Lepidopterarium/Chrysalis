@@ -444,4 +444,4 @@
 
 (defmethod unformat :unknown
   [key]
-  (:keycode key))
+  (:key-code key))
