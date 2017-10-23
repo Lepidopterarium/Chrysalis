@@ -441,3 +441,7 @@
     (let [key-code (key->hid (:key key))
           modifiers (mods->flags (:modifiers key))]
       (bit-or (bit-shift-left modifiers 8) key-code))))
+
+(defmethod unformat :unknown
+  [key]
+  (:keycode key))
