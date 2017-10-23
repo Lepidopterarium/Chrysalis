@@ -135,7 +135,7 @@
  :keymap/layout.upload
  (fn [layout]
    ;; TODO: do we need to process the layout here?
-   (command/run :keymap.layout
+   (command/run :keymap.map
      (->> layout flatten (map key/unformat) (s/join " "))
      :discard)))
 
