@@ -29,8 +29,7 @@
 
             [garden.units :as gu]
             [chrysalis.key :as key]
-            [chrysalis.settings :as settings]
-            [chrysalis.plugin.Kaleidoscope.OneShot.keymap]))
+            [chrysalis.settings :as settings]))
 
 (defn <live-update> []
   [:form.form-group.form-check
@@ -177,7 +176,10 @@
          [:i.fa.fa-floppy-o] " Update"]
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
-         "Cancel"]])
+         "Cancel"]
+        [:button.btn.btn-secondary
+         {:on-click (fn [_] (events/layout:reset!))}
+         "Reset To Default"]])
 
      [:label.mr-sm-2 "Layer"
       [:select.custom-select

@@ -134,10 +134,9 @@
 (re-frame/reg-fx
  :keymap/layout.upload
  (fn [layout]
-   ;; TODO: do we need to process the layout here?
    (command/run :keymap.map
      (->> layout flatten (map key/unformat) (s/join " "))
-     :discard)))
+     :keymap/layout.update)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
@@ -147,6 +146,12 @@
       :db (assoc db
                  :keymap/layout new-layout
                  :keymap/layout.edits {})})))
+
+(re-frame/reg-event-fx
+  :keymap/layout.reset
+  (fn [{db :db} _]
+    ;; TODO: send the right number of layers
+    {:keymap/layout.upload (repeat 5 (empty-layer (:device/current db)))}))
 
 (defn change-key!
   [row col new-key]
@@ -173,6 +178,9 @@
 
 (defn layout:upload! []
   (re-frame/dispatch [:keymap/layout.upload]))
+
+(defn layout:reset! []
+  (re-frame/dispatch [:keymap/layout.reset]))
 
 (defn switch-layer [layer]
   (re-frame/dispatch [:keymap/switch-layer layer]))
