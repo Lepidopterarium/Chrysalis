@@ -136,6 +136,8 @@
  (fn [layout]
    (command/run :keymap.map
      (->> layout flatten (map key/unformat) (s/join " "))
+     ;; After transfering a new layout, ask the keyboard what its new
+     ;; layout is so we can update the display.
      :keymap/layout.update)))
 
 (re-frame/reg-event-fx
