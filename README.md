@@ -3,7 +3,6 @@
 # Chrysalis
 
 [![Latest release](https://img.shields.io/github/release/algernon/Chrysalis/all.svg?style=flat-square)](https://github.com/algernon/Chrysalis/releases/latest)
-[![Patreon](https://img.shields.io/badge/Patreon-algernon-red.svg?style=flat-square&colorA=FF5900&colorB=555555)](https://www.patreon.com/algernon)
 
 [Kaleidoscope][kaleidoscope] command center, a [heavy work in progress][chrysalis:project:1.0]. For the latest news, please check the [NEWS.md](NEWS.md) file, or [algernon's blog][blog:algernon:chrysalis].
 
