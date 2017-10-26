@@ -153,7 +153,7 @@
 (re-frame/reg-event-fx
   :keymap/layout.reset
   (fn [{db :db} _]
-    ;; TODO: send the right number of layers
+    ;; TODO: Update current layer after this runs
     {:keymap/layout.upload (repeat 5 (empty-layer (:device/current db)))}))
 
 (defn change-key!
