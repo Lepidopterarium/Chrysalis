@@ -178,9 +178,9 @@
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
          "Cancel"]
-        [:button.btn.btn-secondary
-         {:on-click (fn [_] (events/layout:reset!))}
-         "Reset To Default"]])
+        #_[:button.btn.btn-secondary
+           {:on-click (fn [_] (events/layout:reset!))}
+           "Reset To Default"]])
 
      [:label.mr-sm-2 "Layer"
       [:select.custom-select
