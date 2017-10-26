@@ -133,16 +133,19 @@
 
 (re-frame/reg-fx
  :keymap/layout.upload
- (fn [layout]
-   (command/run :keymap.map
-     (->> layout flatten (map key/unformat) (s/join " "))
+ (fn [[layer layout]]
+   (command/run :keymap.layer
+     (str layer
+          " "
+          (->> (get layout layer) (map key/unformat) (s/join " ")))
      :keymap/layout.update)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
  (fn [{db :db} _]
-   (let [new-layout (merge-edits db)]
-     {:keymap/layout.upload new-layout
+   (let [new-layout (merge-edits db)
+         current-layer (dec (or (:keymap/layer db) 1))]
+     {:keymap/layout.upload [current-layer new-layout]
       :db (assoc db
                  :keymap/layout new-layout
                  :keymap/layout.edits {})})))
