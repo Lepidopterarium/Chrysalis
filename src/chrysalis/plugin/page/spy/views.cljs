@@ -33,7 +33,7 @@
          {:href (str "#spy-history-collapse-" index)
           :data-toggle :collapse}
          [:i.fa.fa-angle-down]]
-        " " [:code command " " (apply str args)]]]
+        " " [:code command " " (if (coll? args) (apply str args) (str args))]]]
       [:div.collapse.show {:id (str "spy-history-collapse-" index)}
        [:pre (clj->js response) "\r\n."]
        [:div.text-muted.text-right.device-name

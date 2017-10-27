@@ -233,4 +233,4 @@
                     :disable? (fn [] (nil? (device/current)))
                     :device/need? true
                     :render render
-                    :events {:keymap/layout :update}})
+                    :events {:keymap/layout 1}})

@@ -19,7 +19,8 @@
             [clojure.string :as s]
 
             [chrysalis.command.post-process :as post-process]
-            [chrysalis.device :as device]))
+            [chrysalis.device :as device]
+            [clojure.string :as string]))
 
 (def HID-Codes
   [{:plugin :core, :key nil}
@@ -416,11 +417,14 @@
   (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
          :secondary-text (s/join "-" (map mod->short-name mods))))
 
+(defmethod post-process/format [:keymap.layer] [_ text]
+  (into []
+        (map (comp from-code int))
+        (string/split text #" ")))
+
 (defmethod post-process/format [:keymap.map] [_ text]
   (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
-    (->> (.split text " ")
-        (map int)
-        (map from-code)
+    (->> (post-process/format :keymap.layer text)
         (partition keymap-size)
         (map vec)
         vec)))
