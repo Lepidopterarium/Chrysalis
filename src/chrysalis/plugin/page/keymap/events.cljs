@@ -117,7 +117,6 @@
 (re-frame/reg-fx
  :keymap/layout
  (fn [layer]
-   (prn "layer " layer)
    (command/run :keymap.layer layer :keymap/layout.process)))
 
 (re-frame/reg-event-fx
@@ -143,7 +142,7 @@
      (str layer
           " "
           (->> (get layout layer) (map key/unformat) (s/join " ")))
-     :keymap/layout.update)))
+     :discard)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
