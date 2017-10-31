@@ -77,11 +77,7 @@
 (re-frame/reg-event-db
  :keymap/layout.process
  (fn [db [_ [_ _ _ response]]]
-   ;; TODO: make the response include the layer it's the map for to
-   ;; avoid race conditions
-   (let [layer (dec (or (:keymap/layer db) 1))]
-     (assoc-in db [:keymap/layout layer]
-               (post-process/format :keymap.layer response)))))
+   (assoc db :keymap/layout (post-process/format :keymap.map response))))
 
 (defn- empty-layer
   [device]
@@ -116,8 +112,8 @@
 
 (re-frame/reg-fx
  :keymap/layout
- (fn [layer]
-   (command/run :keymap.layer layer :keymap/layout.process)))
+ (fn []
+   (command/run :keymap.map nil :keymap/layout.process)))
 
 (re-frame/reg-event-fx
   :keymap/change-key!
@@ -132,7 +128,7 @@
 (re-frame/reg-event-fx
   :keymap/layout.update
   (fn [cofx _]
-    {:keymap/layout (dec (or (get-in cofx [:db :keymap/layer]) 1))
+    {:keymap/layout nil
      :db (assoc (:db cofx) :keymap/layout.edits {})}))
 
 (re-frame/reg-fx
@@ -195,8 +191,7 @@
 (re-frame/reg-event-fx
  :keymap/switch-layer
  (fn [{db :db :as cofx} [_ layer]]
-   {:db (assoc db :keymap/layer layer)
-    :keymap/layout (dec layer)}))
+   {:db (assoc db :keymap/layer layer)}))
 
 (defn layer []
   @(re-frame/subscribe [:keymap/layer]))
