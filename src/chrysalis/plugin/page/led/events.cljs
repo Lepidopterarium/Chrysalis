@@ -40,6 +40,55 @@
 (defn current-target! [new-target]
   (re-frame/dispatch [:led/current-target new-target]))
 
+;;; ---- Palette --- ;;;
+
+(re-frame/reg-sub
+  :led/palette
+  (fn [db _]
+    (:led/palette db)))
+
+(re-frame/reg-event-db
+  :led/palette.process
+  (fn [db [_ [_ _ _ response]]]
+    (assoc db :led/palette (post-process/format :led.palette response))))
+
+(re-frame/reg-fx
+  :led/palette
+  (fn [_]
+    (command/run :palette nil :led/palette.process)))
+
+(re-frame/reg-fx
+  :led/palette.upload
+  (fn [palette]
+    (command/run :palette (->> palette flatten (s/join " ")) :discard)))
+
+(re-frame/reg-event-fx
+  :led/palette.upload
+  (fn [{db :db} _]
+    {:led/palette! (db :led/palette)}))
+
+(re-frame/reg-event-fx
+  :led/palette.update
+  (fn [cofx _]
+    {:led/palette nil}))
+
+(re-frame/reg-event-fx
+  :led/palette!
+  (fn [cofx [_ palette]]
+    (let [live? (get-in (:db cofx) [:led/live-update])]
+      (-> {:db (assoc (:db cofx) :led/palette palette)}
+          (cond->
+              live? (assoc :led/palette.upload palette))))))
+
+(defn palette []
+  @(re-frame/subscribe [:led/palette]))
+
+(defn palette:update! []
+  (re-frame/dispatch [:led/palette.update]))
+
+(defn palette:upload! []
+  (re-frame/dispatch [:led/palette.upload]))
+
 ;;; ---- Theme ---- ;;;
 
 (re-frame/reg-sub
