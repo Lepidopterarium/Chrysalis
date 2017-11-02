@@ -34,6 +34,10 @@ sudo apt-get install build-essentials libudev-dev
 
 [API](/docs/api.md)
 
+## Contribute
+
+[Code of conduct](CODE_OF_CONDUCT.md)
+
 ## License
 
 The code is released under the terms of the GNU GPL, version 3 or later. See the [COPYING](COPYING) file for details.
