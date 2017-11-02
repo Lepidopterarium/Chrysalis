@@ -128,25 +128,33 @@
 (re-frame/reg-event-fx
   :keymap/layout.update
   (fn [cofx _]
-    {:keymap/layout :update
+    {:keymap/layout nil
      :db (assoc (:db cofx) :keymap/layout.edits {})}))
 
 (re-frame/reg-fx
  :keymap/layout.upload
- (fn [layout]
-   ;; TODO: do we need to process the layout here?
-   (command/run :keymap.map
-     (->> layout flatten (map key/unformat) (s/join " "))
+ (fn [[layer layout]]
+   (command/run :keymap.layer
+     (str layer
+          " "
+          (->> (get layout layer) (map key/unformat) (s/join " ")))
      :discard)))
 
 (re-frame/reg-event-fx
  :keymap/layout.upload
  (fn [{db :db} _]
-   (let [new-layout (merge-edits db)]
-     {:keymap/layout.upload new-layout
+   (let [new-layout (merge-edits db)
+         current-layer (dec (or (:keymap/layer db) 1))]
+     {:keymap/layout.upload [current-layer new-layout]
       :db (assoc db
                  :keymap/layout new-layout
                  :keymap/layout.edits {})})))
+
+(re-frame/reg-event-fx
+  :keymap/layout.reset
+  (fn [{db :db} _]
+    ;; TODO: Update current layer after this runs
+    {:keymap/layout.upload (repeat 5 (empty-layer (:device/current db)))}))
 
 (defn change-key!
   [row col new-key]
@@ -173,6 +181,9 @@
 
 (defn layout:upload! []
   (re-frame/dispatch [:keymap/layout.upload]))
+
+(defn layout:reset! []
+  (re-frame/dispatch [:keymap/layout.reset]))
 
 (defn switch-layer [layer]
   (re-frame/dispatch [:keymap/switch-layer layer]))

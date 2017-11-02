@@ -177,7 +177,10 @@
          [:i.fa.fa-floppy-o] " Update"]
         [:button.btn.btn-secondary
          {:on-click (fn [_] (events/layout:update!))}
-         "Cancel"]])
+         "Cancel"]
+        #_[:button.btn.btn-secondary
+           {:on-click (fn [_] (events/layout:reset!))}
+           "Reset To Default"]])
 
      [:label.mr-sm-2 "Layer"
       [:select.custom-select
@@ -230,4 +233,4 @@
                     :disable? (fn [] (nil? (device/current)))
                     :device/need? true
                     :render render
-                    :events {:keymap/layout :update}})
+                    :events {:keymap/layout 0}})
