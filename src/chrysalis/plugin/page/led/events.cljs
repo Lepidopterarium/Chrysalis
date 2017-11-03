@@ -47,6 +47,22 @@
   (fn [db _]
     (:led/palette db)))
 
+(re-frame/reg-sub
+  :led/palette-selected
+  (fn [db _]
+    (:led/palette-selected db)))
+
+(re-frame/reg-event-db
+  :led/palette-selected!
+  (fn [db [_ selected-idx]]
+    (assoc db :led/palette-selected selected-idx)))
+
+(defn current-palette-target []
+  @(re-frame/subscribe [:led/palette-selected]))
+
+(defn current-palette-target! [idx]
+  (re-frame/dispatch [:led/palette-selected! idx]))
+
 (re-frame/reg-event-db
   :led/palette.process
   (fn [db [_ [_ _ _ response]]]

@@ -23,7 +23,7 @@
    (let [{:keys [r g b]} (js->clj (:rgb color)
                                   :keywordize-keys true)]
      (when (>= index 0)
-       (assoc-in db [:led/theme index] [r g b])))))
+       (assoc-in db [:led/palette index] [r g b])))))
 
 (defn update! [index color]
   (re-frame/dispatch [:led/picker.update index (js->clj color

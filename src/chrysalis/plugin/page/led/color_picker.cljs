@@ -16,25 +16,20 @@
 
 (ns chrysalis.plugin.page.led.color-picker
   (:require [chrysalis.plugin.page.led.events :as led.events]
-            [chrysalis.plugin.page.led.color-picker.events :as picker.events]))
+            [chrysalis.plugin.page.led.color-picker.events :as picker.events]
+            [chrysalis.ui :as ui]))
 
 (defonce react-color (js/require "react-color"))
 
 (defn <color-picker> []
   (let [picker (.-ChromePicker react-color)
-        target (led.events/current-target)
-        index (if target
-                (js/parseInt (.getAttribute target "data-index"))
-                -1)
-        color (if target
-                (.getAttribute target "fill")
-                "#000000")]
+        index (led.events/current-palette-target)
+        color (ui/color->hex (get (led.events/palette) index))]
     [:> picker {:color color
                 :disable-alpha true
                 :triangle :hide
                 :on-change (fn [color _]
-                             (when-not (neg? index)
-                               (picker.events/update! index color)))
+                             (picker.events/update! index color))
                 :on-change-complete (fn [color _]
                                       (when-not (neg? index)
                                         (picker.events/update! index color)

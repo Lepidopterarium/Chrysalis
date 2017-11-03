@@ -22,6 +22,7 @@
 
             [chrysalis.plugin.page.led.events :as events]
             [chrysalis.plugin.page.led.theme :as theme]
+            [chrysalis.plugin.page.led.palette :as palette]
             [chrysalis.plugin.page.led.color-picker :as color-picker]
             [chrysalis.plugin.page.led.presets :as presets]
 
@@ -52,7 +53,7 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/theme)
-      {:max-height "50vh" :interactive? true}]
+      {:interactive? true}]
      [:div.btn-toolbar.justify-content-center
       [:div.btn-group.mr-2
        [:a.btn.btn-primary {:href "#"
@@ -67,6 +68,8 @@
         [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
      [<live-update>]
+     [:h4 "Palette"]
+     [palette/<palette>]
      [:h4 "Color picker"]
      [color-picker/<color-picker>]
      [:hr]
@@ -92,4 +95,5 @@
                  :disable? (fn [] (nil? (device/current)))
                  :device/need? true
                  :render render
-                 :events {:led/theme :update}})
+                 :events {:led/theme :update
+                          :led/palette :update}})
