@@ -32,7 +32,10 @@
 (re-frame/reg-event-db
  :led/current-target
  (fn [db [_ new-target]]
-   (assoc db :led/current-target new-target)))
+   (let [target-palette (get-in db [:led/colormap new-target])]
+     (assoc db
+            :led/current-target new-target
+            :led/palette-selected target-palette))))
 
 (defn current-target []
   @(re-frame/subscribe [:led/current-target]))

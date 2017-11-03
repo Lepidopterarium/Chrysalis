@@ -36,6 +36,8 @@
                  ^{:key i}
                  [:td {:style {:background-color (rgb-str rgb)
                                :color (invert-color rgb)
+                               :border (when (= i (events/current-palette-target))
+                                         "2px dashed white")
                                :padding "0.5em"
                                :cursor "pointer"}
                        :on-click (fn [_]
