@@ -52,13 +52,13 @@
      [theme/<led-theme>
       (device/current)
       @(get-in (device/current) [:meta :layout])
-      (events/theme)
+      (events/colormap)
       {:interactive? true}]
      [:div.btn-toolbar.justify-content-center
       [:div.btn-group.mr-2
        [:a.btn.btn-primary {:href "#"
                             :on-click (fn [e]
-                                        (events/theme:upload!))}
+                                        (events/colormap:upload!))}
         [:i.fa.fa-paint-brush] " Apply"]]
       [:div.btn-group.mr-2
        [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
@@ -68,6 +68,18 @@
         [:i.fa.fa-floppy-o] " Save"]]]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
      [<live-update>]
+     (when-not (events/live-update?)
+       [:div.form-group.form-check
+        [:button.btn.btn-success
+         {:on-click (fn [_]
+                      (events/palette:upload!)
+                      (events/colormap:upload!))}
+         [:i.fa.fa-floppy-o] " Update"]
+        [:button.btn.btn-secondary
+         {:on-click (fn [_]
+                      (events/palette:update!)
+                      (events/colormap:update!))}
+         "Cancel"]])
      [:h4 "Palette"]
      [palette/<palette>]
      [:h4 "Color picker"]
@@ -95,5 +107,5 @@
                  :disable? (fn [] (nil? (device/current)))
                  :device/need? true
                  :render render
-                 :events {:led/theme :update
+                 :events {:led/colormap :update
                           :led/palette :update}})

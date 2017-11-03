@@ -34,4 +34,4 @@
                                       (when-not (neg? index)
                                         (picker.events/update! index color)
                                         (when (led.events/live-update?)
-                                          (led.events/theme:upload!))))}]))
+                                          (led.events/palette:upload!))))}]))

@@ -34,19 +34,12 @@
     (nth (nth led-map r) c)
     (+ (* r cols) c)))
 
-(defn- current-node? [r c]
-  (if-let [target (events/current-target)]
-    (let [cr (js/parseInt (.getAttribute target "data-row"))
-          cc (js/parseInt (.getAttribute target "data-column"))]
-      (and (= r cr) (= c cc)))
-    false))
-
 (defn- node-update [device node theme interactive?]
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            color (nth theme index [0 0 0])]
+            color (get theme index)]
         (if interactive?
           (assoc node
                  :class :key
@@ -54,15 +47,15 @@
                  :data-column c
                  :data-index index
                  :fill (color->hex color)
-                 :stroke-width (if (current-node? r c)
+                 :stroke-width (if (= (events/current-target) index)
                                  2
                                  2)
-                 :stroke (if (current-node? r c)
+                 :stroke (if (= (events/current-target) index)
                            "#ff0000"
                            "#b4b4b4")
                  :on-click (fn [e]
                              (let [target (.-target e)]
-                               (events/current-target! target))))
+                               (events/current-target! index))))
           (assoc node
                  :fill (color->hex color))))
       node)))

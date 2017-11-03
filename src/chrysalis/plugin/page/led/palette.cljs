@@ -38,6 +38,8 @@
                                :color (invert-color rgb)
                                :padding "0.5em"
                                :cursor "pointer"}
-                       :on-click (fn [_] (events/current-palette-target! i))}
+                       :on-click (fn [_]
+                                   (events/current-palette-target! i)
+                                   (events/colormap:set-target-color! i))}
                   i]))
              (partition 4)))])

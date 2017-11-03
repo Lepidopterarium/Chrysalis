@@ -81,7 +81,7 @@
 (re-frame/reg-event-fx
   :led/palette.upload
   (fn [{db :db} _]
-    {:led/palette! (db :led/palette)}))
+    {:led/palette.upload (db :led/palette)}))
 
 (re-frame/reg-event-fx
   :led/palette.update
@@ -105,56 +105,78 @@
 (defn palette:upload! []
   (re-frame/dispatch [:led/palette.upload]))
 
-;;; ---- Theme ---- ;;;
+;;; ---- Colormap ---- ;;;
 
 (re-frame/reg-sub
- :led/theme
- (fn [db _]
-   (:led/theme db)))
+  :led/colormap
+  (fn [db _]
+    (let [palette (:led/palette db)]
+      (mapv palette (:led/colormap db)))))
+
+(re-frame/reg-sub
+  :led/colormap.at
+  (fn [db [_ key-idx]]
+    (let [palette-idx (get-in db [:led/colormap key-idx])]
+      (get-in db [:led/palette palette-idx]))))
 
 (re-frame/reg-event-db
- :led/theme.process
+ :led/colormap.process
  (fn [db [_ [_ _ _ response]]]
-   (assoc db :led/theme (post-process/format :led.theme response))))
+   (assoc db :led/colormap (post-process/format :led.colormap response))))
 
 (re-frame/reg-event-fx
- :led/theme!
- (fn [cofx [_ theme]]
-   (let [live? (get-in (:db cofx) [:led/live-update])]
-     (-> {:db (assoc (:db cofx) :led/theme theme)}
-         (cond->
-             live? (assoc :led/theme.upload theme))))))
+  :led/colormap!
+  (fn [cofx [_ colormap]]
+    (let [live? (get-in (:db cofx) [:led/live-update])]
+      (-> {:db (assoc (:db cofx) :led/colormap colormap)}
+          (cond->
+              live? (assoc :led/colormap.upload colormap))))))
 
 (re-frame/reg-fx
- :led/theme
- (fn []
-   (command/run :led.theme nil :led/theme.process)))
+  :led/colormap
+  (fn []
+    (command/run :colormap.map nil :led/colormap.process)))
 
 (re-frame/reg-event-fx
- :led/theme.update
- (fn [cofx _]
-   {:led/theme :update}))
+  :led/colormap.update
+  (fn [cofx _]
+    {:led/colormap :update}))
 
 (re-frame/reg-fx
- :led/theme.upload
- (fn [theme]
-   (command/run :led.theme (->> theme
-                                flatten
-                                (s/join " ")) :discard)))
+ :led/colormap.upload
+ (fn [colormap]
+   (command/run :colormap.map
+     (->> colormap (s/join " ")) :discard)))
 
 (re-frame/reg-event-fx
- :led/theme.upload
+ :led/colormap.upload
  (fn [cofx _]
-   {:led/theme.upload (get-in cofx [:db :led/theme])}))
+   {:led/colormap.upload (get-in cofx [:db :led/colormap])}))
 
-(defn theme []
-  @(re-frame/subscribe [:led/theme]))
+(re-frame/reg-event-fx
+  :led/colormap.update-at
+  (fn [{db :db} [_ palette-idx]]
+    (let [target-idx (:led/current-target db)
+          new-colormap (assoc (:led/colormap db) target-idx palette-idx)
+          live? (db :led/live-update)]
+      (-> {:db (assoc db :led/colormap new-colormap)}
+          (cond->
+              live? (assoc :led/colormap.upload new-colormap))))))
 
-(defn theme:update! []
-  (re-frame/dispatch [:led/theme.update]))
+(defn colormap []
+  @(re-frame/subscribe [:led/colormap]))
 
-(defn theme:upload! []
-  (re-frame/dispatch [:led/theme.upload]))
+(defn colormap-at [idx]
+  @(re-frame/subscribe [:led/colormap-at idx]))
+
+(defn colormap:update! []
+  (re-frame/dispatch [:led/colormap.update]))
+
+(defn colormap:upload! []
+  (re-frame/dispatch [:led/colormap.upload]))
+
+(defn colormap:set-target-color! [palette-idx]
+  (re-frame/dispatch [:led/colormap.update-at palette-idx]))
 
 ;;; ---- Live update ---- ;;;
 (re-frame/reg-event-db
