@@ -20,7 +20,8 @@
             [chrysalis.plugin.page.led.events :as events]
 
             [re-frame.core :as re-frame]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.set :as set]))
 
 (defn- hex->color [hex]
   (let [r (js/parseInt (.substring hex 1 3) 16)
@@ -72,9 +73,10 @@
                     (node-update device node theme (:interactive? props))
                     node))
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
+                    (update 1 merge (dissoc props :interactive?))
+                    (update 1 set/rename-keys {:viewbox :view-box}))))
 
 (defn <led-theme> [device svg theme props]
   (if theme
-    (prepare device svg theme props)
+    [prepare device svg theme props]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))

@@ -52,7 +52,7 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/theme)
-      {:width 1024 :height 640 :interactive? true}]
+      {:max-height "50vh" :interactive? true}]
      [:div.btn-toolbar.justify-content-center
       [:div.btn-group.mr-2
        [:a.btn.btn-primary {:href "#"
