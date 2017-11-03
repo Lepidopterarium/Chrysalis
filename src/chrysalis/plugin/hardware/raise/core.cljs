@@ -18,20 +18,16 @@
   (:require [chrysalis.hardware :refer [known?]]
             [re-frame.core :as re-frame]))
 
-
-;; The following still needs to be completed.
-
-(defmethod known? [0xfeed 0x6060] [device]
+(defmethod known? [0x1209 0x2202] [device]
   (assoc device
          :meta {:name "Dygma Raise"
                 :logo "images/plugins/dygma-raise.png"
                 :layout (re-frame/subscribe [:device/svg "images/plugins/dygma-raise.svg"])
-                :matrix []}
+                :matrix [[16 5]]}
 
 
-        :board {:name "Dygma Raise"
+         :board {:name "Dygma Raise"
                  :baud 9600
-                 :productId ["" ""]
-                 :protocol ""
-                 :manualReset true
-                 :signature (js/Buffer. #js [])}))
+                 :productId ["0x2200" "0x2202"]
+                 :protocol "avr109"
+                 :signature (js/Buffer. #js [0x43 0x41 0x54 0x45 0x52 0x49 0x4e])}))
