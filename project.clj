@@ -88,7 +88,8 @@
              :server-port 3449}
   :resource {:resource-paths ["src/chrysalis/plugin/hardware/model01"
                               "src/chrysalis/plugin/hardware/virtual"
-                              "src/chrysalis/plugin/hardware/shortcut"]
+                              "src/chrysalis/plugin/hardware/shortcut"
+                              "src/chrysalis/plugin/hardware/raise"]
              :includes [#".*\.png" #".*\.svg"]
              :target-path "resources/public/images/plugins"
              :skip-stencil [#".*"]}
