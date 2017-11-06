@@ -48,7 +48,8 @@
             [chrysalis.plugin.Kaleidoscope.HostOS.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]
             [chrysalis.plugin.Kaleidoscope.OneShot.core]
-            [chrysalis.plugin.Kaleidoscope.Macros.core]))
+            [chrysalis.plugin.Kaleidoscope.Macros.core]
+            [chrysalis.plugin.Kaleidoscope.TapDance.core]))
 
 (re-frame/reg-event-fx
  :db
