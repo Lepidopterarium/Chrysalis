@@ -299,10 +299,10 @@
       (and (bit-test flags 6) ;synthetic
            (bit-test flags 2)) ; switch_to_keymap)
       (if (>= key-code 42) ; Layer_shift_offset = 42
-        {:plugin :core
+        {:plugin :layers
          :key :shift-layer
          :layer (- key-code 42)}
-        {:plugin :core
+        {:plugin :layers
          :key :lock-layer
          :layer key-code})
 
@@ -427,13 +427,14 @@
    :right-alt "AltGr"})
 
 (defmethod format [:core] [{key :key mods :modifiers :as keycode}]
-  (case key
-    :shift-layer {:primary-text "ShiftToLayer"
-                  :secondary-text (:layer keycode)}
-    :lock-layer {:primary-text "LockLayer"
-                 :secondary-text (:layer keycode)}
-    (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
-           :secondary-text (s/join "-" (map mod->short-name mods)))))
+  (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
+         :secondary-text (s/join "-" (map mod->short-name mods))))
+
+(defmethod format [:layers] [{type :key layer :layer}]
+  {:primary-text (case type
+                   :shift-layer "ShiftToLayer"
+                   :lock-layer "LockLayer")
+   :secondary-text layer})
 
 (defmethod post-process/format [:keymap.layer] [_ text]
   (into []
@@ -463,6 +464,14 @@
     (let [key-code (key->hid (:key key))
           modifiers (mods->flags (:modifiers key))]
       (bit-or (bit-shift-left modifiers 8) key-code))))
+
+(defmethod unformat :layers
+  [{type :key layer :layer}]
+  (let [key-code (+ (:layer key)
+                    (if (= (:key key) :shift-to-layer)
+                      42 0))
+        flags (-> 0 (bit-set 6) (bit-set 2))]
+    (bit-or (bit-shift-left flags 8) key-code)))
 
 (defmethod unformat :unknown
   [key]
