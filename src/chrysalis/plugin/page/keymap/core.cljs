@@ -44,8 +44,10 @@
 
 (defn- key-name
   [key]
-  (let [label (:primary-text (key/format key))]
-    (str (when (and (:key key)
+  (let [formatted (key/format key)
+        label (:primary-text formatted)]
+    (str (:extra-text formatted)
+         (when (and (:key key)
                     (s/starts-with? (name (:key key)) "keypad_")
                     (not (s/starts-with? label "Keypad")))
            "Keypad ")

@@ -301,10 +301,11 @@
       (if (>= key-code 42) ; Layer_shift_offset = 42
         {:plugin :layers
          :key :shift-layer
-         :layer (- key-code 42)}
+         ;; layer + 1 b/c we display as 1-indexed
+         :layer (inc (- key-code 42))}
         {:plugin :layers
          :key :lock-layer
-         :layer key-code})
+         :layer (inc key-code)})
 
       ;; LEDEffectNext
       (and (bit-test flags 6) ;synthetic
@@ -438,10 +439,10 @@
          :secondary-text (s/join "-" (map mod->short-name mods))))
 
 (defmethod format [:layers] [{type :key layer :layer}]
-  {:primary-text (case type
-                   :shift-layer "ShiftToLayer"
+  {:extra-text (case type
+                   :shift-layer "ShiftLayer"
                    :lock-layer "LockLayer")
-   :secondary-text layer})
+   :primary-text (str "L" layer)})
 
 (defmethod format [:led-control] [_]
   {:primary-text "LED"
@@ -478,8 +479,8 @@
 
 (defmethod unformat :layers
   [{type :key layer :layer}]
-  (let [key-code (+ (:layer key)
-                    (if (= (:key key) :shift-to-layer)
+  (let [key-code (+ (dec layer) ; we +1'd when reading
+                    (if (= type :shift-layer)
                       42 0))
         flags (-> 0 (bit-set 6) (bit-set 2))]
     (bit-or (bit-shift-left flags 8) key-code)))
