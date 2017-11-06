@@ -2,8 +2,6 @@
 
 # Chrysalis
 
-[![Latest release](https://img.shields.io/github/release/algernon/Chrysalis/all.svg?style=flat-square)](https://github.com/algernon/Chrysalis/releases/latest)
-
 [Kaleidoscope][kaleidoscope] command center, a [heavy work in progress][chrysalis:project:1.0]. For the latest news, please check the [NEWS.md](NEWS.md) file, or [algernon's blog][blog:algernon:chrysalis].
 
  [kaleidoscope]: https://github.com/keyboardio/Kaleidoscope
@@ -33,6 +31,10 @@ sudo apt-get install build-essentials libudev-dev
 ## Documentation
 
 [API](/docs/api.md)
+
+## Contribute
+
+[Code of conduct](CODE_OF_CONDUCT.md)
 
 ## License
 

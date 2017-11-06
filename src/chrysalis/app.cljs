@@ -32,6 +32,8 @@
             [chrysalis.plugin.hardware.virtual.core]
             [chrysalis.plugin.hardware.model01.core]
             [chrysalis.plugin.hardware.shortcut.core]
+            [chrysalis.plugin.hardware.raise.core]
+
 
             ;; Page plugins
             [chrysalis.plugin.page.devices.core]

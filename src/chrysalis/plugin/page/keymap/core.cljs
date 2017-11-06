@@ -132,7 +132,7 @@
        [edit-tab-view @cur-tab args]])))
 
 (defn selected-key-view
-  [{:keys [index key layer] :as args}]
+  [{:keys [index layer] :as args}]
   [:div.edit-key
    [:dl
     [:dt "Current Key"]
