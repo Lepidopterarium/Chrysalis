@@ -159,12 +159,12 @@
 (re-frame/reg-event-fx
   :led/colormap.update-at
   (fn [{db :db} [_ palette-idx]]
-    (let [target-idx (:led/current-target db)
-          new-colormap (assoc (:led/colormap db) target-idx palette-idx)
-          live? (db :led/live-update)]
-      (-> {:db (assoc db :led/colormap new-colormap)}
-          (cond->
-              live? (assoc :led/colormap.upload new-colormap))))))
+    (when-let [target-idx (:led/current-target db)]
+      (let [new-colormap (assoc (:led/colormap db) target-idx palette-idx)
+            live? (db :led/live-update)]
+        (-> {:db (assoc db :led/colormap new-colormap)}
+            (cond->
+                live? (assoc :led/colormap.upload new-colormap)))))))
 
 (defn colormap []
   @(re-frame/subscribe [:led/colormap]))
