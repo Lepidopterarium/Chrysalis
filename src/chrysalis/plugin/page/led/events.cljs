@@ -43,6 +43,25 @@
 (defn current-target! [new-target]
   (re-frame/dispatch [:led/current-target new-target]))
 
+;;; --- Current layer --- ;;;
+
+(re-frame/reg-sub
+  :led/layer
+  (fn [db _]
+    (or (:led/layer db) 1)))
+
+(re-frame/reg-event-db
+  :led/layer!
+  (fn [db [_ new-layer]]
+    (assoc db :led/layer new-layer)))
+
+(defn layer []
+  @(re-frame/subscribe [:led/layer]))
+
+(defn switch-layer
+  [new-layer]
+  (re-frame/dispatch [:led/layer! new-layer]))
+
 ;;; ---- Palette --- ;;;
 
 (re-frame/reg-sub

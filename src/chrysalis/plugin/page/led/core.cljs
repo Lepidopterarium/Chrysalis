@@ -86,6 +86,18 @@
      [:h4 "Color picker"]
      [color-picker/<color-picker>]
      [:hr]
+     [:label.mr-sm-2 "Layer"
+      [:select.custom-select
+       {:value (events/layer)
+        :on-change (fn [e]
+                     (events/switch-layer (js/parseInt (-> e .-target .-value) 10)))}
+       ;; TODO: is there a way to check how many layers there are?
+       [:option {:value 1} "1"]
+       [:option {:value 2} "2"]
+       [:option {:value 3} "3"]
+       [:option {:value 4} "4"]
+       [:option {:value 5} "5"]]]
+     [:hr]
      [:h4 "Presets"
       [:small {:style {:float :right}}
        [:a {:href "#"
