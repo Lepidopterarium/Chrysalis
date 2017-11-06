@@ -23,15 +23,17 @@
     (if (= flags (-> 0
                      (bit-set 6) ;SYNTHETIC
                      (bit-set 5)));IS_MACRO
-      {:plugin :macros
-       :index key-code}
+      (assoc key
+             :plugin :macros
+             :index key-code)
       key)))
 
 (swap! key/processors conj macros-processor)
 
 (defmethod key/format [:macros]
   [key]
-  {:primary-text (str "M(" (:index key) ")")})
+  {:extra-text "Macro"
+   :primary-text (str "M(" (:index key) ")")})
 
 (defmethod key/unformat :macros
   [key]
