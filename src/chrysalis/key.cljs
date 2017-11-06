@@ -306,6 +306,13 @@
          :key :lock-layer
          :layer key-code})
 
+      ;; LEDEffectNext
+      (and (bit-test flags 6) ;synthetic
+           (bit-test flags 3) ; IS_INTERNAL - XXX: this may change soon?
+           (bit-test flags 0)); LED_TOGGLE
+      {:plugin :led-control
+       :key :led-effect-next}
+
       ;; Normal keys (with optional modifiers)
       (and (>= flags 0)
            (<= flags (bit-shift-left 1 4)))
@@ -436,6 +443,10 @@
                    :lock-layer "LockLayer")
    :secondary-text layer})
 
+(defmethod format [:led-control] [_]
+  {:primary-text "LED"
+   :secondary-text "Next"})
+
 (defmethod post-process/format [:keymap.layer] [_ text]
   (into []
         (map (comp from-code int))
@@ -472,6 +483,11 @@
                       42 0))
         flags (-> 0 (bit-set 6) (bit-set 2))]
     (bit-or (bit-shift-left flags 8) key-code)))
+
+(defmethod unformat :led-control
+  [_]
+  (-> 0 (bit-set 6) (bit-set 3) (bit-set 0)
+      (bit-shift-left 8)))
 
 (defmethod unformat :unknown
   [key]
