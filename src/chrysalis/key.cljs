@@ -291,8 +291,21 @@
       ;; Transparent keys
       (= code 0xffff) {:plugin :core
                        :key :transparent}
+
       ;; Reserved bit set
       (bit-test flags 7) key
+
+      ;; Shift/Lock layer key
+      (and (bit-test flags 6) ;synthetic
+           (bit-test flags 2)) ; switch_to_keymap)
+      (if (>= key-code 42) ; Layer_shift_offset = 42
+        {:plugin :core
+         :key :shift-layer
+         :layer (- key-code 42)}
+        {:plugin :core
+         :key :lock-layer
+         :layer key-code})
+
       ;; Normal keys (with optional modifiers)
       (and (>= flags 0)
            (<= flags (bit-shift-left 1 4)))
@@ -413,9 +426,14 @@
    :shift "S"
    :right-alt "AltGr"})
 
-(defmethod format [:core] [{key :key mods :modifiers}]
-  (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
-         :secondary-text (s/join "-" (map mod->short-name mods))))
+(defmethod format [:core] [{key :key mods :modifiers :as keycode}]
+  (case key
+    :shift-layer {:primary-text "ShiftToLayer"
+                  :secondary-text (:layer keycode)}
+    :lock-layer {:primary-text "LockLayer"
+                 :secondary-text (:layer keycode)}
+    (assoc (key->description key {:primary-text (s/capitalize ((fnil name "???") key))})
+           :secondary-text (s/join "-" (map mod->short-name mods)))))
 
 (defmethod post-process/format [:keymap.layer] [_ text]
   (into []
