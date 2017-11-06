@@ -47,7 +47,8 @@
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
             [chrysalis.plugin.Kaleidoscope.HostOS.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]
-            [chrysalis.plugin.Kaleidoscope.OneShot.core]))
+            [chrysalis.plugin.Kaleidoscope.OneShot.core]
+            [chrysalis.plugin.Kaleidoscope.Macros.core]))
 
 (re-frame/reg-event-fx
  :db
