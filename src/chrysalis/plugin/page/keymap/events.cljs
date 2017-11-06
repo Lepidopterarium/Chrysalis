@@ -311,3 +311,9 @@
              {:plugin :layers
               :key key
               :layer (inc layer)}))})
+
+;; Maybe kind of goofy to have this by itself...
+(add-edit-tab!
+  {:title "LED Effects"
+   :keys [{:plugin :led-control
+           :key :led-effect-next}]})
