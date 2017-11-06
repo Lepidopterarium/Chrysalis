@@ -439,10 +439,10 @@
          :secondary-text (s/join "-" (map mod->short-name mods))))
 
 (defmethod format [:layers] [{type :key layer :layer}]
-  {:primary-text (case type
-                   :shift-layer "ShiftToLayer"
+  {:extra-text (case type
+                   :shift-layer "ShiftLayer"
                    :lock-layer "LockLayer")
-   :secondary-text layer})
+   :primary-text (str "L" layer)})
 
 (defmethod format [:led-control] [_]
   {:primary-text "LED"
