@@ -302,3 +302,12 @@
   {:title "Keypad"
    :modifiers? true
    :keys (keys-like #"keypad_.*")})
+
+(add-edit-tab!
+  {:title "Changing Layers"
+   :keys (vec
+           (for [key [:shift-layer :lock-layer]
+                 layer (range 5)]
+             {:plugin :layers
+              :key key
+              :layer (inc layer)}))})
