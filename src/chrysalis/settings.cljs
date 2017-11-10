@@ -68,10 +68,8 @@
    :before (fn [context]
              (let [db (-> context :coeffects :db)
                    page (:page/current db)]
-               (assoc-in context [:effects :db]
-                         (save! db page))))
+               (assoc-in context [:effects :db] (save! db page))))
    :after (fn [context]
             (let [{:keys [db]} (:effects context)
                   [_ page] (-> context :coeffects :event)]
-              (assoc-in context [:effects :db]
-                        (apply! db page))))))
+              (assoc-in context [:effects :db] (apply! db page))))))

@@ -20,7 +20,8 @@
 
             [chrysalis.device :as device]
 
-            [re-frame.core :as re-frame]))
+            [re-frame.core :as re-frame]
+            [chrysalis.settings :as settings]))
 
 (re-frame/reg-sub
  :led/presets
@@ -32,10 +33,12 @@
  (fn [db [_ preset-name]]
    (update db :led/presets dissoc preset-name)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :led/presets.add
- (fn [db [_ preset-name colormap]]
-   (update db :led/presets assoc preset-name colormap)))
+ (fn [{db :db} [_ preset-name colormap]]
+   (let [db (update db :led/presets assoc preset-name colormap)]
+     {:db db
+      :settings/save (settings/save! db :led)})))
 
 (re-frame/reg-event-db
  :led/presets.name
@@ -91,7 +94,7 @@
                              :data-dismiss :modal}
        "Cancel"]]]]])
 
-(defn- <preset> [[preset-name theme]]
+(defn- <preset> [preset-name theme]
   [:div.card {:href "#"
               :key (str "chrysalis-plugin-led-preset-" preset-name)}
    [:h5.card-header preset-name]
@@ -99,11 +102,12 @@
     [:a.card-text {:href "#"
                    :on-click (fn [e]
                                (re-frame/dispatch [:led/colormap.layer! theme]))}
-     [theme/<led-theme>
-      {:device (device/current)
-      :svg @(get-in (device/current) [:meta :layout])
-      :theme (mapv (events/palette) theme)
-      :props {:width 102 :height 64}}]]]
+     (when-let [palette (events/palette)]
+       [theme/<led-theme>
+        {:device (device/current)
+         :svg @(get-in (device/current) [:meta :layout])
+         :theme (mapv (events/palette) theme)
+         :props {:width 102 :height 64}}])]]
    [:div.card-footer.text-left
     [:span.card-text
      [:a {:style {:float :right}
@@ -116,4 +120,7 @@
 
 (defn <presets> []
   [:div.card-group
-   (doall (map <preset> @(re-frame/subscribe [:led/presets])))])
+   (doall
+     (for [[name theme] @(re-frame/subscribe [:led/presets])]
+       ^{:key name}
+       [<preset> name theme]))])

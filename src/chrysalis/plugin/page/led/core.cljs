@@ -110,12 +110,12 @@
 
 (defmethod settings/apply! [:led] [db _]
   (settings/copy-> db
-                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
                    [:led/presets]))
 
 (defmethod settings/save! [:led] [db _]
   (settings/<-copy db
-                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
                    [:led/presets]))
 
 (page/add! :led {:name "LED Theme Editor"
