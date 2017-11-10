@@ -51,20 +51,20 @@
    [:div.row
     [:div.col-sm-9.text-center
      [theme/<led-theme>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      (events/colormap)
-      {:interactive? true}]]
+      {:device (device/current)
+      :svg @(get-in (device/current) [:meta :layout])
+      :theme (events/colormap)
+      :props {:interactive? true}}]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
 
      [<live-update>]
      (when-not (events/live-update?)
        [:div.form-group.form-check
-        [:button.btn.btn-success
+        [:button.btn.btn-primary
          {:on-click (fn [_]
                       (events/palette:upload!)
                       (events/colormap:upload!))}
-         [:i.fa.fa-floppy-o] " Update"]
+         [:i.fa.fa-paint-brush] " Apply"]
         [:button.btn.btn-secondary
          {:on-click (fn [_]
                       (events/palette:update!)
@@ -93,17 +93,13 @@
 
    [:div.row
     [:div.col-sm-12.text-center
-     [:h4 "Presets"
+     [:h4 "Colormap Presets"
       [:small {:style {:float :right}}
        [:a {:href "#"
             :title "Import a preset..."}
         [:i.fa.fa-plus]]]]
      [:div.btn-toolbar.justify-content-center
-      [:div.btn-group.mr-2
-       [:a.btn.btn-primary {:href "#"
-                            :on-click (fn [e]
-                                        (events/colormap:upload!))}
-        [:i.fa.fa-paint-brush] " Apply"]]
+
       [:div.btn-group.mr-2
        [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
                             :data-toggle :modal

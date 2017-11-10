@@ -140,6 +140,11 @@
     (mapv palette (get colormap (dec (or layer 1))))))
 
 (re-frame/reg-sub
+  :led/colormap.raw
+  (fn [db _]
+    (get-in db [:led/colormap (current-layer db)])))
+
+(re-frame/reg-sub
   :led/colormap.at
   (fn [db [_ key-idx]]
     (let [layer (current-layer db)
@@ -158,6 +163,16 @@
       (-> {:db (assoc (:db cofx) :led/colormap colormap)}
           (cond->
               live? (assoc :led/colormap.upload colormap))))))
+
+(re-frame/reg-event-fx
+  :led/colormap.layer!
+  (fn [{db :db} [_ colormap-layer]]
+    (let [live? (:led/live-update db)
+          layer (current-layer db)
+          new-colormap (assoc (:led/colormap db) layer colormap-layer)]
+      (-> {:db (assoc db :led/colormap new-colormap)}
+          (cond->
+              live? (assoc :led/colormap.upload new-colormap))))))
 
 (re-frame/reg-fx
   :led/colormap

@@ -34,8 +34,8 @@
 
 (re-frame/reg-event-db
  :led/presets.add
- (fn [db [_ preset-name theme]]
-   (update db :led/presets assoc preset-name theme)))
+ (fn [db [_ preset-name colormap]]
+   (update db :led/presets assoc preset-name colormap)))
 
 (re-frame/reg-event-db
  :led/presets.name
@@ -63,23 +63,29 @@
       [:div.container-fluid
        [:div.row
         [:div.col-sm-12
-         [:form.input-group {:on-submit (fn [e]
-                                          (.preventDefault e)
-                                          (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
-                                          (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
-                                                              @(re-frame/subscribe [:led/theme])]))}
+         [:form.input-group
+          {:on-submit
+           (fn [e]
+             (.preventDefault e)
+             (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
+             (re-frame/dispatch [:led/presets.add
+                                 @(re-frame/subscribe [:led/presets.name])
+                                 @(re-frame/subscribe [:led/colormap.raw])]))}
           [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
-          [:input.form-control {:type :text
-                                :value @(re-frame/subscribe [:led/presets.name])
-                                :placeholder "Name your theme..."
-                                :on-change (fn [e]
-                                             (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
+          [:input.form-control
+           {:type :text
+            :value @(re-frame/subscribe [:led/presets.name])
+            :placeholder "Name your theme..."
+            :on-change (fn [e]
+                         (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
      [:div.modal-footer
-      [:a.btn.btn-primary {:href "#"
-                           :data-dismiss :modal
-                           :on-click (fn [e]
-                                       (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
-                                                           @(re-frame/subscribe [:led/theme])]))}
+      [:a.btn.btn-primary
+       {:href "#"
+        :data-dismiss :modal
+        :on-click (fn [e]
+                    (re-frame/dispatch [:led/presets.add
+                                        @(re-frame/subscribe [:led/presets.name])
+                                        @(re-frame/subscribe [:led/colormap.raw])]))}
        "Save"]
       [:a.btn.btn-secondary {:href "#"
                              :data-dismiss :modal}
@@ -92,16 +98,13 @@
    [:div.card-block
     [:a.card-text {:href "#"
                    :on-click (fn [e]
-                               (re-frame/dispatch [:led/theme! theme]))}
+                               (re-frame/dispatch [:led/colormap.layer! theme]))}
      [theme/<led-theme>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      theme
-      {:width 102 :height 64}]]]
+      {:device (device/current)
+      :svg @(get-in (device/current) [:meta :layout])
+      :theme (mapv (events/palette) theme)
+      :props {:width 102 :height 64}}]]]
    [:div.card-footer.text-left
-    [:span.card-text
-     [:a {:href "#"}
-      "Export"]]
     [:span.card-text
      [:a {:style {:float :right}
           :href "#"

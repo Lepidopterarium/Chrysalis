@@ -60,7 +60,8 @@
                  :fill (color->hex color))))
       node)))
 
-(defn prepare [device svg theme props]
+(defn svg-theme
+  [{:keys [device svg theme props layer]}]
   (walk/prewalk (fn [node]
                   (if (and (map? node) (get node :id))
                     (node-update device node theme (:interactive? props))
@@ -69,7 +70,8 @@
                     (update 1 merge (dissoc props :interactive?))
                     (update 1 set/rename-keys {:viewbox :view-box}))))
 
-(defn <led-theme> [device svg theme props]
+(defn <led-theme>
+  [{:keys [device svg theme props] :as args}]
   (if theme
-    [prepare device svg theme props]
+    [svg-theme args]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))
