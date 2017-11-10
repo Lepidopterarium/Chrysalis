@@ -53,16 +53,16 @@
    {:plugin :core, :key :x}
    {:plugin :core, :key :y}
    {:plugin :core, :key :z}
-   {:plugin :core, :key :1}
-   {:plugin :core, :key :2}
-   {:plugin :core, :key :3}
-   {:plugin :core, :key :4}
-   {:plugin :core, :key :5}
-   {:plugin :core, :key :6}
-   {:plugin :core, :key :7}
-   {:plugin :core, :key :8}
-   {:plugin :core, :key :9}
-   {:plugin :core, :key :0}
+   {:plugin :core, :key :number_1}
+   {:plugin :core, :key :number_2}
+   {:plugin :core, :key :number_3}
+   {:plugin :core, :key :number_4}
+   {:plugin :core, :key :number_5}
+   {:plugin :core, :key :number_6}
+   {:plugin :core, :key :number_7}
+   {:plugin :core, :key :number_8}
+   {:plugin :core, :key :number_9}
+   {:plugin :core, :key :number_0}
    {:plugin :core, :key :enter}
    {:plugin :core, :key :escape}
    {:plugin :core, :key :backspace}
@@ -346,6 +346,16 @@
         :foreground "red"}
    :transparent {:primary-text "Trns"
                  :foreground "red"}
+   :number_1 {:primary-text "1"}
+   :number_2 {:primary-text "2"}
+   :number_3 {:primary-text "3"}
+   :number_4 {:primary-text "4"}
+   :number_5 {:primary-text "5"}
+   :number_6 {:primary-text "6"}
+   :number_7 {:primary-text "7"}
+   :number_8 {:primary-text "8"}
+   :number_9 {:primary-text "9"}
+   :number_0 {:primary-text "0"}
    :left-shift {:primary-text "Shift L"}
    :right-shift {:primary-text "Shift R"}
    :left-alt {:primary-text "Alt L"}
@@ -457,8 +467,7 @@
   (let [keymap-size (apply * (get-in (device/current) [:meta :matrix]))]
     (->> (post-process/format :keymap.layer text)
         (partition keymap-size)
-        (map vec)
-        vec)))
+        (mapv vec))))
 
 (defmulti unformat :plugin)
 
