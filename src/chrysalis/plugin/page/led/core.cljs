@@ -54,20 +54,9 @@
       (device/current)
       @(get-in (device/current) [:meta :layout])
       (events/colormap)
-      {:interactive? true}]
-     [:div.btn-toolbar.justify-content-center
-      [:div.btn-group.mr-2
-       [:a.btn.btn-primary {:href "#"
-                            :on-click (fn [e]
-                                        (events/colormap:upload!))}
-        [:i.fa.fa-paint-brush] " Apply"]]
-      [:div.btn-group.mr-2
-       [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
-                            :data-toggle :modal
-                            :on-click (fn [e]
-                                        (presets/name! nil))}
-        [:i.fa.fa-floppy-o] " Save"]]]]
+      {:interactive? true}]]
     [:div.col-sm-3.text-center.justify-content-center.bg-faded
+
      [<live-update>]
      (when-not (events/live-update?)
        [:div.form-group.form-check
@@ -81,10 +70,6 @@
                       (events/palette:update!)
                       (events/colormap:update!))}
          "Cancel"]])
-     [:h4 "Palette"]
-     [palette/<palette>]
-     [:h4 "Color picker"]
-     [color-picker/<color-picker>]
      [:hr]
      [:label.mr-sm-2 "Layer"
       [:select.custom-select
@@ -96,13 +81,35 @@
        [:option {:value 2} "2"]
        [:option {:value 3} "3"]
        [:option {:value 4} "4"]
-       [:option {:value 5} "5"]]]
-     [:hr]
+       [:option {:value 5} "5"]]]]]
+
+   [:div.row
+    [:div.col-sm-6.text-left
+     [:h4 "Color Palette"]
+     [palette/<palette>]]
+    [:div.col-sm-6.text-center
+     [:h4 "Adjust Palette Colour"]
+     [color-picker/<color-picker>]]]
+
+   [:div.row
+    [:div.col-sm-12.text-center
      [:h4 "Presets"
       [:small {:style {:float :right}}
        [:a {:href "#"
             :title "Import a preset..."}
         [:i.fa.fa-plus]]]]
+     [:div.btn-toolbar.justify-content-center
+      [:div.btn-group.mr-2
+       [:a.btn.btn-primary {:href "#"
+                            :on-click (fn [e]
+                                        (events/colormap:upload!))}
+        [:i.fa.fa-paint-brush] " Apply"]]
+      [:div.btn-group.mr-2
+       [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
+                            :data-toggle :modal
+                            :on-click (fn [e]
+                                        (presets/name! nil))}
+        [:i.fa.fa-floppy-o] " Save"]]]
      [presets/<presets>]]]])
 
 (defmethod settings/apply! [:led] [db _]
