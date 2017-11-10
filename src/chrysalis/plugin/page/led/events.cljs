@@ -22,27 +22,6 @@
             [clojure.walk :as walk]
             [clojure.string :as s]))
 
-;;; ---- Current target ------ ;;;
-
-(re-frame/reg-sub
- :led/current-target
- (fn [db _]
-   (:led/current-target db)))
-
-(re-frame/reg-event-db
- :led/current-target
- (fn [db [_ new-target]]
-   (let [target-palette (get-in db [:led/colormap new-target])]
-     (assoc db
-            :led/current-target new-target
-            :led/palette-selected target-palette))))
-
-(defn current-target []
-  @(re-frame/subscribe [:led/current-target]))
-
-(defn current-target! [new-target]
-  (re-frame/dispatch [:led/current-target new-target]))
-
 ;;; --- Current layer --- ;;;
 
 (re-frame/reg-sub
@@ -61,6 +40,32 @@
 (defn switch-layer
   [new-layer]
   (re-frame/dispatch [:led/layer! new-layer]))
+
+(defn- current-layer
+  [db]
+  (dec (or (:led/layer db) 1)))
+
+;;; ---- Current target ------ ;;;
+
+(re-frame/reg-sub
+ :led/current-target
+ (fn [db _]
+   (:led/current-target db)))
+
+(re-frame/reg-event-db
+ :led/current-target
+ (fn [db [_ new-target]]
+   (let [layer (current-layer db)
+         target-palette (get-in db [:led/colormap layer new-target])]
+     (assoc db
+            :led/current-target new-target
+            :led/palette-selected target-palette))))
+
+(defn current-target []
+  @(re-frame/subscribe [:led/current-target]))
+
+(defn current-target! [new-target]
+  (re-frame/dispatch [:led/current-target new-target]))
 
 ;;; ---- Palette --- ;;;
 
@@ -131,14 +136,14 @@
 
 (re-frame/reg-sub
   :led/colormap
-  (fn [db _]
-    (let [palette (:led/palette db)]
-      (mapv palette (:led/colormap db)))))
+  (fn [{:keys [led/layer led/palette led/colormap] :as db} _]
+    (mapv palette (get colormap (dec (or layer 1))))))
 
 (re-frame/reg-sub
   :led/colormap.at
   (fn [db [_ key-idx]]
-    (let [palette-idx (get-in db [:led/colormap key-idx])]
+    (let [layer (current-layer db)
+          palette-idx (get-in db [:led/colormap layer key-idx])]
       (get-in db [:led/palette palette-idx]))))
 
 (re-frame/reg-event-db
@@ -168,7 +173,7 @@
  :led/colormap.upload
  (fn [colormap]
    (command/run :colormap.map
-     (->> colormap (s/join " ")) :discard)))
+     (->> colormap flatten (s/join " ")) :discard)))
 
 (re-frame/reg-event-fx
  :led/colormap.upload
@@ -179,7 +184,8 @@
   :led/colormap.update-at
   (fn [{db :db} [_ palette-idx]]
     (when-let [target-idx (:led/current-target db)]
-      (let [new-colormap (assoc (:led/colormap db) target-idx palette-idx)
+      (let [layer (current-layer db)
+            new-colormap (assoc-in (:led/colormap db) [layer target-idx] palette-idx)
             live? (db :led/live-update)]
         (-> {:db (assoc db :led/colormap new-colormap)}
             (cond->

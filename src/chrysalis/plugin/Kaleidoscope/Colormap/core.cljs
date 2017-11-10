@@ -16,8 +16,12 @@
 
 (ns chrysalis.plugin.Kaleidoscope.Colormap.core
   (:require [chrysalis.command.post-process :as post-process]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [chrysalis.device :as device]))
 
 (defmethod post-process/format [:led.colormap] [_ text]
-  (->> (string/split text #" ")
-      (mapv #(js/parseInt % 10))))
+  (let [keyboard-size (apply * (get-in (device/current) [:meta :matrix]))]
+    (->> (string/split text #" ")
+        (map #(js/parseInt % 10))
+        (partition keyboard-size)
+        (mapv vec))))
