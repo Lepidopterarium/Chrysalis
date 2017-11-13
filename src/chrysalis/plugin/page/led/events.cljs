@@ -157,14 +157,6 @@
    (assoc db :led/colormap (post-process/format :led.colormap response))))
 
 (re-frame/reg-event-fx
-  :led/colormap!
-  (fn [cofx [_ colormap]]
-    (let [live? (get-in (:db cofx) [:led/live-update])]
-      (-> {:db (assoc (:db cofx) :led/colormap colormap)}
-          (cond->
-              live? (assoc :led/colormap.upload colormap))))))
-
-(re-frame/reg-event-fx
   :led/colormap.layer!
   (fn [{db :db} [_ colormap-layer]]
     (let [live? (:led/live-update db)
@@ -172,7 +164,7 @@
           new-colormap (assoc (:led/colormap db) layer colormap-layer)]
       (-> {:db (assoc db :led/colormap new-colormap)}
           (cond->
-              live? (assoc :led/colormap.upload new-colormap))))))
+              live? (assoc :led/colormap.upload [layer colormap-layer]))))))
 
 (re-frame/reg-fx
   :led/colormap
@@ -186,14 +178,17 @@
 
 (re-frame/reg-fx
  :led/colormap.upload
- (fn [colormap]
-   (command/run :colormap.map
-     (->> colormap flatten (s/join " ")) :discard)))
+ (fn [[layer colormap]]
+   (command/run :colormap.layer
+     (str layer
+          " "
+          (->> colormap flatten (s/join " "))) :discard)))
 
 (re-frame/reg-event-fx
  :led/colormap.upload
- (fn [cofx _]
-   {:led/colormap.upload (get-in cofx [:db :led/colormap])}))
+ (fn [{db :db} _]
+   (let [layer (current-layer db)]
+     {:led/colormap.upload [layer (get-in db [:led/colormap layer])]})))
 
 (re-frame/reg-event-fx
   :led/colormap.update-at
@@ -204,7 +199,7 @@
             live? (db :led/live-update)]
         (-> {:db (assoc db :led/colormap new-colormap)}
             (cond->
-                live? (assoc :led/colormap.upload new-colormap)))))))
+                live? (assoc :led/colormap.upload [layer new-colormap])))))))
 
 (defn colormap []
   @(re-frame/subscribe [:led/colormap]))
