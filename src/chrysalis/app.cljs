@@ -44,9 +44,11 @@
             [chrysalis.plugin.page.keymap.core]
 
             ;; Kaleidoscope plugins
+            [chrysalis.plugin.Kaleidoscope.Colormap.core]
             [chrysalis.plugin.Kaleidoscope.FingerPainter.core]
             [chrysalis.plugin.Kaleidoscope.HostOS.core]
             [chrysalis.plugin.Kaleidoscope.LEDControl.core]
+            [chrysalis.plugin.Kaleidoscope.LED-Palette-Theme.core]
             [chrysalis.plugin.Kaleidoscope.OneShot.core]
             [chrysalis.plugin.Kaleidoscope.Macros.core]
             [chrysalis.plugin.Kaleidoscope.TapDance.core]))

@@ -22,6 +22,7 @@
 
             [chrysalis.plugin.page.led.events :as events]
             [chrysalis.plugin.page.led.theme :as theme]
+            [chrysalis.plugin.page.led.palette :as palette]
             [chrysalis.plugin.page.led.color-picker :as color-picker]
             [chrysalis.plugin.page.led.presets :as presets]
 
@@ -30,10 +31,11 @@
 (defn <live-update> []
   [:form.form-group.form-check
    [:label.form-check-label
-    [:input.form-check-input {:type :checkbox
-                              :checked (events/live-update?)
-                              :on-change (fn [e]
-                                           (events/live-update! (-> e .-target .-checked)))}]
+    [:input.form-check-input
+     {:type :checkbox
+      :value (events/live-update?)
+      :on-change (fn [e]
+                   (events/live-update! (.. e -target -checked)))}]
     " Live update"]])
 
 (defn render []
@@ -49,42 +51,71 @@
    [:div.row
     [:div.col-sm-9.text-center
      [theme/<led-theme>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      (events/theme)
-      {:width 1024 :height 640 :interactive? true}]
+      {:device (device/current)
+      :svg @(get-in (device/current) [:meta :layout])
+      :theme (events/colormap)
+      :props {:interactive? true}}]]
+    [:div.col-sm-3.text-center.justify-content-center.bg-faded
+
+     [<live-update>]
+     (when-not (events/live-update?)
+       [:div.form-group.form-check
+        [:button.btn.btn-primary
+         {:on-click (fn [_]
+                      (events/palette:upload!)
+                      (events/colormap:upload!))}
+         [:i.fa.fa-paint-brush] " Apply"]
+        [:button.btn.btn-secondary
+         {:on-click (fn [_]
+                      (events/palette:update!)
+                      (events/colormap:update!))}
+         "Cancel"]])
+     [:hr]
+     [:label.mr-sm-2 "Layer"
+      [:select.custom-select
+       {:value (events/layer)
+        :on-change (fn [e]
+                     (events/switch-layer (js/parseInt (-> e .-target .-value) 10)))}
+       ;; TODO: is there a way to check how many layers there are?
+       [:option {:value 1} "1"]
+       [:option {:value 2} "2"]
+       [:option {:value 3} "3"]
+       [:option {:value 4} "4"]
+       [:option {:value 5} "5"]]]]]
+
+   [:div.row
+    [:div.col-sm-6.text-left
+     [:h4 "Color Palette"]
+     [palette/<palette>]]
+    [:div.col-sm-6.text-center
+     [:h4 "Adjust Palette Colour"]
+     [color-picker/<color-picker>]]]
+
+   [:div.row
+    [:div.col-sm-12.text-center
+     [:h4 "Colormap Presets"
+      [:small {:style {:float :right}}
+       [:a {:href "#"
+            :title "Import a preset..."}
+        [:i.fa.fa-plus]]]]
      [:div.btn-toolbar.justify-content-center
-      [:div.btn-group.mr-2
-       [:a.btn.btn-primary {:href "#"
-                            :on-click (fn [e]
-                                        (events/theme:upload!))}
-        [:i.fa.fa-paint-brush] " Apply"]]
+
       [:div.btn-group.mr-2
        [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
                             :data-toggle :modal
                             :on-click (fn [e]
                                         (presets/name! nil))}
-        [:i.fa.fa-floppy-o] " Save"]]]]
-    [:div.col-sm-3.text-center.justify-content-center.bg-faded
-     [<live-update>]
-     [:h4 "Color picker"]
-     [color-picker/<color-picker>]
-     [:hr]
-     [:h4 "Presets"
-      [:small {:style {:float :right}}
-       [:a {:href "#"
-            :title "Import a preset..."}
-        [:i.fa.fa-plus]]]]
+        [:i.fa.fa-floppy-o] " Save"]]]
      [presets/<presets>]]]])
 
 (defmethod settings/apply! [:led] [db _]
   (settings/copy-> db
-                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
                    [:led/presets]))
 
 (defmethod settings/save! [:led] [db _]
   (settings/<-copy db
-                   [:devices (keyword (get-in (device/current) [:meta :name])) :led :presets]
+                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
                    [:led/presets]))
 
 (page/add! :led {:name "LED Theme Editor"
@@ -92,4 +123,5 @@
                  :disable? (fn [] (nil? (device/current)))
                  :device/need? true
                  :render render
-                 :events {:led/theme :update}})
+                 :events {:led/colormap :update
+                          :led/palette :update}})

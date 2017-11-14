@@ -20,7 +20,8 @@
 
             [chrysalis.device :as device]
 
-            [re-frame.core :as re-frame]))
+            [re-frame.core :as re-frame]
+            [chrysalis.settings :as settings]))
 
 (re-frame/reg-sub
  :led/presets
@@ -32,10 +33,12 @@
  (fn [db [_ preset-name]]
    (update db :led/presets dissoc preset-name)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :led/presets.add
- (fn [db [_ preset-name theme]]
-   (update db :led/presets assoc preset-name theme)))
+ (fn [{db :db} [_ preset-name colormap]]
+   (let [db (update db :led/presets assoc preset-name colormap)]
+     {:db db
+      :settings/save (settings/save! db :led)})))
 
 (re-frame/reg-event-db
  :led/presets.name
@@ -63,45 +66,49 @@
       [:div.container-fluid
        [:div.row
         [:div.col-sm-12
-         [:form.input-group {:on-submit (fn [e]
-                                          (.preventDefault e)
-                                          (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
-                                          (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
-                                                              @(re-frame/subscribe [:led/theme])]))}
+         [:form.input-group
+          {:on-submit
+           (fn [e]
+             (.preventDefault e)
+             (.modal (js/$ "#chrysalis-plugin-page-led-save-theme") "hide")
+             (re-frame/dispatch [:led/presets.add
+                                 @(re-frame/subscribe [:led/presets.name])
+                                 @(re-frame/subscribe [:led/colormap.raw])]))}
           [:div.input-group-addon {:title "Name"} [:i.fa.fa-hdd-o]]
-          [:input.form-control {:type :text
-                                :value @(re-frame/subscribe [:led/presets.name])
-                                :placeholder "Name your theme..."
-                                :on-change (fn [e]
-                                             (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
+          [:input.form-control
+           {:type :text
+            :value @(re-frame/subscribe [:led/presets.name])
+            :placeholder "Name your theme..."
+            :on-change (fn [e]
+                         (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
      [:div.modal-footer
-      [:a.btn.btn-primary {:href "#"
-                           :data-dismiss :modal
-                           :on-click (fn [e]
-                                       (re-frame/dispatch [:led/presets.add @(re-frame/subscribe [:led/presets.name])
-                                                           @(re-frame/subscribe [:led/theme])]))}
+      [:a.btn.btn-primary
+       {:href "#"
+        :data-dismiss :modal
+        :on-click (fn [e]
+                    (re-frame/dispatch [:led/presets.add
+                                        @(re-frame/subscribe [:led/presets.name])
+                                        @(re-frame/subscribe [:led/colormap.raw])]))}
        "Save"]
       [:a.btn.btn-secondary {:href "#"
                              :data-dismiss :modal}
        "Cancel"]]]]])
 
-(defn- <preset> [[preset-name theme]]
+(defn- <preset> [preset-name theme]
   [:div.card {:href "#"
               :key (str "chrysalis-plugin-led-preset-" preset-name)}
    [:h5.card-header preset-name]
    [:div.card-block
     [:a.card-text {:href "#"
                    :on-click (fn [e]
-                               (re-frame/dispatch [:led/theme! theme]))}
-     [theme/<led-theme>
-      (device/current)
-      @(get-in (device/current) [:meta :layout])
-      theme
-      {:width 102 :height 64}]]]
+                               (re-frame/dispatch [:led/colormap.layer! theme]))}
+     (when-let [palette (events/palette)]
+       [theme/<led-theme>
+        {:device (device/current)
+         :svg @(get-in (device/current) [:meta :layout])
+         :theme (mapv (events/palette) theme)
+         :props {:width 102 :height 64}}])]]
    [:div.card-footer.text-left
-    [:span.card-text
-     [:a {:href "#"}
-      "Export"]]
     [:span.card-text
      [:a {:style {:float :right}
           :href "#"
@@ -113,4 +120,7 @@
 
 (defn <presets> []
   [:div.card-group
-   (doall (map <preset> @(re-frame/subscribe [:led/presets])))])
+   (doall
+     (for [[name theme] @(re-frame/subscribe [:led/presets])]
+       ^{:key name}
+       [<preset> name theme]))])

@@ -20,7 +20,8 @@
             [chrysalis.plugin.page.led.events :as events]
 
             [re-frame.core :as re-frame]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.set :as set]))
 
 (defn- hex->color [hex]
   (let [r (js/parseInt (.substring hex 1 3) 16)
@@ -33,19 +34,12 @@
     (nth (nth led-map r) c)
     (+ (* r cols) c)))
 
-(defn- current-node? [r c]
-  (if-let [target (events/current-target)]
-    (let [cr (js/parseInt (.getAttribute target "data-row"))
-          cc (js/parseInt (.getAttribute target "data-column"))]
-      (and (= r cr) (= c cc)))
-    false))
-
 (defn- node-update [device node theme interactive?]
   (let [[r c] (map js/parseInt (rest (re-find #"R(\d+)C(\d+)_keyshape$" (:id node))))]
     (if (and r c)
       (let [[cols rows] (get-in device [:meta :matrix])
             index (key-index device r c cols)
-            color (nth theme index [0 0 0])]
+            color (get theme index)]
         (if interactive?
           (assoc node
                  :class :key
@@ -53,28 +47,31 @@
                  :data-column c
                  :data-index index
                  :fill (color->hex color)
-                 :stroke-width (if (current-node? r c)
+                 :stroke-width (if (= (events/current-target) index)
                                  2
                                  2)
-                 :stroke (if (current-node? r c)
+                 :stroke (if (= (events/current-target) index)
                            "#ff0000"
                            "#b4b4b4")
                  :on-click (fn [e]
                              (let [target (.-target e)]
-                               (events/current-target! target))))
+                               (events/current-target! index))))
           (assoc node
                  :fill (color->hex color))))
       node)))
 
-(defn prepare [device svg theme props]
+(defn svg-theme
+  [{:keys [device svg theme props layer]}]
   (walk/prewalk (fn [node]
                   (if (and (map? node) (get node :id))
                     (node-update device node theme (:interactive? props))
                     node))
                 (-> svg
-                    (assoc 1 (assoc (dissoc props :interactive?) :view-box "0 0 1024 640")))))
+                    (update 1 merge (dissoc props :interactive?))
+                    (update 1 set/rename-keys {:viewbox :view-box}))))
 
-(defn <led-theme> [device svg theme props]
+(defn <led-theme>
+  [{:keys [device svg theme props] :as args}]
   (if theme
-    (prepare device svg theme props)
+    [svg-theme args]
     [:i.fa.fa-refresh.fa-spin.fa-5x]))

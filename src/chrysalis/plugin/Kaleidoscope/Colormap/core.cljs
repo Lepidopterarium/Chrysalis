@@ -1,5 +1,5 @@
 ;; Chrysalis -- Kaleidoscope Command Center
-;; Copyright (C) 2017  Gergely Nagy <algernon@madhouse-project.org>
+;; Copyright (C) 2017  James Cash <james.cash@occasionallycogent.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -14,17 +14,14 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns chrysalis.plugin.page.led.color-picker.events
-  (:require [re-frame.core :as re-frame]))
+(ns chrysalis.plugin.Kaleidoscope.Colormap.core
+  (:require [chrysalis.command.post-process :as post-process]
+            [clojure.string :as string]
+            [chrysalis.device :as device]))
 
-(re-frame/reg-event-db
- :led/picker.update
- (fn [db [_ index color]]
-   (let [{:keys [r g b]} (js->clj (:rgb color)
-                                  :keywordize-keys true)]
-     (when (>= index 0)
-       (assoc-in db [:led/palette index] [r g b])))))
-
-(defn update! [index color]
-  (re-frame/dispatch [:led/picker.update index (js->clj color
-                                                        :keywordize-keys true)]))
+(defmethod post-process/format [:led.colormap] [_ text]
+  (let [keyboard-size (apply * (get-in (device/current) [:meta :matrix]))]
+    (->> (string/split text #" ")
+        (map #(js/parseInt % 10))
+        (partition keyboard-size)
+        (mapv vec))))
