@@ -63,8 +63,14 @@
 (defn svg-theme
   [{:keys [device svg theme props layer]}]
   (walk/prewalk (fn [node]
-                  (if (and (map? node) (get node :id))
+                  (cond
+                    (and (map? node) (get node :id))
                     (node-update device node theme (:interactive? props))
+
+                    (and (vector? node) (= (first node) :text))
+                    [:g]
+
+                    :else
                     node))
                 (-> svg
                     (update 1 merge (dissoc props :interactive?))
