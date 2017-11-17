@@ -218,32 +218,32 @@
                 </text>
             </g>
             <g transform="matrix(0.999332,0.0365445,-0.0365445,0.999332,284.689,100.745)">
-                <text id="R3C4_t_secondary" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
+                <text id="R3C5_t_secondary" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
                     SECOND
                 </text>
             </g>
             <g transform="matrix(0.899399,0.0328901,-0.0365445,0.999332,296.845,85.7461)">
-                <text id="R3C4_t_primary" x="116" y="177.877" font-family="'OpenSans-Bold','Open Sans',sans-serif" font-size="13" font-weight="700">
+                <text id="R3C5_t_primary" x="116" y="177.877" font-family="'OpenSans-Bold','Open Sans',sans-serif" font-size="13" font-weight="700">
                     Prim
                 </text>
             </g>
             <g transform="matrix(0.999332,0.0365445,-0.0365445,0.999332,285.661,74.1781)">
-                <text id="R3C4_t_extra" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
+                <text id="R3C5_t_extra" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
                     EXTRA
                 </text>
             </g>
             <g transform="matrix(0.999386,0.0350435,-0.0350435,0.999386,227.512,87.3094)">
-                <text id="R3C4_t_secondary1" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
+                <text id="R3C4_t_secondary" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
                     SECOND
                 </text>
             </g>
             <g transform="matrix(0.899447,0.0315391,-0.0350435,0.999386,239.646,72.2924)">
-                <text id="R3C4_t_primary1" x="116" y="177.877" font-family="'OpenSans-Bold','Open Sans',sans-serif" font-size="13" font-weight="700">
+                <text id="R3C4_t_primary" x="116" y="177.877" font-family="'OpenSans-Bold','Open Sans',sans-serif" font-size="13" font-weight="700">
                     Prim
                 </text>
             </g>
             <g transform="matrix(0.999386,0.0350435,-0.0350435,0.999386,228.444,60.7412)">
-                <text id="R3C4_t_extra1" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
+                <text id="R3C4_t_extra" x="116" y="175.01" font-family="'SourceCodePro-Bold','Source Code Pro',monospace" font-size="10" font-weight="700">
                     EXTRA
                 </text>
             </g>
