@@ -309,9 +309,10 @@
          :layer (inc key-code)})
 
       ;; LEDEffectNext
-      (and (bit-test flags 6) ;synthetic
-           (bit-test flags 3) ; IS_INTERNAL - XXX: this may change soon?
-           (bit-test flags 0)); LED_TOGGLE
+      (= flags (-> 0
+                   (bit-set 6) ;synthetic
+                   (bit-set 3) ; IS_INTERNAL - XXX: this may change soon?
+                   (bit-set 0))); LED_TOGGLE
       {:plugin :led-control
        :key :led-effect-next}
 
