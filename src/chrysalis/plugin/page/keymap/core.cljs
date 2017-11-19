@@ -30,6 +30,7 @@
             [garden.units :as gu]
             [chrysalis.key :as key]
             [chrysalis.settings :as settings]
+            [chrysalis.plugin.Kaleidoscope.MouseKeys.keymap]
             [chrysalis.plugin.Kaleidoscope.OneShot.keymap]))
 
 (defn <live-update> []
