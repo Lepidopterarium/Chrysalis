@@ -51,6 +51,7 @@
             [chrysalis.plugin.Kaleidoscope.LED-Palette-Theme.core]
             [chrysalis.plugin.Kaleidoscope.OneShot.core]
             [chrysalis.plugin.Kaleidoscope.Macros.core]
+            [chrysalis.plugin.Kaleidoscope.MouseKeys.core]
             [chrysalis.plugin.Kaleidoscope.TapDance.core]))
 
 (re-frame/reg-event-fx
