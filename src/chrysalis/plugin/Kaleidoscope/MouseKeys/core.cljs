@@ -77,4 +77,19 @@
 
 (defmethod key/unformat :mouse-keys
   [{:keys [warp? warp-end? wheel? button directions]}]
-  )
+  (let [flags (-> 0 (bit-set 6) (bit-set 4) (bit-shift-left 8))
+        key-code (cond-> 0
+                   wheel? (bit-set 4)
+                   warp? (bit-set 5)
+                   warp-end? (bit-set 6)
+                   (some? button) (bit-set (case button
+                                             :left 0
+                                             :right 1
+                                             :middle 2))
+                   (seq directions)
+                   (as-> <>
+                       (reduce bit-set
+                               <>
+                               (map {:up 0 :down 1 :left 2 :right 3}
+                                    directions))))]
+    (bit-or flags key-code)))
