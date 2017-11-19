@@ -296,8 +296,9 @@
       (bit-test flags 7) key
 
       ;; Shift/Lock layer key
-      (and (bit-test flags 6) ;synthetic
-           (bit-test flags 2)) ; switch_to_keymap)
+      (= flags (-> 0
+                   (bit-set 6) ;synthetic
+                   (bit-set 2))) ; switch_to_keymap)
       (if (>= key-code 42) ; Layer_shift_offset = 42
         {:plugin :layers
          :key :shift-layer
