@@ -273,7 +273,7 @@
 ;; TODO: is this the best place to do this?
 (add-edit-tab!
   {:title "Alphanumeric"
-   :keys (keys-like #"\d|\w")
+   :keys (keys-like #"(number_\d)|\w")
    :modifiers? true})
 
 (add-edit-tab!
