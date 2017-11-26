@@ -18,7 +18,7 @@
   (:require [chrysalis.hardware :refer [known?]]
             [re-frame.core :as re-frame]))
 
-(defmethod known? [0xfeed 0x6060] [device]
+(defmethod known? [0x1209 0x2201] [device]
   (assoc device
          :meta {:name "Shortcut v0.4"
                 :logo "images/plugins/shortcut-keyboard.png"
@@ -30,7 +30,7 @@
                      [-1 -1 -1 -1 -1 -1 -1     -1 -1 -1 -1 -1 -1 -1]]}
          :board {:name "Shortcut v0.4"
                  :baud 9600
-                 :productId ["0x6060" "0x0036"]
+                 :productId ["0x2201" "0x2200"]
                  :protocol "avr109"
                  :manualReset true
                  :signature (js/Buffer. #js [0x43 0x41 0x54 0x45 0x52 0x49 0x4e])}))
