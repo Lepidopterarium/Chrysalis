@@ -40,9 +40,65 @@
                      (pr-str settings)
                      #js {"mode" 0644}))))
 
+(def ^:private settings-file-filters
+  #js [ #js {"name" "EDN files"
+             "extensions" #js ["edn"]}])
+
+(re-frame/reg-fx
+  :settings/export
+  (fn [to-export]
+    (let [dialog (.. (js/require "electron") -remote -dialog)
+          fs (js/require "fs")]
+      (.showSaveDialog
+        dialog
+        #js {"title" "Export Chrysalis Setting"
+             "defaultPath" "export.edn"
+             "filters" settings-file-filters}
+        (fn [file-name]
+          (when file-name
+            (.writeFileSync fs file-name
+                            (pr-str to-export)
+                            #js {"mode" 0644})))))))
+
+(re-frame/reg-fx
+  :settings/import
+  (fn [_]
+    (let [dialog (.. (js/require "electron") -remote -dialog)
+          fs (js/require "fs")]
+      (.showOpenDialog
+        dialog
+        #js {"title" "Load Chrysalis Setting"
+             "filters" settings-file-filters
+             "properties" #js ["openFile" "multiSelections"]}
+        (fn [file-names]
+          (doseq [file file-names]
+            (.readFile fs file
+                       #js {"encoding" "utf-8"}
+                       (fn [err data]
+                         (when-not err
+                           (->> data
+                               edn/read-string
+                               (vector :settings/-merge-imported)
+                               (re-frame/dispatch)))))))))))
+
+(re-frame/reg-event-fx
+  :settings/import
+  (fn [_ _]
+    {:settings/import nil}))
+
 (defmulti apply!
   (fn [_ page]
     [page]))
+
+(re-frame/reg-event-fx
+  :settings/-merge-imported
+  (fn [{db :db} [_ imported]]
+    (let [settings (assoc-in (:settings db) (:path imported)
+                             (:value imported))
+          cur-page (:page/current db)]
+      {:db (-> db (assoc :settings settings)
+               (apply! cur-page))
+       :settings/save settings})))
 
 (defmethod apply! :default [db _]
   db)
