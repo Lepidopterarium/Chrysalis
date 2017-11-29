@@ -39,7 +39,7 @@
     (let [preset (get-in db [:led/presets preset-name])
           device (get-in db [:device/current :meta :name])]
       {:settings/export
-       {:path [:devices device :keymap :presets preset-name]
+       {:path [:devices device :led :presets preset-name]
         :page :led
         :value preset}})))
 
@@ -90,7 +90,8 @@
             :value @(re-frame/subscribe [:led/presets.name])
             :placeholder "Name your theme..."
             :on-change (fn [e]
-                         (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
+                         (re-frame/dispatch [:led/presets.name
+                                             (.. e -target -value)]))}]]]]]]
      [:div.modal-footer
       [:a.btn.btn-primary
        {:href "#"

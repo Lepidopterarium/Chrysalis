@@ -24,6 +24,7 @@
             [chrysalis.plugin.page.led.theme :as theme]
             [chrysalis.plugin.page.led.palette :as palette]
             [chrysalis.plugin.page.led.color-picker :as color-picker]
+            [chrysalis.plugin.page.led.palette.presets :as palette-presets]
             [chrysalis.plugin.page.led.presets :as presets]
 
             [garden.units :as gu]))
@@ -48,6 +49,7 @@
                              :stroke-width (gu/px 2)
                              :stroke "#0000ff"}]]]]
    [presets/<save-theme>]
+   [palette-presets/<save-palette>]
    [:div.row
     [:div.col-sm-9.text-center
      [theme/<led-theme>
@@ -86,39 +88,63 @@
    [:div.row
     [:div.col-sm-6.text-left
      [:h4 "Color Palette"]
-     [palette/<palette>]]
+     [palette/<palette> (events/palette)]]
     [:div.col-sm-6.text-center
      [:h4 "Adjust Palette Colour"]
      [color-picker/<color-picker>]]]
 
    [:div.row
-    [:div.col-sm-12.text-center
-     [:h4 "Colormap Presets"
-      [:small {:style {:float :right}}
-       [:a {:href "#"
-            :on-click (fn [e] (.preventDefault e)
-                        (events/import-presets!))
-            :title "Import a preset..."}
-        [:i.fa.fa-plus] "Import"]]]
-     [:div.btn-toolbar.justify-content-center
+    [:button.btn-primary
+     {:on-click (fn [e] (.preventDefault e)
+                  (events/import-presets!))
+      :title "Import a preset..."}
+     [:i.fa.fa-plus] "Import Presets"]]
 
+   [:div.row
+    [:div.col-sm-12.text-center
+     [:h4 "Colormap Presets"]
+     [:div.btn-toolbar.justify-content-center
       [:div.btn-group.mr-2
        [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-theme"
                             :data-toggle :modal
                             :on-click (fn [e]
                                         (presets/name! nil))}
         [:i.fa.fa-floppy-o] " Save"]]]
-     [presets/<presets>]]]])
+     [presets/<presets>]]]
+
+   [:div.row
+    [:div.col-sm-12.tex-center
+     [:h4 "Palette Presets"]
+     [:div.btn-toolbar.justify-content-center
+      [:div.btn-group.mr-2
+       [:a.btn.btn-success {:href "#chrysalis-plugin-page-led-save-palette"
+                            :data-toggle :modal
+                            :on-click (fn [e]
+                                        (palette-presets/name! nil))}
+        [:i.fa.fa-floppy-o] " Save"]]]
+     [palette-presets/<presets>]]]])
 
 (defmethod settings/apply! [:led] [db _]
-  (settings/copy-> db
-                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
-                   [:led/presets]))
+  (let [device-name (get-in (device/current) [:meta :name])]
+    (-> db
+        (settings/copy->
+          [:devices device-name :led :presets]
+          [:led/presets])
+        (settings/copy->
+          [:devices device-name :led :palette-presets]
+          [:led.palette/presets]))))
 
 (defmethod settings/save! [:led] [db _]
-  (settings/<-copy db
-                   [:devices (get-in (device/current) [:meta :name]) :led :presets]
-                   [:led/presets]))
+  (let [device-name (get-in (device/current) [:meta :name])]
+    (merge
+      (settings/<-copy
+        db
+        [:devices device-name :led :presets]
+        [:led/presets])
+      (settings/<-copy
+        db
+        [:devices device-name :led :palette-presets]
+        [:led.palette/presets]))))
 
 (page/add! :led {:name "LED Theme Editor"
                  :index 10

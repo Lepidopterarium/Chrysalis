@@ -27,7 +27,6 @@
           device (get-in db [:device/current :meta :name])]
       {:settings/export
        {:path [:devices device :keymap :presets preset-name]
-        :page :keymap
         :value preset}})))
 
 (re-frame/reg-event-fx
