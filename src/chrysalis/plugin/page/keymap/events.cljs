@@ -260,6 +260,9 @@
   []
   @(re-frame/subscribe [:keymap/edit-tabs]))
 
+(defn import-preset! []
+  (re-frame/dispatch [:settings/import]))
+
 ;; add default tabs
 
 (defn- keys-like

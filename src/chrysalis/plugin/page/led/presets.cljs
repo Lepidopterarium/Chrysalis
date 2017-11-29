@@ -34,6 +34,16 @@
    (update db :led/presets dissoc preset-name)))
 
 (re-frame/reg-event-fx
+  :led/presets.export
+  (fn [{db :db} [_ preset-name]]
+    (let [preset (get-in db [:led/presets preset-name])
+          device (get-in db [:device/current :meta :name])]
+      {:settings/export
+       {:path [:devices device :led :presets preset-name]
+        :page :led
+        :value preset}})))
+
+(re-frame/reg-event-fx
  :led/presets.add
  (fn [{db :db} [_ preset-name colormap]]
    (let [db (update db :led/presets assoc preset-name colormap)]
@@ -80,7 +90,8 @@
             :value @(re-frame/subscribe [:led/presets.name])
             :placeholder "Name your theme..."
             :on-change (fn [e]
-                         (re-frame/dispatch [:led/presets.name (.-value (.-target e))]))}]]]]]]
+                         (re-frame/dispatch [:led/presets.name
+                                             (.. e -target -value)]))}]]]]]]
      [:div.modal-footer
       [:a.btn.btn-primary
        {:href "#"
@@ -94,7 +105,8 @@
                              :data-dismiss :modal}
        "Cancel"]]]]])
 
-(defn- <preset> [preset-name theme]
+(defn- <preset>
+  [preset-name theme]
   [:div.card {:href "#"
               :key (str "chrysalis-plugin-led-preset-" preset-name)}
    [:h5.card-header preset-name]
@@ -110,6 +122,13 @@
          :props {:width 102 :height 64}}])]]
    [:div.card-footer.text-left
     [:span.card-text
+     [:a {:href "#"
+          :title "Export"
+          :on-click (fn [e]
+                      (.preventDefault e)
+                      (re-frame/dispatch [:led/presets.export
+                                          preset-name]))}
+      [:i.fa.fa-share]]
      [:a {:style {:float :right}
           :href "#"
           :title "Remove"

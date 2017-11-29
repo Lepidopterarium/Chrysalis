@@ -26,11 +26,11 @@
   (str "rgb(" (bit-xor 0xff r) "," (bit-xor 0xff g) "," (bit-xor 0xff b) ")"))
 
 (defn <palette>
-  []
+  [palette]
   [:table
    (into [:tbody]
          (map (fn [r] [:tr r]))
-         (->> (events/palette)
+         (->> palette
              (map-indexed
                (fn [i [r g b :as rgb]]
                  ^{:key i}

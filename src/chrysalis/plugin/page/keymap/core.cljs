@@ -210,6 +210,9 @@
     [:div.col-sm-12.text-center
      [:h2 "Presets"]
      [presets/<save-layout>]
+     [:button.btn-primary
+      {:on-click (fn [_] (events/import-preset!))}
+       "Import"]
      [:div.btn-group.mr-2
       [:a.btn.btn-success {:href "#chrysalis-plugin-page-keymap-save-layout"
                            :data-toggle :modal

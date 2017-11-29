@@ -21,6 +21,15 @@
       :settings/save settings})))
 
 (re-frame/reg-event-fx
+  :keymap/presets.export
+  (fn [{db :db} [_ preset-name]]
+    (let [preset (get-in db [:keymap/presets preset-name])
+          device (get-in db [:device/current :meta :name])]
+      {:settings/export
+       {:path [:devices device :keymap :presets preset-name]
+        :value preset}})))
+
+(re-frame/reg-event-fx
  :keymap/presets.add
  (fn [{db :db} [_ preset-name layout]]
    ;; TODO: do we really have to save settings manually?
@@ -101,6 +110,14 @@
        :layer 0
        :props {:style {:width 102 :height 64}}}]]]
    [:div.card-footer.text-left
+    [:span.card-text
+     [:a {:href "#"
+          :title "Export"
+          :on-click (fn [e]
+                      (.preventDefault e)
+                      (re-frame/dispatch [:keymap/presets.export
+                                          preset-name]))}
+      [:i.fa.fa-share]]]
     [:span.card-text
      [:a {:style {:float :right}
           :href "#"
