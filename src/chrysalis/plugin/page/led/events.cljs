@@ -216,6 +216,9 @@
 (defn colormap:set-target-color! [palette-idx]
   (re-frame/dispatch [:led/colormap.update-at palette-idx]))
 
+(defn import-presets! []
+  (re-frame/dispatch [:settings/import]))
+
 ;;; ---- Live update ---- ;;;
 (re-frame/reg-event-db
  :led/live-update

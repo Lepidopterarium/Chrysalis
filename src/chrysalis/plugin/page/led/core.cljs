@@ -96,8 +96,10 @@
      [:h4 "Colormap Presets"
       [:small {:style {:float :right}}
        [:a {:href "#"
+            :on-click (fn [e] (.preventDefault e)
+                        (events/import-presets!))
             :title "Import a preset..."}
-        [:i.fa.fa-plus]]]]
+        [:i.fa.fa-plus] "Import"]]]
      [:div.btn-toolbar.justify-content-center
 
       [:div.btn-group.mr-2
