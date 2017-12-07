@@ -22,6 +22,16 @@
 
             [clojure.string :as s]))
 
+(defn- <pending-item> [[device command args]]
+  [:div.row.box
+   [:div.col-sm-12
+    [:div.card.bg-faded
+     [:div.card-block
+      [:div.card-title.row
+       [:div.col-sm-6.text-left
+        " " [:code command " " (if (coll? args) (apply str args) (str args))]]]]]]])
+
+
 (defn- <spy-item> [index [device command args response]]
   [:div.row.box {:key (str "spy-history-" index)}
    [:div.col-sm-12
@@ -43,8 +53,14 @@
   [:div.container-fluid {:id :spy}
    [ui/style (repl/style :#spy)]
 
-   (let [history (command/history)]
-     (doall (map (fn [item index]
-                   (<spy-item> index item))
-                 history
-                 (range (count history) 0 -1))))])
+   [:h3 "Pending Commands"]
+   (into
+     [:div.pending]
+     (for [in-flight (command/pending)]
+       [<pending-item> in-flight]))
+
+   [:h3 "Sent Commands"]
+   (into
+     [:div.sent]
+     (for [[index item] (map-indexed vector (command/history))]
+       [<spy-item> index item]))])
