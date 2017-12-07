@@ -25,7 +25,7 @@ First of all, install [Leiningen](https://leiningen.org/) and [Node](https://nod
 To build the [node-usb](https://www.npmjs.com/package/usb) dependency, the following packages are also required (Debian and Ubuntu systems, others may need a similar package installed):
 
 ```
-sudo apt-get install build-essentials libudev-dev
+sudo apt-get install build-essential libudev-dev
 ```
 
 ## Documentation
