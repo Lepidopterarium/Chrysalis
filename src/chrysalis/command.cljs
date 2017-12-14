@@ -95,6 +95,11 @@
    (update db :command/history #(->> (conj % item)
                                      (take-last 50)))))
 
+(re-frame/reg-sub
+  :command/pending
+  (fn [db _]
+    (:command/queue db)))
+
 ;;; ---- API ---- ;;;
 (defn history-append! [item]
   (re-frame/dispatch [:command/history.append item]))
@@ -110,6 +115,10 @@
                                 (partial processor command)
                                 identity)]
                      [device command args (proc response)])))))
+
+(defn pending
+  []
+  @(re-frame/subscribe [:command/pending]))
 
 ;;; `on-data` was initially defined as an API function.
 ;;; However, given that it's only called when data comes in through
