@@ -23,7 +23,7 @@
          :meta {:name "Dygma Raise"
                 :logo "images/plugins/dygma-raise.png"
                 :layout (re-frame/subscribe [:device/svg "images/plugins/dygma-raise.svg"])
-                :matrix [[16 5]]}
+                :matrix [16 5]}
 
 
          :board {:name "Dygma Raise"
