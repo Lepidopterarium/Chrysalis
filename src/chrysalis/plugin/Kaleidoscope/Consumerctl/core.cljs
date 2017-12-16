@@ -25,7 +25,7 @@
         key-code (bit-and code 0x00ff)]
     (if (and (not= key 0xffff)
              (bit-test flags 6) ;synthetic
-             (bit-test flags 1));is_consumer
+             (bit-test flags 3));is_consumer
       (cond
         (and (bit-test flags 2) (bit-test flags 4)) ; HID_TYPE_RTC
         (case key-code
