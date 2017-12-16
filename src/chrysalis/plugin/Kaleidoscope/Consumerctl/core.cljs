@@ -66,5 +66,5 @@
       :volume-decrement (-> 0x00EA (bit-set (+ 8 2)) (bit-set (+ 8 4)))
       :volume-mute (-> 0x00E2 (bit-set (+ 8 2)) (bit-set (+ 8 3)))
       :play-pause (-> 0x00CD (bit-set (+ 8 4))))
-    (bit-set (+ 8 1))
+    (bit-set (+ 8 3))
     (bit-set (+ 8 6))))
