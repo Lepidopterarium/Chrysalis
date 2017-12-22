@@ -408,7 +408,7 @@
    :keypad_0 {:primary-text "0"}
    :keypad_dot {:primary-text "."}
    :keypad_equals {:primary-text "="}
-   :execute {:primary-text ""}
+   :execute {:primary-text "Exe"}
    :select {:primary-text "Sel"}
    :volume-up {:primary-text "Vol +"}
    :volume-down {:primary-text "Vol -"}

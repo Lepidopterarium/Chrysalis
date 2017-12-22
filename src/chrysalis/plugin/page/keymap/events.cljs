@@ -283,7 +283,7 @@
   {:title "Punctuation & Spaces"
    :modifiers? true
    :keys
-   (into []
+   (into [{:plugin :core :key :insert}]
          (comp (drop-while #(not= :enter (:key %)))
                (take-while #(not= :F1 (:key %))))
          key/HID-Codes)})
@@ -321,6 +321,18 @@
            (keys-like #"\w+-arrow")
            (keys-like #"page-(up|down)")
            (keys-like #"home|end"))})
+
+(add-edit-tab!
+  {:title "Special"
+   :keys (concat
+           [{:plugin :core :key :print-screen}
+            {:plugin :core :key :scroll-lock}
+            {:plugin :core :key :num-lock}
+            {:plugin :core :key :pause}]
+           (into []
+                 (comp (drop-while #(not= :execute (:key %)))
+                       (take-while some?))
+                 key/HID-Codes))})
 
 ;; Maybe kind of goofy to have this by itself...
 (add-edit-tab!
