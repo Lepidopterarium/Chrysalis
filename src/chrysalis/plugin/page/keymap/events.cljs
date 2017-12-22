@@ -315,6 +315,13 @@
               :key key
               :layer (inc layer)}))})
 
+(add-edit-tab!
+  {:title "Navigation"
+   :keys (concat
+           (keys-like #"\w+-arrow")
+           (keys-like #"page-(up|down)")
+           (keys-like #"home|end"))})
+
 ;; Maybe kind of goofy to have this by itself...
 (add-edit-tab!
   {:title "LED Effects"
