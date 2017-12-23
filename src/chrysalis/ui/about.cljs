@@ -31,7 +31,7 @@
            [:span "×"]]]
          [:div.modal-body
           [:div.card
-           [:a {:href "https://github.com/algernon/Chrysalis"
+           [:a {:href "https://github.com/Lepidopterarium/Chrysalis"
                 :style {:margin :auto}}
             [:img.card-img-top {:alt "Kaleidoscope Logo"
                                 :width "350"
@@ -39,7 +39,7 @@
                                 :src "images/kaleidoscope-logo-ph-small.png"}]]
            [:div.card-block
             [:h4.card-title "Chrysalis " (.getVersion app)
-             [:small " " [:a.link-button {:href (str "https://github.com/algernon/Chrysalis/releases/tag/chrysalis-"
+             [:small " " [:a.link-button {:href (str "https://github.com/Lepidopterarium/Chrysalis/releases/tag/chrysalis-"
                                                      (.getVersion app))
                                           :title "Release notes"}
                           [:i.fa.fa-id-card-o]]]]

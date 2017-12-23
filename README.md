@@ -5,7 +5,7 @@
 [Kaleidoscope][kaleidoscope] command center, a [heavy work in progress][chrysalis:project:1.0]. For the latest news, please check the [NEWS.md](NEWS.md) file, or [algernon's blog][blog:algernon:chrysalis].
 
  [kaleidoscope]: https://github.com/keyboardio/Kaleidoscope
- [chrysalis:project:1.0]: https://github.com/algernon/Chrysalis/projects/1
+ [chrysalis:project:1.0]: https://github.com/Lepidopterarium/Chrysalis/projects/1
  [blog:algernon:chrysalis]: https://asylum.madhouse-project.org/blog/tags/chrysalis/
 
 ![Chrysalis](docs/screenshots/led-theme-editor.png)
