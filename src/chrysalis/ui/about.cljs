@@ -48,7 +48,9 @@
               "Electron/" (.-electron (.-versions proc)) ", Chrome/" (.-chrome (.-versions proc))]
              [:div.text-muted
               "Built by " [:a {:href "https://asylum.madhouse-project.org/"} "Gergely Nagy"]
-              " & " [:a {:href "https://github.com/algernon/Chrysalis/graphs/contributors"} "others"] "."]]]]]
+              ", " [:a {:href "http://occasionallycogent.com/"} "James Cash"]
+              ", " [:a {:href "http://simonclaudius.com/"} "Simon-Claudius Wystrach"]
+              " & " [:a {:href "https://github.com/Lepidopterarium/Chrysalis/graphs/contributors"} "others"] "."]]]]]
          [:div.modal-footer
           [:a.btn.btn-secondary.mr-auto {:href "https://www.gnu.org/licenses/gpl.html"} "License"]
           [:a.btn.btn-info {:href "#" :data-dismiss :modal}
