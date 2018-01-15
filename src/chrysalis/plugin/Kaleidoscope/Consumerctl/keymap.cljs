@@ -24,5 +24,6 @@
            [{:key :volume-increment}
             {:key :volume-decrement}
             {:key :volume-mute}
-            {:key :play-pause}]
+            {:key :play-pause}
+            {:key :power}]
            (mapv #(assoc % :plugin :consumer)))})

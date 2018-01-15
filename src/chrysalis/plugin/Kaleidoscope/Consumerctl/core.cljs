@@ -35,10 +35,13 @@
                       :key :volume-decrement)
           key)
 
-        (and (bit-test flags 2) (bit-test flags 3) ; HID_TYPE_OOC
-             (= key-code 0xE2))
-        (assoc key :plugin :consumer
-               :key :volume-mute)
+        (and (bit-test flags 2) (bit-test flags 3)) ; HID_TYPE_OOC
+        (case key-code
+          0x30 (assoc key :plugin :consumer
+                      :key :power)
+          0xE2 (assoc key :plugin :consumer
+                      :key :volume-mute)
+          key)
 
         (and (bit-test flags 4) ; HID_TYPE_OSC
              (= key-code 0xCD))
@@ -56,7 +59,8 @@
                    :volume-increment "🔊"
                    :volume-decrement "🔉"
                    :volume-mute "🔇"
-                   :play-pause "🢒/⏸")})
+                   :play-pause "🢒/⏸"
+                   :power "⏻")})
 
 (defmethod key/unformat :consumer
   [key]
@@ -65,6 +69,7 @@
       :volume-increment (-> 0x00E9 (bit-set (+ 8 2)) (bit-set (+ 8 4)))
       :volume-decrement (-> 0x00EA (bit-set (+ 8 2)) (bit-set (+ 8 4)))
       :volume-mute (-> 0x00E2 (bit-set (+ 8 2)) (bit-set (+ 8 3)))
+      :power (-> 0x0030 (bit-set (+ 8 2)) (bit-set (+ 8 3)))
       :play-pause (-> 0x00CD (bit-set (+ 8 4))))
     (bit-set (+ 8 3))
     (bit-set (+ 8 6))))
