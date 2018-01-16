@@ -311,7 +311,7 @@
       ;; LEDEffectNext
       (= flags (-> 0
                    (bit-set 6) ;synthetic
-                   (bit-set 3) ; IS_INTERNAL - XXX: this may change soon?
+                   (bit-set 1) ; IS_INTERNAL
                    (bit-set 0))); LED_TOGGLE
       {:plugin :led-control
        :key :led-effect-next}
@@ -498,7 +498,7 @@
 
 (defmethod unformat :led-control
   [_]
-  (-> 0 (bit-set 6) (bit-set 3) (bit-set 0)
+  (-> 0 (bit-set 6) (bit-set 1) (bit-set 0)
       (bit-shift-left 8)))
 
 (defmethod unformat :unknown
