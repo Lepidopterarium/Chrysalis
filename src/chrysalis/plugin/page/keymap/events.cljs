@@ -283,7 +283,8 @@
   {:title "Punctuation & Spaces"
    :modifiers? true
    :keys
-   (into [{:plugin :core :key :insert}]
+   (into [{:plugin :core :key :insert}
+          {:plugin :core :key :delete}]
          (comp (drop-while #(not= :enter (:key %)))
                (take-while #(not= :F1 (:key %))))
          key/HID-Codes)})
