@@ -64,19 +64,22 @@
  :device/svg
  (fn [app-db [_ file-name]]
    (when file-name
-     (let [fs (js/require "fs")]
-      (.readFile fs file-name "utf8"
-                 (fn [err data]
-                   (when-not err
-                     (let [svg (-> data
-                                   h/parse
-                                   h/as-hiccup
-                                   first
-                                   (nth 3)
-                                   (nth 2))]
-                       (re-frame/dispatch [:files/add file-name svg])))))))
+     (let [fs (js/require "fs")
+           path (js/require "path")
+           root (.. (js/require "electron") -remote -app getAppPath)
+           file-path (.join path root file-name)]
+       (.readFile fs file-path "utf8"
+                  (fn [err data]
+                    (when-not err
+                      (let [svg (-> data
+                                    h/parse
+                                    h/as-hiccup
+                                    first
+                                    (nth 3)
+                                    (nth 2))]
+                        (re-frame/dispatch [:files/add file-name svg])))))))
    (rv/make-reaction
-    (fn [] (get-in @app-db [:files file-name])))))
+     (fn [] (get-in @app-db [:files file-name])))))
 
 ;; Scanning
 
