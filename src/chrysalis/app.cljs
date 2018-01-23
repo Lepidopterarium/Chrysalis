@@ -42,6 +42,7 @@
             [chrysalis.plugin.page.repl.core]
             [chrysalis.plugin.page.spy.core]
             [chrysalis.plugin.page.keymap.core]
+            [chrysalis.plugin.page.eeprom.core]
 
             ;; Kaleidoscope plugins
             [chrysalis.plugin.Kaleidoscope.Colormap.core]
